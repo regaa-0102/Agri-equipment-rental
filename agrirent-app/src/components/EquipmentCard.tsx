@@ -1,0 +1,168 @@
+import { Star, MapPin } from 'lucide-react'
+import { CatalogItem } from '../lib/catalog'
+import { useLanguage } from '../context/LanguageContext'
+
+interface Props {
+  equipment: CatalogItem
+  onNavigate: (screen: string) => void
+  onSelect?: (item: CatalogItem) => void
+}
+
+export default function EquipmentCard({ equipment, onNavigate, onSelect }: Props) {
+  const { isTamil } = useLanguage()
+
+  const handleCardClick = () => {
+    if (onSelect) onSelect(equipment)
+    onNavigate('equipment-details')
+  }
+
+  const handleBookClick = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    if (onSelect) onSelect(equipment)
+    onNavigate('booking')
+  }
+
+  return (
+    <div
+      onClick={handleCardClick}
+      className="card-shadow card-shadow-hover"
+      style={{
+        background: '#fff',
+        borderRadius: 16,
+        overflow: 'hidden',
+        cursor: 'pointer',
+        border: '1px solid #F3F4F6',
+        transition: 'all 0.2s ease',
+        display: 'flex',
+        flexDirection: 'column',
+      }}
+    >
+      <div style={{ position: 'relative', height: 200, background: '#F3F4F6' }}>
+        <img
+          src={equipment.img}
+          alt={equipment.name}
+          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+          onError={(e) => {
+            e.currentTarget.src =
+              'https://images.unsplash.com/photo-1533062618053-d51e617307ec?auto=format&fit=crop&w=400&h=300&q=80'
+          }}
+        />
+        <div
+          style={{
+            position: 'absolute',
+            top: 12,
+            left: 12,
+            background: '#E8F5E9',
+            borderRadius: 8,
+            padding: '4px 10px',
+            fontSize: 12,
+            fontWeight: 700,
+            color: '#2E7D32',
+          }}
+        >
+          {equipment.cat}
+        </div>
+        {equipment.avail ? (
+          <div
+            style={{
+              position: 'absolute',
+              top: 12,
+              right: 12,
+              background: 'rgba(46, 125, 50, 0.9)',
+              color: '#fff',
+              borderRadius: 8,
+              padding: '3px 8px',
+              fontSize: 11,
+              fontWeight: 700,
+            }}
+          >
+            {isTamil ? 'கிடைக்கிறது' : 'Available'}
+          </div>
+        ) : (
+          <div
+            style={{
+              position: 'absolute',
+              top: 12,
+              right: 12,
+              background: 'rgba(107, 114, 128, 0.9)',
+              color: '#fff',
+              borderRadius: 8,
+              padding: '3px 8px',
+              fontSize: 11,
+              fontWeight: 700,
+            }}
+          >
+            {isTamil ? 'முன்பதிவானது' : 'Booked'}
+          </div>
+        )}
+      </div>
+
+      <div style={{ padding: '18px 20px 20px', flex: 1, display: 'flex', flexDirection: 'column' }}>
+        <h3
+          style={{
+            fontWeight: 700,
+            fontSize: 16,
+            color: '#111827',
+            marginBottom: 8,
+            lineHeight: 1.3,
+          }}
+        >
+          {equipment.name}
+        </h3>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
+          <Star size={14} style={{ fill: '#F59E0B', color: '#F59E0B' }} />
+          <span style={{ fontWeight: 700, color: '#111827', fontSize: 13 }}>{equipment.rating}</span>
+          <span style={{ color: '#9CA3AF', fontSize: 12 }}>({equipment.reviews} reviews)</span>
+        </div>
+
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+            color: '#6B7280',
+            fontSize: 13,
+            marginBottom: 16,
+          }}
+        >
+          <MapPin size={13} style={{ color: '#9CA3AF', flexShrink: 0 }} />
+          <span>{equipment.location}</span>
+        </div>
+
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            marginTop: 'auto',
+            paddingTop: 12,
+            borderTop: '1px solid #F3F4F6',
+          }}
+        >
+          <div>
+            <span style={{ fontSize: 20, fontWeight: 800, color: '#2E7D32' }}>{equipment.price}</span>
+            <span style={{ color: '#9CA3AF', fontSize: 12 }}>{equipment.unit}</span>
+          </div>
+          <button
+            type="button"
+            onClick={handleBookClick}
+            className="btn-primary"
+            style={{
+              borderRadius: 10,
+              padding: '8px 18px',
+              fontSize: 13,
+              fontWeight: 700,
+              background: '#2E7D32',
+              color: '#fff',
+              border: 'none',
+              cursor: 'pointer',
+            }}
+          >
+            {isTamil ? 'இப்போது முன்பதிவு செய்க' : 'Book Now'}
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
