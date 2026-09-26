@@ -44,14 +44,8 @@ export function usePrototypeNavigate() {
 
 export default function PrototypeShell({ children }: { children: ReactNode }) {
   const navigate = useNavigate()
-  const routerState = useRouterState()
-  const currentPath = routerState.location.pathname
-  const { isTamil } = useLanguage()
-
   const [apiModalOpen, setApiModalOpen] = useState(false)
   const [jwtModalOpen, setJwtModalOpen] = useState(false)
-
-  const currentScreen = SCREENS.find((s) => s.path === currentPath) || SCREENS[0]
 
   const handleScreenChange = (path: string) => {
     navigate({ to: path as string })
@@ -111,33 +105,6 @@ export default function PrototypeShell({ children }: { children: ReactNode }) {
             <strong style={{ color: '#4ADE80', fontSize: 13, letterSpacing: '-0.2px' }}>AgriRent Enterprise</strong>
           </div>
 
-          <div style={{ width: 1, height: 20, background: '#334155' }} />
-
-          {/* Screen selector dropdown */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <span style={{ color: '#94A3B8', fontSize: 11 }}>Screen:</span>
-            <select
-              value={currentScreen.path}
-              onChange={(e) => handleScreenChange(e.target.value)}
-              style={{
-                background: '#1E293B',
-                color: '#E2E8F0',
-                border: '1px solid #475569',
-                borderRadius: 6,
-                padding: '4px 8px',
-                fontSize: 12,
-                fontWeight: 600,
-                cursor: 'pointer',
-                outline: 'none',
-              }}
-            >
-              {SCREENS.map((s) => (
-                <option key={s.id} value={s.path}>
-                  {s.label}
-                </option>
-              ))}
-            </select>
-          </div>
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
