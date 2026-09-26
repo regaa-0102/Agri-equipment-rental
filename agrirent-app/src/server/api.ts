@@ -1,5 +1,5 @@
 import { decodeJwt, signJwt, verifyJwt, type JwtPayload } from "./jwt";
-import { hashPassword, storage, type StoredListing, type StoredUser } from "./storage";
+import { hashPassword, storage, type StoredListing, type StoredUser, type StoredBooking } from "./storage";
 
 const jsonHeaders = {
   "content-type": "application/json; charset=utf-8",
@@ -319,6 +319,7 @@ export async function handleApiRequest(request: Request): Promise<Response | nul
         avatar: `https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80`,
         status: "active",
         provider: "local",
+        verificationStatus: "VERIFIED",
       });
 
       const token = signJwt({
@@ -352,6 +353,7 @@ export async function handleApiRequest(request: Request): Promise<Response | nul
           avatar,
           status: "active",
           provider: "google",
+          verificationStatus: "VERIFIED",
         });
       }
 
@@ -398,7 +400,13 @@ export async function handleApiRequest(request: Request): Promise<Response | nul
       const minPrice = url.searchParams.has("minPrice") ? Number(url.searchParams.get("minPrice")) : undefined;
       const maxPrice = url.searchParams.has("maxPrice") ? Number(url.searchParams.get("maxPrice")) : undefined;
 
-      const items = storage.getListings({ search, category, minPrice, maxPrice });
+      const filters: { search?: string; category?: string; minPrice?: number; maxPrice?: number } = {};
+      if (search) filters.search = search;
+      if (category) filters.category = category;
+      if (minPrice !== undefined) filters.minPrice = minPrice;
+      if (maxPrice !== undefined) filters.maxPrice = maxPrice;
+
+      const items = storage.getListings(filters);
       return json({ count: items.length, listings: items });
     }
 
@@ -439,6 +447,17 @@ export async function handleApiRequest(request: Request): Promise<Response | nul
         securityDeposit: Number(body.securityDeposit || 2000),
         operatorIncluded: Boolean(body.operatorIncluded),
         specs: body.specs || [],
+        ...(body.lat !== undefined ? { lat: body.lat } : {}),
+        ...(body.lng !== undefined ? { lng: body.lng } : {}),
+      });
+
+      storage.createNotification({
+        userId: jwtUser.userId,
+        title: "Equipment Listed Successfully",
+        message: `Your ${created.name} is now published and visible to farmers on the AgriRent marketplace.`,
+        type: "equipment_added",
+        read: false,
+        relatedId: created.id,
       });
 
       return json({ listing: created }, 201);
@@ -479,6 +498,7 @@ export async function handleApiRequest(request: Request): Promise<Response | nul
       const booking = storage.createBooking({
         listingId: listing.id,
         equipmentName: listing.name,
+        equipmentImg: listing.img,
         farmerId: jwtUser.userId,
         farmerName: jwtUser.name,
         ownerId: listing.ownerId,
@@ -491,6 +511,26 @@ export async function handleApiRequest(request: Request): Promise<Response | nul
         securityDeposit: listing.securityDeposit || 2000,
         escrowStatus: "held",
         status: "active",
+      });
+
+      // Notification for Farmer
+      storage.createNotification({
+        userId: jwtUser.userId,
+        title: `Booking Confirmed: ${listing.name}`,
+        message: `Your booking ${booking.id} (${days} days, ₹${totalAmount.toLocaleString()}) has been placed. Equipment will arrive on ${body.startDate}.`,
+        type: "booking_confirmed",
+        read: false,
+        relatedId: booking.id,
+      });
+
+      // Notification for Owner
+      storage.createNotification({
+        userId: listing.ownerId,
+        title: `New Booking Received: ${listing.name}`,
+        message: `Farmer ${jwtUser.name} booked ${listing.name} from ${body.startDate} to ${body.endDate}. ₹${totalAmount.toLocaleString()} held in escrow.`,
+        type: "booking_received",
+        read: false,
+        relatedId: booking.id,
       });
 
       return json({ booking }, 201);
@@ -506,10 +546,75 @@ export async function handleApiRequest(request: Request): Promise<Response | nul
 
       const updated = storage.updateBookingStatus(bookingId, body.status, body.escrowStatus);
       if (!updated) return json({ error: "Booking not found" }, 404);
+
+      if (body.status === "cancelled") {
+        storage.createNotification({
+          userId: updated.farmerId,
+          title: `Booking Cancelled: ${updated.equipmentName}`,
+          message: `Booking ${updated.id} has been cancelled. Refund has been initiated.`,
+          type: "booking_cancelled",
+          read: false,
+          relatedId: updated.id,
+        });
+        storage.createNotification({
+          userId: updated.ownerId,
+          title: `Booking Cancelled: ${updated.equipmentName}`,
+          message: `Booking ${updated.id} was cancelled by the renter. Equipment is now available again.`,
+          type: "booking_cancelled",
+          read: false,
+          relatedId: updated.id,
+        });
+      }
+
       return json({ booking: updated });
     }
 
-    // 9. Admin Dashboard Metrics & Management (Mandatory Admin Features)
+    // 9. Notifications Center API (Scoped per user)
+    if (request.method === "GET" && pathname === "/api/notifications") {
+      const jwtUser = getJwtFromHeader(request);
+      const queryUserId = url.searchParams.get("userId") || undefined;
+      const targetUserId = jwtUser?.userId || queryUserId || "usr-farmer-1";
+      const notifs = storage.getNotifications(targetUserId);
+      return json({ count: notifs.length, notifications: notifs });
+    }
+
+    if (request.method === "PATCH" && pathname.startsWith("/api/notifications/") && pathname.endsWith("/read")) {
+      const notifId = pathname.replace("/api/notifications/", "").replace("/read", "");
+      const updated = storage.markNotificationRead(notifId);
+      if (!updated) return json({ error: "Notification not found" }, 404);
+      return json({ notification: updated });
+    }
+
+    if (request.method === "POST" && pathname === "/api/notifications/mark-all-read") {
+      const jwtUser = getJwtFromHeader(request);
+      const queryUserId = url.searchParams.get("userId") || undefined;
+      const targetUserId = jwtUser?.userId || queryUserId || "usr-farmer-1";
+      storage.markAllNotificationsRead(targetUserId);
+      return json({ ok: true, message: "All notifications marked as read" });
+    }
+
+    // 10. User Identity Verification API
+    if (request.method === "POST" && pathname.startsWith("/api/users/") && pathname.endsWith("/verification")) {
+      const userId = pathname.replace("/api/users/", "").replace("/verification", "");
+      const body = await readBody<{ status: "NOT_VERIFIED" | "PENDING" | "VERIFIED" | "REJECTED" }>(request);
+      if (!body?.status) {
+        return json({ error: "status is required" }, 400);
+      }
+      const user = storage.updateUserVerification(userId, body.status);
+      if (!user) return json({ error: "User not found" }, 404);
+
+      storage.createNotification({
+        userId,
+        title: "Verification Status Updated",
+        message: `Your identity verification status has been set to: ${body.status}.`,
+        type: "verification_status",
+        read: false,
+      });
+
+      return json({ user, verificationStatus: user.verificationStatus });
+    }
+
+    // 11. Admin Dashboard Metrics & Management (Mandatory Admin Features)
     if (request.method === "GET" && pathname === "/api/admin/metrics") {
       const jwtUser = getJwtFromHeader(request);
       // Allow demo read, enforce admin role for edits

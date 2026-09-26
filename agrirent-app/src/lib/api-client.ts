@@ -125,6 +125,40 @@ export const api = {
     return request<{ listing: any }>(`/api/listings/${id}`)
   },
 
+  async createListing(data: any) {
+    return request<{ listing: any }>('/api/listings', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    })
+  },
+
+  // Notifications
+  async getNotifications(userId?: string) {
+    const query = userId ? `?userId=${encodeURIComponent(userId)}` : ''
+    return request<{ count: number; notifications: any[] }>(`/api/notifications${query}`)
+  },
+
+  async markNotificationRead(id: string) {
+    return request<{ notification: any }>(`/api/notifications/${id}/read`, {
+      method: 'PATCH',
+    })
+  },
+
+  async markAllNotificationsRead(userId?: string) {
+    const query = userId ? `?userId=${encodeURIComponent(userId)}` : ''
+    return request<{ ok: boolean; message: string }>(`/api/notifications/mark-all-read${query}`, {
+      method: 'POST',
+    })
+  },
+
+  // Verification
+  async updateUserVerification(userId: string, status: string) {
+    return request<{ user: any; verificationStatus: string }>(`/api/users/${userId}/verification`, {
+      method: 'POST',
+      body: JSON.stringify({ status }),
+    })
+  },
+
   // Bookings
   async getBookings() {
     return request<{ count: number; bookings: any[] }>('/api/bookings')

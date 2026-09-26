@@ -1,5 +1,5 @@
 import { Star, MapPin } from 'lucide-react'
-import { CatalogItem } from '../lib/catalog'
+import { CatalogItem, getCategoryFallback } from '../lib/catalog'
 import { useLanguage } from '../context/LanguageContext'
 
 interface Props {
@@ -12,12 +12,24 @@ export default function EquipmentCard({ equipment, onNavigate, onSelect }: Props
   const { isTamil } = useLanguage()
 
   const handleCardClick = () => {
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem('agrirent_selected_equipment_id', equipment.id)
+      const url = new URL(window.location.href)
+      url.searchParams.set('id', equipment.id)
+      window.history.replaceState({}, '', url.toString())
+    }
     if (onSelect) onSelect(equipment)
     onNavigate('equipment-details')
   }
 
   const handleBookClick = (e: React.MouseEvent) => {
     e.stopPropagation()
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem('agrirent_selected_equipment_id', equipment.id)
+      const url = new URL(window.location.href)
+      url.searchParams.set('id', equipment.id)
+      window.history.replaceState({}, '', url.toString())
+    }
     if (onSelect) onSelect(equipment)
     onNavigate('booking')
   }
@@ -39,12 +51,11 @@ export default function EquipmentCard({ equipment, onNavigate, onSelect }: Props
     >
       <div style={{ position: 'relative', height: 200, background: '#F3F4F6' }}>
         <img
-          src={equipment.img}
+          src={equipment.imageUrl || equipment.img}
           alt={equipment.name}
           style={{ width: '100%', height: '100%', objectFit: 'cover' }}
           onError={(e) => {
-            e.currentTarget.src =
-              'https://images.unsplash.com/photo-1533062618053-d51e617307ec?auto=format&fit=crop&w=400&h=300&q=80'
+            e.currentTarget.src = getCategoryFallback(equipment.category || equipment.cat)
           }}
         />
         <div
@@ -98,6 +109,11 @@ export default function EquipmentCard({ equipment, onNavigate, onSelect }: Props
       </div>
 
       <div style={{ padding: '18px 20px 20px', flex: 1, display: 'flex', flexDirection: 'column' }}>
+        {equipment.brand && (
+          <div style={{ fontSize: 11, fontWeight: 800, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 4 }}>
+            {equipment.brand} {equipment.model ? `• ${equipment.model}` : ''}
+          </div>
+        )}
         <h3
           style={{
             fontWeight: 700,

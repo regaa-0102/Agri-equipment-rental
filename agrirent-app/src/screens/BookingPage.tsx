@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react'
-import { CalendarDays, CheckCircle2, ShieldCheck, MapPin, ArrowRight } from 'lucide-react'
+import { CalendarDays, CheckCircle2, ShieldCheck, MapPin, ArrowRight, AlertCircle, X, ShieldAlert, Check } from 'lucide-react'
 import { useLanguage } from '../context/LanguageContext'
 import { createNewBooking } from '../lib/bookings'
-import { catalog, findCatalogItem, CatalogItem } from '../lib/catalog'
-import { api } from '../lib/api-client'
+import { catalog, findCatalogItem, CatalogItem, getCategoryFallback } from '../lib/catalog'
+import { api, getStoredUser } from '../lib/api-client'
+import { checkBookingVerification, BookingVerificationCheck } from '../lib/verification'
+import { addNotification } from '../lib/notifications'
 
 const P = '#2E7D32'
 const PM = '#E8F5E9'
@@ -15,34 +17,54 @@ interface Props {
 
 export default function BookingPage({ onNavigate, selectedEquipment }: Props) {
   const { t, isTamil } = useLanguage()
+  const currentUser = getStoredUser()
 
   const [eq, setEq] = useState<CatalogItem>(() => {
     if (selectedEquipment) return selectedEquipment
     if (typeof window !== 'undefined') {
-      const storedId = window.localStorage.getItem('agrirent_selected_equipment_id')
+      const urlId = new URLSearchParams(window.location.search).get('id')
+      const storedId = urlId || window.localStorage.getItem('agrirent_selected_equipment_id')
       if (storedId) {
         const found = findCatalogItem(storedId)
         if (found) return found
       }
     }
-    return catalog[0]
+    return (catalog[0] as CatalogItem)
   })
 
   useEffect(() => {
-    if (!selectedEquipment && typeof window !== 'undefined') {
-      const storedId = window.localStorage.getItem('agrirent_selected_equipment_id')
+    if (typeof window !== 'undefined') {
+      const urlId = new URLSearchParams(window.location.search).get('id')
+      const storedId = urlId || (!selectedEquipment ? window.localStorage.getItem('agrirent_selected_equipment_id') : null)
       if (storedId) {
         const found = findCatalogItem(storedId)
         if (found) setEq(found)
+      } else if (selectedEquipment) {
+        setEq(selectedEquipment)
       }
     }
   }, [selectedEquipment])
 
+  const [verification, setVerification] = useState<BookingVerificationCheck>(() => checkBookingVerification(currentUser))
+  useEffect(() => {
+    setVerification(checkBookingVerification(currentUser))
+  }, [currentUser])
+
   const [payMethod, setPayMethod] = useState<'upi' | 'card' | 'netbanking' | 'wallet'>('upi')
   const [upiId, setUpiId] = useState('farmer@upi')
 
-  const [startDate, setStartDate] = useState('2026-09-24')
-  const [endDate, setEndDate] = useState('2026-09-27')
+  const [startDate, setStartDate] = useState('2026-09-26')
+  const [endDate, setEndDate] = useState('2026-09-29')
+
+  const [village, setVillage] = useState('Raikot Village')
+  const [district, setDistrict] = useState('Ludhiana')
+  const [stateName, setStateName] = useState('Punjab')
+  const [pincode, setPincode] = useState('141001')
+
+  // Review & Confirmation Modal State
+  const [showConfirmModal, setShowConfirmModal] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [bookingSuccess, setBookingSuccess] = useState(false)
 
   // Dynamic days calculation
   const startMs = new Date(startDate).getTime()
@@ -55,37 +77,85 @@ export default function BookingPage({ onNavigate, selectedEquipment }: Props) {
   const tax = Math.round(subtotal * 0.18)
   const total = subtotal + deposit + tax
 
-  const handlePay = async () => {
-    // Add to centralized booking store
-    createNewBooking({
-      equipment: eq.name,
-      cat: eq.cat,
-      img: eq.img,
-      location: eq.location,
-      from: startDate,
-      to: endDate,
-      dailyRate: pricePerDay,
-      amount: `₹${total.toLocaleString('en-IN')}`,
-      totalNumeric: total,
-      owner: eq.owner || 'Verified Owner',
-      ownerPhone: eq.ownerPhone || '+91 98421 54321',
-      lastLocation: eq.location,
-      distance: eq.distance || '2.5 km away',
-    })
+  // Trigger Review Step
+  const handleProceedToReview = () => {
+    const currentVerif = checkBookingVerification(currentUser)
+    setVerification(currentVerif)
 
-    // Also sync to backend API
-    try {
-      await api.createBooking({
-        listingId: eq.id,
-        startDate,
-        endDate,
-        days,
-      })
-    } catch (err) {
-      console.warn('Backend booking sync notice:', err)
+    if (!currentVerif.canBook) {
+      // Identity verification gating - prompt to complete verification
+      return
     }
 
-    onNavigate('payment-success')
+    setShowConfirmModal(true)
+  }
+
+  // Final Confirmed Booking Action
+  const handleFinalConfirm = async () => {
+    if (isSubmitting) return
+    setIsSubmitting(true)
+
+    try {
+      // 1. Add to centralized booking store
+      const bookingRecord = createNewBooking({
+        equipment: eq.name,
+        cat: eq.cat,
+        img: eq.img,
+        location: `${village}, ${district}`,
+        from: startDate,
+        to: endDate,
+        dailyRate: pricePerDay,
+        amount: `₹${total.toLocaleString('en-IN')}`,
+        totalNumeric: total,
+        owner: eq.owner || 'Verified Equipment Partner',
+        ownerPhone: eq.ownerPhone || '+91 98421 54321',
+        lastLocation: eq.location,
+        distance: eq.distance || '2.5 km away',
+      })
+
+      // 2. Dispatch notifications
+      // A) To the Farmer
+      addNotification({
+        userId: currentUser?.id || 'usr-farmer-1',
+        title: isTamil ? `முன்பதிவு உறுதியானது: ${eq.name}` : `Booking Confirmed: ${eq.name}`,
+        message: isTamil
+          ? `உங்கள் ${eq.name} முன்பதிவு (${days} நாட்கள், ₹${total.toLocaleString('en-IN')}) வெற்றிகரமாக பதிவானது. உரிய தேதியில் அனுப்பி வைக்கப்படும்.`
+          : `Your booking for ${eq.name} (${days} days, ₹${total.toLocaleString('en-IN')}) has been confirmed. Escrow held securely.`,
+        type: 'booking_confirmed',
+        relatedId: bookingRecord.id,
+      })
+
+      // B) To the Equipment Owner
+      const ownerId = eq.ownerId || 'usr-owner-1'
+      addNotification({
+        userId: ownerId,
+        title: isTamil ? `புதிய முன்பதிவு கோரிக்கை: ${eq.name}` : `New Equipment Booking: ${eq.name}`,
+        message: isTamil
+          ? `விவசாயி ${currentUser?.name || 'Muthukumar S.'} உங்கள் ${eq.name} கருவியை ${startDate} முதல் ${endDate} வரை முன்பதிவு செய்துள்ளார்.`
+          : `Farmer ${currentUser?.name || 'Muthukumar S.'} has booked your ${eq.name} for ${days} days (${startDate} to ${endDate}). ₹${total.toLocaleString('en-IN')} escrow reserved.`,
+        type: 'booking_received',
+        relatedId: bookingRecord.id,
+      })
+
+      // 3. Sync to backend API if available
+      try {
+        await api.createBooking({
+          listingId: eq.id,
+          startDate,
+          endDate,
+          days,
+        })
+      } catch (err) {
+        console.warn('Backend booking sync notice (continuing with local confirmation):', err)
+      }
+
+      setBookingSuccess(true)
+      setTimeout(() => {
+        onNavigate('payment-success')
+      }, 700)
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -114,36 +184,37 @@ export default function BookingPage({ onNavigate, selectedEquipment }: Props) {
             </div>
             <div style={{ fontSize: 12, color: '#6B7280' }}>{eq.name}</div>
           </div>
-          {/* Steps */}
+
+          {/* Stepper */}
           <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8 }}>
             {[
-              { en: 'Dates', ta: 'தேதிகள்' },
-              { en: 'Payment', ta: 'கட்டணம்' },
-              { en: 'Confirm', ta: 'உறுதி செய்' },
+              { en: '1. Dates & Address', ta: '1. தேதிகள் & முகவரி' },
+              { en: '2. Payment Mode', ta: '2. கட்டண முறை' },
+              { en: '3. Review & Confirm', ta: '3. உறுதிப்படுத்துதல்' },
             ].map((step, i) => (
               <div key={step.en} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                   <div
                     style={{
-                      width: 26,
-                      height: 26,
+                      width: 24,
+                      height: 24,
                       borderRadius: '50%',
                       background: i <= 1 ? P : '#E5E7EB',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      fontSize: 12,
+                      fontSize: 11,
                       fontWeight: 700,
                       color: i <= 1 ? '#fff' : '#9CA3AF',
                     }}
                   >
                     {i + 1}
                   </div>
-                  <span style={{ fontSize: 13, fontWeight: i <= 1 ? 600 : 400, color: i <= 1 ? '#111827' : '#9CA3AF' }}>
+                  <span style={{ fontSize: 12, fontWeight: i <= 1 ? 600 : 400, color: i <= 1 ? '#111827' : '#9CA3AF' }}>
                     {isTamil ? step.ta : step.en}
                   </span>
                 </div>
-                {i < 2 && <div style={{ width: 24, height: 2, background: i < 1 ? P : '#E5E7EB' }} />}
+                {i < 2 && <div style={{ width: 16, height: 2, background: i < 1 ? P : '#E5E7EB' }} />}
               </div>
             ))}
           </div>
@@ -151,6 +222,118 @@ export default function BookingPage({ onNavigate, selectedEquipment }: Props) {
       </header>
 
       <div style={{ maxWidth: 1280, margin: '0 auto', padding: '32px 24px' }}>
+        {/* Verification Status Alert Banner */}
+        <div style={{ marginBottom: 24 }}>
+          {verification.canBook ? (
+            <div
+              style={{
+                background: '#ECFDF5',
+                border: '1px solid #A7F3D0',
+                borderRadius: 14,
+                padding: '14px 20px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                flexWrap: 'wrap',
+                gap: 12,
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <div style={{ width: 34, height: 34, borderRadius: '50%', background: '#10B981', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>
+                  <Check size={18} strokeWidth={3} />
+                </div>
+                <div>
+                  <div style={{ fontWeight: 700, fontSize: 14, color: '#065F46' }}>
+                    Identity Verification: Verified (Aadhaar Demo Prototype)
+                  </div>
+                  <div style={{ fontSize: 12, color: '#047857' }}>
+                    Aadhaar ID: •••• •••• 4821 • Verified farmer profile • Eligible for instant machine dispatch & AgriSafe™ escrow.
+                  </div>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => onNavigate('profile')}
+                style={{
+                  background: '#D1FAE5',
+                  color: '#065F46',
+                  border: '1px solid #6EE7B7',
+                  borderRadius: 8,
+                  padding: '6px 14px',
+                  fontSize: 12,
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                }}
+              >
+                View Profile ID
+              </button>
+            </div>
+          ) : (
+            <div
+              style={{
+                background: verification.status === 'REJECTED' ? '#FEF2F2' : '#FFFBEB',
+                border: `1.5px solid ${verification.status === 'REJECTED' ? '#FCA5A5' : '#FCD34D'}`,
+                borderRadius: 14,
+                padding: '16px 20px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                flexWrap: 'wrap',
+                gap: 16,
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: 14 }}>
+                <div
+                  style={{
+                    width: 36,
+                    height: 36,
+                    borderRadius: '50%',
+                    background: verification.status === 'REJECTED' ? '#EF4444' : '#F59E0B',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#fff',
+                    flexShrink: 0,
+                  }}
+                >
+                  <ShieldAlert size={20} />
+                </div>
+                <div>
+                  <div style={{ fontWeight: 800, fontSize: 15, color: '#111827' }}>
+                    {verification.title}
+                  </div>
+                  <p style={{ margin: '4px 0 0', fontSize: 13, color: '#4B5563', lineHeight: 1.4 }}>
+                    {verification.message}
+                  </p>
+                  <p style={{ margin: '4px 0 0', fontSize: 12, color: '#6B7280' }}>
+                    {isTamil
+                      ? 'கனரக விவசாய இயந்திரங்களை முன்பதிவு செய்ய ஆதார் மாதிரி சரிபார்ப்பு அவசியம்.'
+                      : 'High-value agricultural machinery requires one-time identity verification check for insurance & asset security.'}
+                  </p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => onNavigate('profile')}
+                style={{
+                  background: verification.status === 'REJECTED' ? '#DC2626' : '#D97706',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: 10,
+                  padding: '10px 18px',
+                  fontSize: 13,
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                }}
+              >
+                {verification.actionLabel} →
+              </button>
+            </div>
+          )}
+        </div>
+
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: 32 }}>
           {/* Left: Booking form */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
@@ -158,17 +341,23 @@ export default function BookingPage({ onNavigate, selectedEquipment }: Props) {
             <div className="card-shadow" style={{ background: '#fff', borderRadius: 20, padding: 24, border: '1px solid #F3F4F6' }}>
               <div style={{ display: 'flex', gap: 16, alignItems: 'center', flexWrap: 'wrap' }}>
                 <img
-                  src={eq.img}
+                  src={eq.imageUrl || eq.img}
                   alt={eq.name}
-                  style={{ width: 120, height: 90, borderRadius: 12, objectFit: 'cover', background: '#F3F4F6', flexShrink: 0 }}
+                  style={{ width: 130, height: 95, borderRadius: 12, objectFit: 'cover', background: '#F3F4F6', flexShrink: 0 }}
                   onError={(e) => {
-                    e.currentTarget.src =
-                      'https://images.unsplash.com/photo-1533062618053-d51e617307ec?auto=format&fit=crop&w=400&h=300&q=80'
+                    e.currentTarget.src = getCategoryFallback(eq.category || eq.cat)
                   }}
                 />
                 <div>
-                  <div style={{ fontSize: 12, color: P, fontWeight: 700, background: PM, borderRadius: 6, padding: '2px 8px', display: 'inline-block', marginBottom: 6 }}>
-                    {eq.cat}
+                  <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginBottom: 6 }}>
+                    <span style={{ fontSize: 12, color: P, fontWeight: 700, background: PM, borderRadius: 6, padding: '2px 8px' }}>
+                      {eq.category || eq.cat}
+                    </span>
+                    {eq.brand && (
+                      <span style={{ fontSize: 11, color: '#64748B', fontWeight: 700, textTransform: 'uppercase' }}>
+                        {eq.brand} {eq.model ? `• ${eq.model}` : ''}
+                      </span>
+                    )}
                   </div>
                   <h3 style={{ fontWeight: 800, fontSize: 18, color: '#111827', margin: '0 0 6px' }}>{eq.name}</h3>
                   <div style={{ fontSize: 13, color: '#6B7280' }}>
@@ -253,19 +442,34 @@ export default function BookingPage({ onNavigate, selectedEquipment }: Props) {
                   <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#6B7280', marginBottom: 6 }}>
                     {isTamil ? 'கிராமம் / ஊர்' : 'Village / Town'}
                   </label>
-                  <input className="input-field" defaultValue="Raikot Village" style={{ width: '100%', padding: '10px', borderRadius: 8, border: '1px solid #D1D5DB' }} />
+                  <input
+                    value={village}
+                    onChange={(e) => setVillage(e.target.value)}
+                    className="input-field"
+                    style={{ width: '100%', padding: '10px', borderRadius: 8, border: '1px solid #D1D5DB' }}
+                  />
                 </div>
                 <div>
                   <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#6B7280', marginBottom: 6 }}>
                     {isTamil ? 'மாவட்டம்' : 'District'}
                   </label>
-                  <input className="input-field" defaultValue="Ludhiana" style={{ width: '100%', padding: '10px', borderRadius: 8, border: '1px solid #D1D5DB' }} />
+                  <input
+                    value={district}
+                    onChange={(e) => setDistrict(e.target.value)}
+                    className="input-field"
+                    style={{ width: '100%', padding: '10px', borderRadius: 8, border: '1px solid #D1D5DB' }}
+                  />
                 </div>
                 <div>
                   <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#6B7280', marginBottom: 6 }}>
                     {isTamil ? 'மாநிலம்' : 'State'}
                   </label>
-                  <select className="input-field" style={{ width: '100%', padding: '10px', borderRadius: 8, border: '1px solid #D1D5DB' }}>
+                  <select
+                    value={stateName}
+                    onChange={(e) => setStateName(e.target.value)}
+                    className="input-field"
+                    style={{ width: '100%', padding: '10px', borderRadius: 8, border: '1px solid #D1D5DB' }}
+                  >
                     <option>Punjab</option>
                     <option>Tamil Nadu</option>
                     <option>Maharashtra</option>
@@ -277,7 +481,12 @@ export default function BookingPage({ onNavigate, selectedEquipment }: Props) {
                   <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#6B7280', marginBottom: 6 }}>
                     PIN Code
                   </label>
-                  <input className="input-field" defaultValue="141001" style={{ width: '100%', padding: '10px', borderRadius: 8, border: '1px solid #D1D5DB' }} />
+                  <input
+                    value={pincode}
+                    onChange={(e) => setPincode(e.target.value)}
+                    className="input-field"
+                    style={{ width: '100%', padding: '10px', borderRadius: 8, border: '1px solid #D1D5DB' }}
+                  />
                 </div>
               </div>
             </div>
@@ -345,11 +554,11 @@ export default function BookingPage({ onNavigate, selectedEquipment }: Props) {
                       { l: isTamil ? 'தொடக்க தேதி' : 'Start Date', v: startDate },
                       { l: isTamil ? 'முடிவு தேதி' : 'End Date', v: endDate },
                       { l: isTamil ? 'காலம்' : 'Duration', v: `${days} ${isTamil ? 'நாட்கள்' : 'days'}` },
-                      { l: isTamil ? 'நிலை' : 'Status', v: isTamil ? 'உறுதிப்படுத்தப்பட்டது' : 'Confirmed' },
+                      { l: isTamil ? 'உரிமையாளர்' : 'Owner', v: eq.owner || 'Verified Partner' },
                     ].map(({ l, v }) => (
                       <div key={l}>
                         <div style={{ fontSize: 11, color: '#9CA3AF', fontWeight: 700, textTransform: 'uppercase' }}>{l}</div>
-                        <div style={{ fontSize: 13, fontWeight: 700, color: '#111827', marginTop: 2 }}>{v}</div>
+                        <div style={{ fontSize: 13, fontWeight: 700, color: '#111827', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{v}</div>
                       </div>
                     ))}
                   </div>
@@ -379,38 +588,340 @@ export default function BookingPage({ onNavigate, selectedEquipment }: Props) {
                   </div>
                 </div>
 
-                <button
-                  type="button"
-                  onClick={handlePay}
-                  className="btn-primary"
-                  style={{
-                    width: '100%',
-                    padding: '16px',
-                    fontSize: 16,
-                    borderRadius: 14,
-                    fontWeight: 800,
-                    background: P,
-                    color: '#fff',
-                    border: 'none',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: 8,
-                  }}
-                >
-                  <span>🔒</span>
-                  <span>
-                    {isTamil
-                      ? `₹${total.toLocaleString('en-IN')} பாதுகாப்பாக செலுத்தவும்`
-                      : `Pay ₹${total.toLocaleString('en-IN')} Securely`}
-                  </span>
-                </button>
+                {verification.canBook ? (
+                  <button
+                    type="button"
+                    onClick={handleProceedToReview}
+                    className="btn-primary"
+                    style={{
+                      width: '100%',
+                      padding: '16px',
+                      fontSize: 16,
+                      borderRadius: 14,
+                      fontWeight: 800,
+                      background: P,
+                      color: '#fff',
+                      border: 'none',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: 8,
+                    }}
+                  >
+                    <span>📋</span>
+                    <span>
+                      {isTamil ? 'முன்பதிவை மதிப்பாய்வு செய்து உறுதிப்படுத்துக' : 'Review & Confirm Booking'}
+                    </span>
+                  </button>
+                ) : (
+                  <div>
+                    <button
+                      type="button"
+                      onClick={() => onNavigate('profile')}
+                      style={{
+                        width: '100%',
+                        padding: '14px',
+                        fontSize: 15,
+                        borderRadius: 14,
+                        fontWeight: 700,
+                        background: '#DC2626',
+                        color: '#fff',
+                        border: 'none',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: 8,
+                      }}
+                    >
+                      <ShieldAlert size={18} />
+                      <span>{verification.actionLabel}</span>
+                    </button>
+                    <div style={{ fontSize: 12, color: '#EF4444', textAlign: 'center', marginTop: 8, fontWeight: 600 }}>
+                      ⚠️ {verification.title} - Booking blocked until verified
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
         </div>
       </div>
+
+      {/* CONFIRMATION STEP MODAL (Requirement 4: Confirm Booking Step Before Final Booking) */}
+      {showConfirmModal && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(0, 0, 0, 0.65)',
+            backdropFilter: 'blur(4px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 10000,
+            padding: 16,
+          }}
+        >
+          <div
+            className="card-shadow"
+            style={{
+              background: '#fff',
+              borderRadius: 24,
+              maxWidth: 580,
+              width: '100%',
+              overflow: 'hidden',
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+              animation: 'fadeIn 0.2s ease-out',
+            }}
+          >
+            {/* Modal Header */}
+            <div
+              style={{
+                padding: '20px 24px',
+                borderBottom: '1px solid #E5E7EB',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                background: '#F8FAFC',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <div style={{ width: 36, height: 36, borderRadius: 10, background: PM, display: 'flex', alignItems: 'center', justifyContent: 'center', color: P, fontWeight: 800 }}>
+                  ✓
+                </div>
+                <div>
+                  <h3 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: '#111827' }}>
+                    {isTamil ? 'முன்பதிவு உறுதிப்படுத்தல்' : 'Confirm Your Equipment Booking'}
+                  </h3>
+                  <div style={{ fontSize: 12, color: '#6B7280' }}>
+                    {isTamil ? 'கடைசி படி: கட்டணம் செலுத்துவதற்கு முன் விபரங்களை சரிபார்க்கவும்' : 'Step 3 of 3: Review all details before final confirmation'}
+                  </div>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => !isSubmitting && setShowConfirmModal(false)}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  cursor: isSubmitting ? 'not-allowed' : 'pointer',
+                  color: '#9CA3AF',
+                  padding: 4,
+                }}
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div style={{ padding: '24px', maxHeight: '75vh', overflowY: 'auto' }}>
+              {/* Equipment Item Row */}
+              <div
+                style={{
+                  display: 'flex',
+                  gap: 16,
+                  padding: '16px',
+                  background: '#F9FAFB',
+                  borderRadius: 16,
+                  border: '1px solid #F3F4F6',
+                  marginBottom: 20,
+                  alignItems: 'center',
+                }}
+              >
+                <img
+                  src={eq.imageUrl || eq.img}
+                  alt={eq.name}
+                  style={{ width: 90, height: 75, objectFit: 'cover', borderRadius: 10, background: '#E5E7EB' }}
+                  onError={(e) => {
+                    e.currentTarget.src = getCategoryFallback(eq.category || eq.cat)
+                  }}
+                />
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginBottom: 2 }}>
+                    <span style={{ fontSize: 11, fontWeight: 700, color: P, background: PM, padding: '2px 8px', borderRadius: 6 }}>
+                      {eq.category || eq.cat}
+                    </span>
+                    {eq.brand && (
+                      <span style={{ fontSize: 10, fontWeight: 700, color: '#64748B', textTransform: 'uppercase' }}>
+                        {eq.brand}
+                      </span>
+                    )}
+                  </div>
+                  <div style={{ fontWeight: 800, fontSize: 16, color: '#111827', margin: '4px 0 2px' }}>
+                    {eq.name}
+                  </div>
+                  <div style={{ fontSize: 12, color: '#6B7280' }}>
+                    👤 {isTamil ? 'உரிமையாளர்' : 'Owner'}: <strong>{eq.owner || 'Verified Equipment Partner'}</strong> ({eq.ownerPhone || '+91 98421 54321'})
+                  </div>
+                </div>
+              </div>
+
+              {/* Booking Specifications Grid */}
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(2, 1fr)',
+                  gap: 12,
+                  marginBottom: 20,
+                  background: '#F8FAFC',
+                  padding: 16,
+                  borderRadius: 14,
+                  border: '1px solid #E2E8F0',
+                  fontSize: 13,
+                }}
+              >
+                <div>
+                  <span style={{ color: '#64748B', fontSize: 11, textTransform: 'uppercase', fontWeight: 700 }}>
+                    {isTamil ? 'வாடகை காலம்' : 'Rental Duration'}
+                  </span>
+                  <div style={{ fontWeight: 700, color: '#0F172A', marginTop: 2 }}>
+                    {startDate} &nbsp;→&nbsp; {endDate}
+                  </div>
+                  <div style={{ fontSize: 12, color: P, fontWeight: 700 }}>({days} {isTamil ? 'நாட்கள்' : 'Days'})</div>
+                </div>
+
+                <div>
+                  <span style={{ color: '#64748B', fontSize: 11, textTransform: 'uppercase', fontWeight: 700 }}>
+                    {isTamil ? 'தினசரி வாடகை' : 'Daily Rental Rate'}
+                  </span>
+                  <div style={{ fontWeight: 700, color: '#0F172A', marginTop: 2 }}>
+                    ₹{pricePerDay.toLocaleString('en-IN')} / day
+                  </div>
+                </div>
+
+                <div>
+                  <span style={{ color: '#64748B', fontSize: 11, textTransform: 'uppercase', fontWeight: 700 }}>
+                    {isTamil ? 'விநியோக இடம்' : 'Delivery Destination'}
+                  </span>
+                  <div style={{ fontWeight: 700, color: '#0F172A', marginTop: 2 }}>
+                    {village}, {district} ({pincode})
+                  </div>
+                </div>
+
+                <div>
+                  <span style={{ color: '#64748B', fontSize: 11, textTransform: 'uppercase', fontWeight: 700 }}>
+                    {isTamil ? 'கட்டண முறை' : 'Payment Method'}
+                  </span>
+                  <div style={{ fontWeight: 700, color: '#0F172A', marginTop: 2 }}>
+                    {payMethod.toUpperCase()} {payMethod === 'upi' ? `(${upiId})` : ''}
+                  </div>
+                </div>
+              </div>
+
+              {/* Price Breakdown */}
+              <div style={{ borderTop: '1px solid #E5E7EB', paddingTop: 16, marginBottom: 20 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#4B5563', marginBottom: 8 }}>
+                  <span>Machinery Rental ({days} days × ₹{pricePerDay.toLocaleString('en-IN')})</span>
+                  <span style={{ fontWeight: 600 }}>₹{subtotal.toLocaleString('en-IN')}</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#4B5563', marginBottom: 8 }}>
+                  <span>AgriSafe™ Escrow Security Deposit (Refundable)</span>
+                  <span style={{ fontWeight: 600 }}>₹{deposit.toLocaleString('en-IN')}</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#4B5563', marginBottom: 12 }}>
+                  <span>Applicable GST & Maintenance Cess (18%)</span>
+                  <span style={{ fontWeight: 600 }}>₹{tax.toLocaleString('en-IN')}</span>
+                </div>
+                <div style={{ height: 1, background: '#E5E7EB', marginBottom: 12 }} />
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontSize: 16, fontWeight: 800, color: '#111827' }}>
+                    {isTamil ? 'இறுதி செலுத்த வேண்டிய தொகை' : 'Final Payable Amount'}
+                  </span>
+                  <span style={{ fontSize: 24, fontWeight: 900, color: P }}>
+                    ₹{total.toLocaleString('en-IN')}
+                  </span>
+                </div>
+              </div>
+
+              {/* Security guarantee notice */}
+              <div
+                style={{
+                  background: '#ECFDF5',
+                  border: '1px solid #A7F3D0',
+                  borderRadius: 12,
+                  padding: '12px 14px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 10,
+                  fontSize: 12,
+                  color: '#065F46',
+                }}
+              >
+                <ShieldCheck size={18} style={{ flexShrink: 0 }} />
+                <span>
+                  {isTamil
+                    ? 'முன்பதிவு உறுதி செய்யப்பட்டவுடன் தொகை அக்ரிசேஃப் (AgriSafe™) எஸ்க்ரோவில் வைக்கப்படும். கருவி ஆய்வு செய்யப்பட்ட பின்னரே உரிமையாளருக்கு அளிக்கப்படும்.'
+                    : '100% Escrow Protected: Funds remain securely locked in AgriSafe™ escrow and are released to owner only after successful machinery handover.'}
+                </span>
+              </div>
+            </div>
+
+            {/* Modal Actions */}
+            <div
+              style={{
+                padding: '16px 24px',
+                borderTop: '1px solid #E5E7EB',
+                display: 'flex',
+                justifyContent: 'flex-end',
+                gap: 12,
+                background: '#F8FAFC',
+              }}
+            >
+              <button
+                type="button"
+                disabled={isSubmitting}
+                onClick={() => setShowConfirmModal(false)}
+                style={{
+                  padding: '12px 20px',
+                  background: '#F1F5F9',
+                  border: '1px solid #CBD5E1',
+                  borderRadius: 12,
+                  fontSize: 14,
+                  fontWeight: 600,
+                  color: '#475569',
+                  cursor: isSubmitting ? 'not-allowed' : 'pointer',
+                }}
+              >
+                {isTamil ? 'ரத்துசெய் / பின்செல்' : 'Cancel / Go Back'}
+              </button>
+
+              <button
+                type="button"
+                disabled={isSubmitting}
+                onClick={handleFinalConfirm}
+                style={{
+                  padding: '12px 28px',
+                  background: isSubmitting ? '#9CA3AF' : P,
+                  border: 'none',
+                  borderRadius: 12,
+                  fontSize: 14,
+                  fontWeight: 800,
+                  color: '#fff',
+                  cursor: isSubmitting ? 'not-allowed' : 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  boxShadow: '0 4px 6px -1px rgba(46, 125, 50, 0.3)',
+                }}
+              >
+                {isSubmitting ? (
+                  <>
+                    <span style={{ display: 'inline-block', animation: 'spin 1s linear infinite' }}>⏳</span>
+                    <span>{isTamil ? 'உறுதிப்படுத்தப்படுகிறது...' : 'Confirming Booking...'}</span>
+                  </>
+                ) : (
+                  <>
+                    <span>✓</span>
+                    <span>{isTamil ? 'முன்பதிவை உறுதி செய்' : 'Confirm Booking'}</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

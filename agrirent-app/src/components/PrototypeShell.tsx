@@ -19,6 +19,13 @@ export const SCREENS = [
   { id: 'owner-dashboard', path: '/owner-dashboard', label: '9. Owner Dashboard' },
   { id: 'add-equipment', path: '/add-equipment', label: '10. Add Equipment' },
   { id: 'admin-dashboard', path: '/admin-dashboard', label: '11. Admin Dashboard (Mandatory)' },
+  { id: 'notifications', path: '/notifications', label: '12. Notifications Center' },
+  { id: 'profile', path: '/profile', label: '13. Profile & Identity Verification' },
+  { id: 'payments', path: '/payments', label: '14. Payments & Escrow Ledger' },
+  { id: 'help', path: '/help', label: '15. Help & Support' },
+  { id: 'owner-bookings', path: '/owner-bookings', label: '16. Owner Booking Requests' },
+  { id: 'analytics', path: '/analytics', label: '17. Fleet Analytics' },
+  { id: 'revenue', path: '/revenue', label: '18. Revenue & Settlements' },
 ]
 
 export function screenPath(screen: string) {

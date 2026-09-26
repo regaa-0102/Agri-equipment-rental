@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { catalog, categories, categoryNames, tamilNaduDistricts } from '../lib/catalog'
+import { useState, useEffect, useMemo } from 'react'
+import { catalog, categories, categoryNames, tamilNaduDistricts, getFullCatalog, getAllBrands, searchCatalog } from '../lib/catalog'
 import { useLanguage } from '../context/LanguageContext'
 import LanguageSelector from '../components/LanguageSelector'
 import CategoryCard from '../components/CategoryCard'
@@ -10,7 +10,7 @@ import AgriWeatherCard from '../components/AgriWeatherCard'
 import AgriMatchCalculator from '../components/AgriMatchCalculator'
 import AgriChatbot from '../components/AgriChatbot'
 import ApiExplorerModal from '../components/ApiExplorerModal'
-import { Terminal } from 'lucide-react'
+import { Terminal, Search, Filter, X, RotateCcw, Check, Sparkles } from 'lucide-react'
 
 const P = '#2E7D32'
 const PL = '#66BB6A'
@@ -61,17 +61,53 @@ export default function HomePage({ onNavigate }: Props) {
   const { t, isTamil } = useLanguage()
   const [openFaq, setOpenFaq] = useState<number | null>(null)
   const [activeCat, setActiveCat] = useState('All')
-  const [searchLocation, setSearchLocation] = useState('Coimbatore, Tamil Nadu')
+  const [searchLocation, setSearchLocation] = useState('All Locations')
   const [searchType, setSearchType] = useState('All Equipment')
+  const [searchQuery, setSearchQuery] = useState('')
+  const [selectedBrand, setSelectedBrand] = useState('All')
+  const [maxPrice, setMaxPrice] = useState<number>(0)
+  const [availableOnly, setAvailableOnly] = useState(false)
   const [apiModalOpen, setApiModalOpen] = useState(false)
+  const [equipmentList, setEquipmentList] = useState(() => getFullCatalog())
 
-  const filteredEquipment = equipment.filter((e) => {
-    if (activeCat === 'All') return true
-    if (activeCat === 'Fertilizer Spreader' || activeCat === 'Fertilizers') {
-      return e.cat === 'Fertilizer Spreader' || e.cat === 'Fertilizers'
+  useEffect(() => {
+    setEquipmentList(getFullCatalog())
+    const handleUpdate = () => {
+      setEquipmentList(getFullCatalog())
     }
-    return e.cat === activeCat
-  })
+    window.addEventListener('agrirent_catalog_updated', handleUpdate)
+    return () => window.removeEventListener('agrirent_catalog_updated', handleUpdate)
+  }, [])
+
+  const allBrands = useMemo(() => getAllBrands(equipmentList), [equipmentList])
+
+  const filteredEquipment = useMemo(() => {
+    return searchCatalog(equipmentList, searchQuery, {
+      category: activeCat,
+      brand: selectedBrand,
+      maxPrice: maxPrice > 0 ? maxPrice : undefined,
+      availableOnly,
+      location: searchLocation !== 'All Locations' ? searchLocation : undefined,
+    })
+  }, [equipmentList, searchQuery, activeCat, selectedBrand, maxPrice, availableOnly, searchLocation])
+
+  const hasActiveFilters = Boolean(
+    searchQuery.trim() ||
+    activeCat !== 'All' ||
+    selectedBrand !== 'All' ||
+    maxPrice > 0 ||
+    availableOnly ||
+    searchLocation !== 'All Locations'
+  )
+
+  const handleResetFilters = () => {
+    setSearchQuery('')
+    setActiveCat('All')
+    setSelectedBrand('All')
+    setMaxPrice(0)
+    setAvailableOnly(false)
+    setSearchLocation('All Locations')
+  }
 
   const handleCategoryClick = (catName: string) => {
     setActiveCat(catName)
@@ -233,12 +269,71 @@ export default function HomePage({ onNavigate }: Props) {
                 flexWrap: 'wrap',
                 gap: 12,
                 alignItems: 'center',
-                maxWidth: 720,
-                background: 'rgba(255,255,255,0.95)',
+                maxWidth: 780,
+                background: 'rgba(255,255,255,0.96)',
                 boxShadow: '0 20px 40px rgba(0,0,0,0.25)',
               }}
             >
-              <div style={{ flex: '1 1 180px' }}>
+              <div style={{ flex: '1 1 200px' }}>
+                <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#6B7280', marginBottom: 4, textTransform: 'uppercase' }}>
+                  {isTamil ? 'உபகரணம் / பிராண்ட்' : 'Keyword or Brand'}
+                </label>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') handleSearch()
+                    }}
+                    placeholder={isTamil ? 'டிராக்டர், ட்ரோன், மகிந்திரா...' : 'e.g. Mahindra, Drone, Harvester...'}
+                    style={{
+                      border: 'none',
+                      padding: '4px 0',
+                      fontSize: 14,
+                      width: '100%',
+                      outline: 'none',
+                      background: 'transparent',
+                      fontWeight: 600,
+                      color: '#0F172A',
+                    }}
+                  />
+                  {searchQuery && (
+                    <button
+                      type="button"
+                      onClick={() => setSearchQuery('')}
+                      style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#94A3B8', padding: 2 }}
+                    >
+                      <X size={14} />
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              <div style={{ width: 1, height: 40, background: '#E5E7EB' }} className="search-divider" />
+
+              <div style={{ flex: '1 1 150px' }}>
+                <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#6B7280', marginBottom: 4, textTransform: 'uppercase' }}>
+                  {t('Equipment Type')}
+                </label>
+                <select
+                  className="input-field"
+                  value={activeCat}
+                  onChange={(e) => setActiveCat(e.target.value)}
+                  style={{ border: 'none', padding: '4px 0', fontSize: 14, width: '100%', outline: 'none', background: 'transparent', fontWeight: 600 }}
+                >
+                  <option value="All">{isTamil ? 'அனைத்து பிரிவுகள்' : 'All Categories'}</option>
+                  {categoryNames.filter((c) => c !== 'All').map((c) => (
+                    <option key={c} value={c}>
+                      {t(c)}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div style={{ width: 1, height: 40, background: '#E5E7EB' }} className="search-divider" />
+
+              <div style={{ flex: '1 1 150px' }}>
                 <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#6B7280', marginBottom: 4, textTransform: 'uppercase' }}>
                   {t('Location')}
                 </label>
@@ -248,30 +343,13 @@ export default function HomePage({ onNavigate }: Props) {
                   onChange={(e) => setSearchLocation(e.target.value)}
                   style={{ border: 'none', padding: '4px 0', fontSize: 14, width: '100%', outline: 'none', background: 'transparent', fontWeight: 600 }}
                 >
+                  <option value="All Locations">{isTamil ? 'அனைத்து மாவட்டங்கள்' : 'All Locations'}</option>
                   {tamilNaduDistricts.map((district) => (
-                    <option key={district}>{district}, Tamil Nadu</option>
-                  ))}
-                </select>
-              </div>
-
-              <div style={{ width: 1, height: 40, background: '#E5E7EB' }} className="search-divider" />
-
-              <div style={{ flex: '1 1 180px' }}>
-                <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#6B7280', marginBottom: 4, textTransform: 'uppercase' }}>
-                  {t('Equipment Type')}
-                </label>
-                <select
-                  className="input-field"
-                  value={searchType}
-                  onChange={(e) => setSearchType(e.target.value)}
-                  style={{ border: 'none', padding: '4px 0', fontSize: 14, width: '100%', outline: 'none', background: 'transparent', fontWeight: 600 }}
-                >
-                  <option value="All Equipment">{isTamil ? 'அனைத்து கருவிகள்' : 'All Equipment'}</option>
-                  {categoryNames.map((c) => (
-                    <option key={c} value={c}>
-                      {t(c)}
+                    <option key={district} value={`${district}, Tamil Nadu`}>
+                      {district}, Tamil Nadu
                     </option>
                   ))}
+                  <option value="Ludhiana, Punjab">Ludhiana, Punjab</option>
                 </select>
               </div>
 
@@ -293,7 +371,7 @@ export default function HomePage({ onNavigate }: Props) {
                   gap: 6,
                 }}
               >
-                <span>🔍</span> {t('Search')}
+                <Search size={16} /> {t('Search')}
               </button>
             </div>
 
@@ -425,9 +503,205 @@ export default function HomePage({ onNavigate }: Props) {
             )}
           </div>
 
+          {/* Search, Brand, Price & Availability Filter Toolbar */}
+          <div
+            style={{
+              background: '#F8FAFC',
+              borderRadius: 16,
+              padding: '16px 20px',
+              border: '1px solid #E2E8F0',
+              marginBottom: 24,
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 14,
+            }}
+          >
+            {/* Top row: search input + brand + price + available toggle */}
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, alignItems: 'center' }}>
+              {/* Live search input */}
+              <div style={{ flex: '1 1 280px', position: 'relative' }}>
+                <Search size={18} style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: '#94A3B8' }} />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder={isTamil ? 'பெயர், பிராண்ட், மாதிரி அல்லது ஊர் வாரியாக தேடுங்கள்...' : 'Search by name, brand (e.g. Mahindra), model, or location...'}
+                  style={{
+                    width: '100%',
+                    padding: '10px 38px 10px 42px',
+                    borderRadius: 10,
+                    border: '1.5px solid #CBD5E1',
+                    background: '#fff',
+                    fontSize: 14,
+                    color: '#0F172A',
+                    fontWeight: 500,
+                    outline: 'none',
+                  }}
+                />
+                {searchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => setSearchQuery('')}
+                    style={{
+                      position: 'absolute',
+                      right: 12,
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      background: '#F1F5F9',
+                      border: 'none',
+                      borderRadius: '50%',
+                      width: 20,
+                      height: 20,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      cursor: 'pointer',
+                      color: '#64748B',
+                    }}
+                  >
+                    <X size={12} />
+                  </button>
+                )}
+              </div>
+
+              {/* Brand filter */}
+              <div style={{ minWidth: 150, flexShrink: 0 }}>
+                <select
+                  value={selectedBrand}
+                  onChange={(e) => setSelectedBrand(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '10px 14px',
+                    borderRadius: 10,
+                    border: '1.5px solid #CBD5E1',
+                    background: '#fff',
+                    fontSize: 13,
+                    color: '#0F172A',
+                    fontWeight: 600,
+                    outline: 'none',
+                    cursor: 'pointer',
+                  }}
+                >
+                  <option value="All">{isTamil ? 'அனைத்து பிராண்டுகளும்' : 'All Brands'}</option>
+                  {allBrands.map((b) => (
+                    <option key={b} value={b}>
+                      {b}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Max Price filter */}
+              <div style={{ minWidth: 150, flexShrink: 0 }}>
+                <select
+                  value={maxPrice}
+                  onChange={(e) => setMaxPrice(Number(e.target.value))}
+                  style={{
+                    width: '100%',
+                    padding: '10px 14px',
+                    borderRadius: 10,
+                    border: '1.5px solid #CBD5E1',
+                    background: '#fff',
+                    fontSize: 13,
+                    color: '#0F172A',
+                    fontWeight: 600,
+                    outline: 'none',
+                    cursor: 'pointer',
+                  }}
+                >
+                  <option value={0}>{isTamil ? 'அனைத்து கட்டணங்கள்' : 'All Rental Rates'}</option>
+                  <option value={800}>{isTamil ? '₹800 வரை / நாள்' : 'Up to ₹800 / day'}</option>
+                  <option value={1500}>{isTamil ? '₹1,500 வரை / நாள்' : 'Up to ₹1,500 / day'}</option>
+                  <option value={2000}>{isTamil ? '₹2,000 வரை / நாள்' : 'Up to ₹2,000 / day'}</option>
+                  <option value={3000}>{isTamil ? '₹3,000 வரை / நாள்' : 'Up to ₹3,000 / day'}</option>
+                </select>
+              </div>
+
+              {/* Available Only toggle */}
+              <button
+                type="button"
+                onClick={() => setAvailableOnly(!availableOnly)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  padding: '9px 14px',
+                  borderRadius: 10,
+                  border: `1.5px solid ${availableOnly ? P : '#CBD5E1'}`,
+                  background: availableOnly ? PM : '#fff',
+                  color: availableOnly ? P : '#475569',
+                  fontSize: 13,
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  flexShrink: 0,
+                }}
+              >
+                <span
+                  style={{
+                    width: 8,
+                    height: 8,
+                    borderRadius: '50%',
+                    background: availableOnly ? P : '#94A3B8',
+                  }}
+                />
+                {isTamil ? 'கிடைப்பவை மட்டும்' : 'Available Only'}
+              </button>
+
+              {/* Reset button if active */}
+              {hasActiveFilters && (
+                <button
+                  type="button"
+                  onClick={handleResetFilters}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 6,
+                    padding: '9px 14px',
+                    borderRadius: 10,
+                    border: '1px solid #FECACA',
+                    background: '#FEF2F2',
+                    color: '#DC2626',
+                    fontSize: 13,
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    flexShrink: 0,
+                  }}
+                >
+                  <RotateCcw size={14} />
+                  {isTamil ? 'வடிகட்டிகளை நீக்கு' : 'Reset'}
+                </button>
+              )}
+            </div>
+
+            {/* Results count indicator */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 13, color: '#64748B' }}>
+              <div>
+                {isTamil ? (
+                  <>
+                    காட்டப்படும் உபகரணங்கள்: <strong style={{ color: '#0F172A' }}>{filteredEquipment.length}</strong> / {equipmentList.length}
+                  </>
+                ) : (
+                  <>
+                    Showing <strong style={{ color: '#0F172A' }}>{filteredEquipment.length}</strong> of {equipmentList.length} verified machines
+                  </>
+                )}
+                {searchQuery && (
+                  <span style={{ marginLeft: 8, color: P, fontWeight: 600 }}>
+                    matching &ldquo;{searchQuery}&rdquo;
+                  </span>
+                )}
+                {selectedBrand !== 'All' && (
+                  <span style={{ marginLeft: 8, color: '#0F172A', fontWeight: 600 }}>
+                    • Brand: {selectedBrand}
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+
           {/* Category Filter Pills */}
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 28 }}>
-            {['All', ...categoryNames].map((c) => (
+            {categoryNames.map((c) => (
               <button
                 key={c}
                 type="button"
@@ -444,7 +718,7 @@ export default function HomePage({ onNavigate }: Props) {
                   transition: 'all 0.15s ease',
                 }}
               >
-                {c === 'All' ? t('All') : t(c)}
+                {c === 'All' ? (isTamil ? 'அனைத்து பிரிவுகள்' : 'All Categories') : t(c)}
               </button>
             ))}
           </div>
@@ -463,22 +737,78 @@ export default function HomePage({ onNavigate }: Props) {
           </div>
 
           {filteredEquipment.length === 0 && (
-            <div style={{ textAlign: 'center', padding: '48px 0', color: '#6B7280' }}>
-              <p>{isTamil ? 'இந்த பிரிவில் உபகரணங்கள் கிடைக்கவில்லை' : 'No equipment found in this category'}</p>
+            <div
+              style={{
+                textAlign: 'center',
+                padding: '56px 20px',
+                background: '#F8FAFC',
+                borderRadius: 20,
+                border: '1.5px dashed #CBD5E1',
+                margin: '20px 0',
+              }}
+            >
+              <div style={{ fontSize: 44, marginBottom: 12 }}>🚜🔍</div>
+              <h3 style={{ fontSize: 18, fontWeight: 800, color: '#0F172A', marginBottom: 8 }}>
+                {searchQuery
+                  ? isTamil
+                    ? `"${searchQuery}" என்ற தேடலுக்கு உபகரணங்கள் கிடைக்கவில்லை`
+                    : `No machinery found matching "${searchQuery}"`
+                  : isTamil
+                    ? 'தேர்ந்தெடுக்கப்பட்ட வடிகட்டிகளுக்கு உபகரணங்கள் கிடைக்கவில்லை'
+                    : 'No equipment matches the selected filters'}
+              </h3>
+              <p style={{ color: '#64748B', fontSize: 14, maxWidth: 500, margin: '0 auto 20px' }}>
+                {isTamil
+                  ? 'வேறு வார்த்தைகளை பயன்படுத்தி தேடவும் அல்லது வடிகட்டிகளை மீட்டமைக்கவும்.'
+                  : 'Try searching with general terms like "Mahindra", "Tractor", "Harvester", or "Drone".'}
+              </p>
+
+              {/* Quick suggestion chips */}
+              <div style={{ display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 24 }}>
+                {['Mahindra', 'John Deere', 'Tractor', 'Harvester', 'Drone', 'Rotavator', 'Sprayer', 'Pump'].map((term) => (
+                  <button
+                    key={term}
+                    type="button"
+                    onClick={() => {
+                      setSearchQuery(term)
+                      setActiveCat('All')
+                      setSelectedBrand('All')
+                    }}
+                    style={{
+                      background: '#fff',
+                      border: '1px solid #CBD5E1',
+                      borderRadius: 20,
+                      padding: '4px 12px',
+                      fontSize: 12,
+                      fontWeight: 600,
+                      color: P,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    🔍 {term}
+                  </button>
+                ))}
+              </div>
+
               <button
                 type="button"
-                onClick={() => setActiveCat('All')}
+                onClick={handleResetFilters}
                 style={{
-                  padding: '8px 16px',
+                  padding: '10px 24px',
                   background: P,
                   color: '#fff',
                   border: 'none',
-                  borderRadius: 8,
+                  borderRadius: 10,
                   cursor: 'pointer',
                   fontWeight: 700,
+                  fontSize: 14,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 6,
                 }}
               >
-                {isTamil ? 'அனைத்து உபகரணங்களையும் பார்க்க' : 'View All Equipment'}
+                <RotateCcw size={16} />
+                {isTamil ? 'அனைத்து வடிகட்டிகளையும் மீட்டமை' : 'Reset All Filters & Show Full Inventory'}
               </button>
             </div>
           )}

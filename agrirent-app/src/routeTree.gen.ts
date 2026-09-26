@@ -12,14 +12,21 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AddEquipmentRouteImport } from './routes/add-equipment'
 import { Route as AdminDashboardRouteImport } from './routes/admin-dashboard'
+import { Route as AnalyticsRouteImport } from './routes/analytics'
 import { Route as BookingRouteImport } from './routes/booking'
 import { Route as EquipmentDetailsRouteImport } from './routes/equipment-details'
 import { Route as FarmerDashboardRouteImport } from './routes/farmer-dashboard'
+import { Route as HelpRouteImport } from './routes/help'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as MyBookingsRouteImport } from './routes/my-bookings'
+import { Route as NotificationsRouteImport } from './routes/notifications'
+import { Route as OwnerBookingsRouteImport } from './routes/owner-bookings'
 import { Route as OwnerDashboardRouteImport } from './routes/owner-dashboard'
 import { Route as PaymentSuccessRouteImport } from './routes/payment-success'
+import { Route as PaymentsRouteImport } from './routes/payments'
+import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as RegisterRouteImport } from './routes/register'
+import { Route as RevenueRouteImport } from './routes/revenue'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -34,6 +41,11 @@ const AddEquipmentRoute = AddEquipmentRouteImport.update({
 const AdminDashboardRoute = AdminDashboardRouteImport.update({
   id: '/admin-dashboard',
   path: '/admin-dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AnalyticsRoute = AnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BookingRoute = BookingRouteImport.update({
@@ -51,6 +63,11 @@ const FarmerDashboardRoute = FarmerDashboardRouteImport.update({
   path: '/farmer-dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
+const HelpRoute = HelpRouteImport.update({
+  id: '/help',
+  path: '/help',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
@@ -59,6 +76,16 @@ const LoginRoute = LoginRouteImport.update({
 const MyBookingsRoute = MyBookingsRouteImport.update({
   id: '/my-bookings',
   path: '/my-bookings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NotificationsRoute = NotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OwnerBookingsRoute = OwnerBookingsRouteImport.update({
+  id: '/owner-bookings',
+  path: '/owner-bookings',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OwnerDashboardRoute = OwnerDashboardRouteImport.update({
@@ -71,9 +98,24 @@ const PaymentSuccessRoute = PaymentSuccessRouteImport.update({
   path: '/payment-success',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PaymentsRoute = PaymentsRouteImport.update({
+  id: '/payments',
+  path: '/payments',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
   path: '/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RevenueRoute = RevenueRouteImport.update({
+  id: '/revenue',
+  path: '/revenue',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -81,41 +123,62 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/add-equipment': typeof AddEquipmentRoute
   '/admin-dashboard': typeof AdminDashboardRoute
+  '/analytics': typeof AnalyticsRoute
   '/booking': typeof BookingRoute
   '/equipment-details': typeof EquipmentDetailsRoute
   '/farmer-dashboard': typeof FarmerDashboardRoute
+  '/help': typeof HelpRoute
   '/login': typeof LoginRoute
   '/my-bookings': typeof MyBookingsRoute
+  '/notifications': typeof NotificationsRoute
+  '/owner-bookings': typeof OwnerBookingsRoute
   '/owner-dashboard': typeof OwnerDashboardRoute
   '/payment-success': typeof PaymentSuccessRoute
+  '/payments': typeof PaymentsRoute
+  '/profile': typeof ProfileRoute
   '/register': typeof RegisterRoute
+  '/revenue': typeof RevenueRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/add-equipment': typeof AddEquipmentRoute
   '/admin-dashboard': typeof AdminDashboardRoute
+  '/analytics': typeof AnalyticsRoute
   '/booking': typeof BookingRoute
   '/equipment-details': typeof EquipmentDetailsRoute
   '/farmer-dashboard': typeof FarmerDashboardRoute
+  '/help': typeof HelpRoute
   '/login': typeof LoginRoute
   '/my-bookings': typeof MyBookingsRoute
+  '/notifications': typeof NotificationsRoute
+  '/owner-bookings': typeof OwnerBookingsRoute
   '/owner-dashboard': typeof OwnerDashboardRoute
   '/payment-success': typeof PaymentSuccessRoute
+  '/payments': typeof PaymentsRoute
+  '/profile': typeof ProfileRoute
   '/register': typeof RegisterRoute
+  '/revenue': typeof RevenueRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/add-equipment': typeof AddEquipmentRoute
   '/admin-dashboard': typeof AdminDashboardRoute
+  '/analytics': typeof AnalyticsRoute
   '/booking': typeof BookingRoute
   '/equipment-details': typeof EquipmentDetailsRoute
   '/farmer-dashboard': typeof FarmerDashboardRoute
+  '/help': typeof HelpRoute
   '/login': typeof LoginRoute
   '/my-bookings': typeof MyBookingsRoute
+  '/notifications': typeof NotificationsRoute
+  '/owner-bookings': typeof OwnerBookingsRoute
   '/owner-dashboard': typeof OwnerDashboardRoute
   '/payment-success': typeof PaymentSuccessRoute
+  '/payments': typeof PaymentsRoute
+  '/profile': typeof ProfileRoute
   '/register': typeof RegisterRoute
+  '/revenue': typeof RevenueRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -123,54 +186,82 @@ export interface FileRouteTypes {
     | '/'
     | '/add-equipment'
     | '/admin-dashboard'
+    | '/analytics'
     | '/booking'
     | '/equipment-details'
     | '/farmer-dashboard'
+    | '/help'
     | '/login'
     | '/my-bookings'
+    | '/notifications'
+    | '/owner-bookings'
     | '/owner-dashboard'
     | '/payment-success'
+    | '/payments'
+    | '/profile'
     | '/register'
+    | '/revenue'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/add-equipment'
     | '/admin-dashboard'
+    | '/analytics'
     | '/booking'
     | '/equipment-details'
     | '/farmer-dashboard'
+    | '/help'
     | '/login'
     | '/my-bookings'
+    | '/notifications'
+    | '/owner-bookings'
     | '/owner-dashboard'
     | '/payment-success'
+    | '/payments'
+    | '/profile'
     | '/register'
+    | '/revenue'
   id:
     | '__root__'
     | '/'
     | '/add-equipment'
     | '/admin-dashboard'
+    | '/analytics'
     | '/booking'
     | '/equipment-details'
     | '/farmer-dashboard'
+    | '/help'
     | '/login'
     | '/my-bookings'
+    | '/notifications'
+    | '/owner-bookings'
     | '/owner-dashboard'
     | '/payment-success'
+    | '/payments'
+    | '/profile'
     | '/register'
+    | '/revenue'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AddEquipmentRoute: typeof AddEquipmentRoute
   AdminDashboardRoute: typeof AdminDashboardRoute
+  AnalyticsRoute: typeof AnalyticsRoute
   BookingRoute: typeof BookingRoute
   EquipmentDetailsRoute: typeof EquipmentDetailsRoute
   FarmerDashboardRoute: typeof FarmerDashboardRoute
+  HelpRoute: typeof HelpRoute
   LoginRoute: typeof LoginRoute
   MyBookingsRoute: typeof MyBookingsRoute
+  NotificationsRoute: typeof NotificationsRoute
+  OwnerBookingsRoute: typeof OwnerBookingsRoute
   OwnerDashboardRoute: typeof OwnerDashboardRoute
   PaymentSuccessRoute: typeof PaymentSuccessRoute
+  PaymentsRoute: typeof PaymentsRoute
+  ProfileRoute: typeof ProfileRoute
   RegisterRoute: typeof RegisterRoute
+  RevenueRoute: typeof RevenueRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -196,6 +287,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminDashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/analytics': {
+      id: '/analytics'
+      path: '/analytics'
+      fullPath: '/analytics'
+      preLoaderRoute: typeof AnalyticsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/booking': {
       id: '/booking'
       path: '/booking'
@@ -217,6 +315,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FarmerDashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/help': {
+      id: '/help'
+      path: '/help'
+      fullPath: '/help'
+      preLoaderRoute: typeof HelpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/login': {
       id: '/login'
       path: '/login'
@@ -229,6 +334,20 @@ declare module '@tanstack/react-router' {
       path: '/my-bookings'
       fullPath: '/my-bookings'
       preLoaderRoute: typeof MyBookingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/notifications': {
+      id: '/notifications'
+      path: '/notifications'
+      fullPath: '/notifications'
+      preLoaderRoute: typeof NotificationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/owner-bookings': {
+      id: '/owner-bookings'
+      path: '/owner-bookings'
+      fullPath: '/owner-bookings'
+      preLoaderRoute: typeof OwnerBookingsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/owner-dashboard': {
@@ -245,11 +364,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PaymentSuccessRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/payments': {
+      id: '/payments'
+      path: '/payments'
+      fullPath: '/payments'
+      preLoaderRoute: typeof PaymentsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/register': {
       id: '/register'
       path: '/register'
       fullPath: '/register'
       preLoaderRoute: typeof RegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/revenue': {
+      id: '/revenue'
+      path: '/revenue'
+      fullPath: '/revenue'
+      preLoaderRoute: typeof RevenueRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -259,14 +399,21 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AddEquipmentRoute: AddEquipmentRoute,
   AdminDashboardRoute: AdminDashboardRoute,
+  AnalyticsRoute: AnalyticsRoute,
   BookingRoute: BookingRoute,
   EquipmentDetailsRoute: EquipmentDetailsRoute,
   FarmerDashboardRoute: FarmerDashboardRoute,
+  HelpRoute: HelpRoute,
   LoginRoute: LoginRoute,
   MyBookingsRoute: MyBookingsRoute,
+  NotificationsRoute: NotificationsRoute,
+  OwnerBookingsRoute: OwnerBookingsRoute,
   OwnerDashboardRoute: OwnerDashboardRoute,
   PaymentSuccessRoute: PaymentSuccessRoute,
+  PaymentsRoute: PaymentsRoute,
+  ProfileRoute: ProfileRoute,
   RegisterRoute: RegisterRoute,
+  RevenueRoute: RevenueRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

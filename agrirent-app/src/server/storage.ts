@@ -1,7 +1,8 @@
 import { createHash, randomUUID } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
-import { catalog } from "../lib/catalog";
+import { catalog, CatalogItem } from "../lib/catalog";
+import { SEED_NOTIFICATIONS, NotificationItem } from "../lib/notifications";
 
 export interface StoredUser {
   id: string;
@@ -13,6 +14,7 @@ export interface StoredUser {
   location: string;
   avatar: string;
   status: "active" | "suspended";
+  verificationStatus: "NOT_VERIFIED" | "PENDING" | "VERIFIED" | "REJECTED";
   provider?: "local" | "google";
   createdAt: string;
 }
@@ -23,15 +25,20 @@ export interface StoredListing {
   name: string;
   nameTa: string;
   category: string;
+  brand?: string | undefined;
+  model?: string | undefined;
+  imageUrl?: string | undefined;
   description: string;
   location: string;
+  lat?: number | undefined;
+  lng?: number | undefined;
   pricePerDay: number;
   available: boolean;
   img: string;
   rating: number;
   reviews: number;
-  hp?: number;
-  fuelType?: string;
+  hp?: number | string | undefined;
+  fuelType?: string | undefined;
   securityDeposit: number;
   operatorIncluded: boolean;
   specs: { label: string; labelTa: string; value: string }[];
@@ -42,6 +49,7 @@ export interface StoredBooking {
   id: string;
   listingId: string;
   equipmentName: string;
+  equipmentImg?: string | undefined;
   farmerId: string;
   farmerName: string;
   ownerId: string;
@@ -55,6 +63,17 @@ export interface StoredBooking {
   escrowStatus: "held" | "released" | "refunded" | "disputed";
   status: "pending" | "approved" | "dispatched" | "delivered" | "active" | "completed" | "cancelled";
   createdAt: string;
+}
+
+export interface StoredNotification {
+  id: string;
+  userId: string;
+  title: string;
+  message: string;
+  type: string;
+  read: boolean;
+  timestamp: string;
+  relatedId?: string | undefined;
 }
 
 export function hashPassword(password: string): string {
@@ -75,6 +94,7 @@ export const SEED_USERS: StoredUser[] = [
     location: "Chennai / Pan-India HQ",
     avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&auto=format&fit=crop&q=80",
     status: "active",
+    verificationStatus: "VERIFIED",
     provider: "local",
     createdAt: "2026-01-10T10:00:00.000Z",
   },
@@ -88,6 +108,7 @@ export const SEED_USERS: StoredUser[] = [
     location: "Thanjavur, Tamil Nadu (Cauvery Delta)",
     avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80",
     status: "active",
+    verificationStatus: "VERIFIED",
     provider: "local",
     createdAt: "2026-02-14T09:30:00.000Z",
   },
@@ -101,6 +122,7 @@ export const SEED_USERS: StoredUser[] = [
     location: "Pune, Maharashtra",
     avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80",
     status: "active",
+    verificationStatus: "NOT_VERIFIED",
     provider: "local",
     createdAt: "2026-03-01T11:15:00.000Z",
   },
@@ -114,6 +136,7 @@ export const SEED_USERS: StoredUser[] = [
     location: "Coimbatore & Pollachi, Tamil Nadu",
     avatar: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150&auto=format&fit=crop&q=80",
     status: "active",
+    verificationStatus: "VERIFIED",
     provider: "local",
     createdAt: "2026-01-20T08:00:00.000Z",
   },
@@ -127,6 +150,7 @@ export const SEED_USERS: StoredUser[] = [
     location: "Ludhiana, Punjab & Madurai, Tamil Nadu",
     avatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150&auto=format&fit=crop&q=80",
     status: "active",
+    verificationStatus: "VERIFIED",
     provider: "local",
     createdAt: "2026-01-25T14:45:00.000Z",
   },
@@ -136,6 +160,7 @@ interface DataStore {
   users: StoredUser[];
   listings: StoredListing[];
   bookings: StoredBooking[];
+  notifications: StoredNotification[];
 }
 
 let memoryStore: DataStore | null = null;
@@ -145,12 +170,17 @@ function initializeDataStore(): DataStore {
     const isOwner1 = item.location.includes("Coimbatore") || item.location.includes("Salem");
     return {
       id: item.id,
-      ownerId: isOwner1 ? "usr-owner-1" : "usr-owner-2",
+      ownerId: item.ownerId || (isOwner1 ? "usr-owner-1" : "usr-owner-2"),
       name: item.name,
       nameTa: item.nameTa,
-      category: item.cat,
+      category: item.category || item.cat,
+      brand: item.brand,
+      model: item.model,
+      imageUrl: item.imageUrl || item.img,
       description: item.description || "",
       location: item.location,
+      lat: item.lat,
+      lng: item.lng,
       pricePerDay: item.dailyRate,
       available: item.avail,
       img: item.img,
@@ -170,6 +200,7 @@ function initializeDataStore(): DataStore {
       id: "BK-9021",
       listingId: "eq-drone-1",
       equipmentName: "DJI Agras T40 Agricultural Spraying Drone (40L)",
+      equipmentImg: "https://images.unsplash.com/photo-1508614589041-895b88991e3e?auto=format&fit=crop&w=900&h=600&q=85",
       farmerId: "usr-farmer-1",
       farmerName: "Muthukumar S.",
       ownerId: "usr-owner-1",
@@ -188,6 +219,7 @@ function initializeDataStore(): DataStore {
       id: "BK-8842",
       listingId: "eq-harvester-1",
       equipmentName: "Preet 987 Self-Propelled Multi-Crop Combine Harvester",
+      equipmentImg: "https://images.unsplash.com/photo-1635174815612-fd9636f70146?auto=format&fit=crop&w=900&h=600&q=85",
       farmerId: "usr-farmer-1",
       farmerName: "Muthukumar S.",
       ownerId: "usr-owner-2",
@@ -206,6 +238,7 @@ function initializeDataStore(): DataStore {
       id: "BK-8510",
       listingId: "eq-tractor-1",
       equipmentName: "John Deere 5310 4WD (55 HP) Tractor",
+      equipmentImg: "https://images.unsplash.com/photo-1533062618053-d51e617307ec?auto=format&fit=crop&w=900&h=600&q=85",
       farmerId: "usr-farmer-2",
       farmerName: "Rajesh Kumar Patil",
       ownerId: "usr-owner-1",
@@ -224,6 +257,7 @@ function initializeDataStore(): DataStore {
       id: "BK-8104",
       listingId: "eq-leveler-1",
       equipmentName: "Fieldking Dual-Mast Precision Laser Land Leveler",
+      equipmentImg: "https://images.unsplash.com/photo-1605000797499-95a51c5269ae?auto=format&fit=crop&w=900&h=600&q=85",
       farmerId: "usr-farmer-1",
       farmerName: "Muthukumar S.",
       ownerId: "usr-owner-2",
@@ -240,10 +274,22 @@ function initializeDataStore(): DataStore {
     },
   ];
 
+  const seedNotifs: StoredNotification[] = SEED_NOTIFICATIONS.map((n) => ({
+    id: n.id,
+    userId: n.userId,
+    title: n.title,
+    message: n.message,
+    type: n.type,
+    read: n.read,
+    timestamp: n.timestamp,
+    relatedId: n.relatedId,
+  }));
+
   return {
     users: [...SEED_USERS],
     listings: seedListings,
     bookings: seedBookings,
+    notifications: seedNotifs,
   };
 }
 
@@ -255,13 +301,40 @@ function loadStore(): DataStore {
       const data = fs.readFileSync(STORE_PATH, "utf-8");
       const parsed = JSON.parse(data) as DataStore;
       if (parsed.users && parsed.listings && parsed.bookings) {
-        // Ensure all 5 seed users exist
+        // Ensure all seed users exist
         for (const seedUser of SEED_USERS) {
-          if (!parsed.users.some((u) => u.email === seedUser.email)) {
+          const existing = parsed.users.find((u) => u.email === seedUser.email);
+          if (!existing) {
             parsed.users.push(seedUser);
+          } else {
+            // Keep verificationStatus up to date
+            existing.verificationStatus = existing.verificationStatus || seedUser.verificationStatus;
           }
         }
+
+        // If listings have pollinations image or missing images, refresh from catalog
+        const hasOutdatedImages = parsed.listings.some((l) => !l.img || l.img.includes("pollinations.ai"));
+        if (hasOutdatedImages || parsed.listings.length < catalog.length) {
+          const fresh = initializeDataStore();
+          parsed.listings = fresh.listings;
+        }
+
+        // Ensure notifications table exists
+        if (!parsed.notifications || parsed.notifications.length === 0) {
+          parsed.notifications = SEED_NOTIFICATIONS.map((n) => ({
+            id: n.id,
+            userId: n.userId,
+            title: n.title,
+            message: n.message,
+            type: n.type,
+            read: n.read,
+            timestamp: n.timestamp,
+            relatedId: n.relatedId,
+          }));
+        }
+
         memoryStore = parsed;
+        saveStore();
         return memoryStore;
       }
     }
@@ -306,11 +379,21 @@ export const storage = {
     const newUser: StoredUser = {
       ...user,
       id: randomUUID(),
+      verificationStatus: user.verificationStatus || "NOT_VERIFIED",
       createdAt: new Date().toISOString(),
     };
     store.users.push(newUser);
     saveStore();
     return newUser;
+  },
+
+  updateUserVerification(userId: string, status: StoredUser["verificationStatus"]): StoredUser | null {
+    const store = loadStore();
+    const user = store.users.find((u) => u.id === userId);
+    if (!user) return null;
+    user.verificationStatus = status;
+    saveStore();
+    return user;
   },
 
   toggleUserStatus(userId: string): StoredUser | null {
@@ -414,6 +497,45 @@ export const storage = {
     }
     saveStore();
     return booking;
+  },
+
+  // Notifications Operations
+  getNotifications(userId?: string): StoredNotification[] {
+    const store = loadStore();
+    if (!userId) return store.notifications;
+    return store.notifications.filter((n) => n.userId === userId || n.userId === "all");
+  },
+
+  createNotification(notif: Omit<StoredNotification, "id" | "timestamp">): StoredNotification {
+    const store = loadStore();
+    const newNotif: StoredNotification = {
+      ...notif,
+      id: `notif-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+      timestamp: new Date().toISOString(),
+    };
+    store.notifications.unshift(newNotif);
+    saveStore();
+    return newNotif;
+  },
+
+  markNotificationRead(id: string): StoredNotification | null {
+    const store = loadStore();
+    const target = store.notifications.find((n) => n.id === id);
+    if (!target) return null;
+    target.read = true;
+    saveStore();
+    return target;
+  },
+
+  markAllNotificationsRead(userId?: string): boolean {
+    const store = loadStore();
+    store.notifications.forEach((n) => {
+      if (!userId || n.userId === userId || n.userId === "all") {
+        n.read = true;
+      }
+    });
+    saveStore();
+    return true;
   },
 
   getMetrics() {

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Truck, Star, MapPin, ShieldCheck, Check, ArrowRight, Phone, Calendar, Clock } from 'lucide-react'
 import { useLanguage } from '../context/LanguageContext'
-import { catalog, findCatalogItem, type CatalogItem } from '../lib/catalog'
+import { catalog, findCatalogItem, type CatalogItem, getCategoryFallback } from '../lib/catalog'
 import { recordRecentlyViewed } from '../lib/recently-accessed'
 import TrackingPanel from '../components/TrackingPanel'
 import { SEED_BOOKINGS } from '../lib/bookings'
@@ -15,35 +15,49 @@ interface Props {
 
 export default function EquipmentDetails({ onNavigate }: Props) {
   const { t, isTamil } = useLanguage()
-  const [item, setItem] = useState<CatalogItem>(() => catalog[0])
-  const [selectedImg, setSelectedImg] = useState<string>(catalog[0].img)
+  const [item, setItem] = useState<CatalogItem>(() => {
+    if (typeof window !== 'undefined') {
+      const urlId = new URLSearchParams(window.location.search).get('id')
+      const storedId = urlId || window.localStorage.getItem('agrirent_selected_equipment_id')
+      if (storedId) {
+        const found = findCatalogItem(storedId)
+        if (found) return found
+      }
+    }
+    return (catalog[0] as CatalogItem)
+  })
+  const [selectedImg, setSelectedImg] = useState<string>(() => item.imageUrl || item.img)
   const [activeTab, setActiveTab] = useState<'specs' | 'desc' | 'escrow'>('specs')
   const [showTracking, setShowTracking] = useState(false)
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const storedId = window.localStorage.getItem('agrirent_selected_equipment_id')
+      const urlId = new URLSearchParams(window.location.search).get('id')
+      const storedId = urlId || window.localStorage.getItem('agrirent_selected_equipment_id')
       if (storedId) {
         const found = findCatalogItem(storedId)
         if (found) {
           setItem(found)
-          setSelectedImg(found.img)
+          setSelectedImg(found.imageUrl || found.img)
           recordRecentlyViewed(found)
           return
         }
       }
     }
-    recordRecentlyViewed(catalog[0])
+    recordRecentlyViewed(catalog[0] as CatalogItem)
   }, [])
 
   const handleBookNow = () => {
     if (typeof window !== 'undefined') {
       window.localStorage.setItem('agrirent_selected_equipment_id', item.id)
+      const url = new URL(window.location.href)
+      url.searchParams.set('id', item.id)
+      window.history.replaceState({}, '', url.toString())
     }
     onNavigate('booking')
   }
 
-  const gallery = item.gallery && item.gallery.length > 0 ? item.gallery : [item.img]
+  const gallery = item.gallery && item.gallery.length > 0 ? item.gallery : [item.imageUrl || item.img]
 
   return (
     <div style={{ minWidth: 0, background: '#F8FAFC', minHeight: 'calc(100vh - 44px)' }}>
@@ -102,6 +116,9 @@ export default function EquipmentDetails({ onNavigate }: Props) {
                 src={selectedImg}
                 alt={item.name}
                 style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                onError={(e) => {
+                  e.currentTarget.src = getCategoryFallback(item.cat)
+                }}
               />
               <div
                 style={{
@@ -153,9 +170,16 @@ export default function EquipmentDetails({ onNavigate }: Props) {
               </span>
             </div>
 
-            <h1 style={{ fontSize: 26, fontWeight: 900, color: '#0F172A', margin: '0 0 10px', lineHeight: 1.25 }}>
+            <h1 style={{ fontSize: 26, fontWeight: 900, color: '#0F172A', margin: '0 0 6px', lineHeight: 1.25 }}>
               {isTamil && item.nameTa ? item.nameTa : item.name}
             </h1>
+
+            {item.brand && (
+              <div style={{ fontSize: 13, fontWeight: 700, color: '#475569', marginBottom: 12 }}>
+                {isTamil ? 'பிராண்ட்' : 'Brand'}: <span style={{ color: '#0F172A', fontWeight: 800 }}>{item.brand}</span>
+                {item.model ? ` • Model: ${item.model}` : ''}
+              </div>
+            )}
 
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 4, background: '#FEF3C7', padding: '3px 8px', borderRadius: 6 }}>

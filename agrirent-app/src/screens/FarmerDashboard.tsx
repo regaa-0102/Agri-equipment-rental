@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import Sidebar from '../components/Sidebar'
-import { catalog, categoryNames } from '../lib/catalog'
+import { getFullCatalog, categoryNames, getCategoryFallback, searchCatalog } from '../lib/catalog'
 import { useLanguage } from '../context/LanguageContext'
 import { BookingItem, getStoredBookings, onBookingsChange } from '../lib/bookings'
 import { getStoredUser } from '../lib/api-client'
@@ -24,21 +24,33 @@ export default function FarmerDashboard({ onNavigate }: Props) {
   const [priceRange, setPriceRange] = useState(6000)
   const [category, setCategory] = useState('All')
   const [location, setLocation] = useState('All Locations')
+  const [searchQuery, setSearchQuery] = useState('')
   const [bookingsList, setBookingsList] = useState<BookingItem[]>(() => getStoredBookings())
   const [trackingBooking, setTrackingBooking] = useState<BookingItem | null>(null)
   const [user, setUser] = useState<any>(null)
+  const [allCatalog, setAllCatalog] = useState(() => getFullCatalog())
 
   useEffect(() => {
     setUser(getStoredUser())
+    setAllCatalog(getFullCatalog())
+    const handleCatalogUpdate = () => {
+      setAllCatalog(getFullCatalog())
+    }
+    window.addEventListener('agrirent_catalog_updated', handleCatalogUpdate)
+    return () => {
+      window.removeEventListener('agrirent_catalog_updated', handleCatalogUpdate)
+    }
+  }, [])
+
+  useEffect(() => {
     return onBookingsChange((updated) => {
       setBookingsList(updated)
     })
   }, [])
 
-  const filtered = catalog.filter((e) => {
-    if (category !== 'All' && e.cat !== category) return false
-    if (e.dailyRate > priceRange) return false
-    return true
+  const filtered = searchCatalog(allCatalog, searchQuery, {
+    category,
+    maxPrice: priceRange,
   })
 
   const activeRentalsCount = bookingsList.filter((b) => b.status === 'active').length
@@ -65,10 +77,44 @@ export default function FarmerDashboard({ onNavigate }: Props) {
           </div>
           <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
             <div style={{ position: 'relative' }}>
-              <input className="input-field" placeholder={isTamil ? 'உபகரணங்களைத் தேடு...' : 'Search farm machinery...'} style={{ width: 220, paddingLeft: 36 }} />
+              <input
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="input-field"
+                placeholder={isTamil ? 'உபகரணங்களைத் தேடு...' : 'Search farm machinery (e.g. Mahindra, Drone)...'}
+                style={{ width: 280, paddingLeft: 36, paddingRight: searchQuery ? 30 : 12 }}
+              />
               <span style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#94A3B8', fontSize: 15 }}>🔍</span>
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery('')}
+                  style={{
+                    position: 'absolute',
+                    right: 8,
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    border: 'none',
+                    background: '#F1F5F9',
+                    borderRadius: '50%',
+                    width: 18,
+                    height: 18,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    color: '#64748B',
+                    fontSize: 11,
+                  }}
+                >
+                  ✕
+                </button>
+              )}
             </div>
-            <div style={{ width: 40, height: 40, background: PM, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: 14, color: P }}>
+            <div
+              onClick={() => onNavigate('profile')}
+              style={{ width: 40, height: 40, background: PM, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: 14, color: P, cursor: 'pointer' }}
+            >
               {displayName.slice(0, 2).toUpperCase()}
             </div>
           </div>
@@ -189,19 +235,36 @@ export default function FarmerDashboard({ onNavigate }: Props) {
                 <div
                   key={eq.id}
                   onClick={() => {
-                    if (typeof window !== 'undefined') window.localStorage.setItem('agrirent_selected_equipment_id', eq.id)
+                    if (typeof window !== 'undefined') {
+                      window.localStorage.setItem('agrirent_selected_equipment_id', eq.id)
+                      const url = new URL(window.location.href)
+                      url.searchParams.set('id', eq.id)
+                      window.history.replaceState({}, '', url.toString())
+                    }
                     onNavigate('equipment-details')
                   }}
                   className="card-shadow"
                   style={{ background: '#fff', borderRadius: 16, overflow: 'hidden', border: '1px solid #E2E8F0', cursor: 'pointer', display: 'flex', flexDirection: 'column' }}
                 >
                   <div style={{ height: 160, position: 'relative' }}>
-                    <img src={eq.img} alt={eq.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    <img
+                      src={eq.imageUrl || eq.img}
+                      alt={eq.name}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      onError={(e) => {
+                        e.currentTarget.src = getCategoryFallback(eq.category || eq.cat)
+                      }}
+                    />
                     <span style={{ position: 'absolute', top: 8, left: 8, background: '#DCFCE7', color: '#15803D', fontSize: 11, fontWeight: 700, padding: '2px 8px', borderRadius: 6 }}>
-                      {eq.cat}
+                      {eq.category || eq.cat}
                     </span>
                   </div>
                   <div style={{ padding: '14px', flex: 1, display: 'flex', flexDirection: 'column' }}>
+                    {eq.brand && (
+                      <div style={{ fontSize: 10, fontWeight: 800, color: '#64748B', textTransform: 'uppercase', marginBottom: 2 }}>
+                        {eq.brand} {eq.model ? `• ${eq.model}` : ''}
+                      </div>
+                    )}
                     <div style={{ fontSize: 14, fontWeight: 800, color: '#0F172A', marginBottom: 4 }}>
                       {isTamil && eq.nameTa ? eq.nameTa : eq.name}
                     </div>
@@ -211,7 +274,12 @@ export default function FarmerDashboard({ onNavigate }: Props) {
                       <button
                         onClick={(e) => {
                           e.stopPropagation()
-                          if (typeof window !== 'undefined') window.localStorage.setItem('agrirent_selected_equipment_id', eq.id)
+                          if (typeof window !== 'undefined') {
+                            window.localStorage.setItem('agrirent_selected_equipment_id', eq.id)
+                            const url = new URL(window.location.href)
+                            url.searchParams.set('id', eq.id)
+                            window.history.replaceState({}, '', url.toString())
+                          }
                           onNavigate('booking')
                         }}
                         className="btn-primary"
