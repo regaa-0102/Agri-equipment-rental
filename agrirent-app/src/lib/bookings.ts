@@ -2,6 +2,8 @@ export interface BookingItem {
   id: string
   equipment: string
   cat: string
+  category?: string | undefined
+  days?: number | undefined
   img: string
   location: string
   from: string // YYYY-MM-DD or readable
@@ -11,10 +13,10 @@ export interface BookingItem {
   totalNumeric: number
   status: 'active' | 'completed' | 'cancelled' | 'pending' | 'confirmed'
   owner: string
-  ownerPhone?: string
+  ownerPhone?: string | undefined
   trackingStage: number // 0 to 6
-  lastLocation?: string
-  distance?: string
+  lastLocation?: string | undefined
+  distance?: string | undefined
 }
 
 export const TRACKING_STAGES = [
@@ -30,108 +32,108 @@ export const TRACKING_STAGES = [
 export const SEED_BOOKINGS: BookingItem[] = [
   {
     id: 'BK-2841',
-    equipment: 'John Deere 5310 Tractor',
+    equipment: 'John Deere 5310',
     cat: 'Tractor',
-    img: 'https://images.unsplash.com/photo-1533062618053-d51e617307ec?auto=format&fit=crop&w=800&h=520&q=85',
-    location: 'Ludhiana, Punjab',
+    img: '/equipment/tractors/john-deere-5310.jpg',
+    location: 'Thanjavur, Tamil Nadu',
     from: '2026-09-22',
     to: '2026-09-25',
-    dailyRate: 1800,
-    amount: '₹5,400',
-    totalNumeric: 5400,
+    dailyRate: 2200,
+    amount: '₹6,600',
+    totalNumeric: 6600,
     status: 'active',
-    owner: 'Gurpreet Singh',
-    ownerPhone: '+91 98765 43210',
+    owner: 'M. Ramesh',
+    ownerPhone: '+91 98422 34567',
     trackingStage: 4, // Near Your Location
-    lastLocation: 'GT Road, Near Doraha Toll (1.8 km away)',
+    lastLocation: 'Thanjavur Bypass (1.8 km away)',
     distance: '2.5 km away',
   },
   {
     id: 'BK-2799',
-    equipment: 'Aspee Power Sprayer 45L',
-    cat: 'Water Sprayer',
-    img: 'https://images.unsplash.com/photo-1592417817098-8f3d69106a49?auto=format&fit=crop&w=800&h=520&q=85',
-    location: 'Salem, Tamil Nadu',
+    equipment: 'DJI Agras T40 Agricultural Drone',
+    cat: 'Sprayers & Drones',
+    img: '/equipment/sprayers-drones/dji-agras-t40.jpg',
+    location: 'Coimbatore, Tamil Nadu',
     from: '2026-09-20',
     to: '2026-09-24',
-    dailyRate: 450,
-    amount: '₹1,800',
-    totalNumeric: 1800,
+    dailyRate: 2800,
+    amount: '₹8,400',
+    totalNumeric: 8400,
     status: 'active',
-    owner: 'Ramesh Kumar',
-    ownerPhone: '+91 94432 18765',
+    owner: 'Balvinder Singh',
+    ownerPhone: '+91 98140 87654',
     trackingStage: 5, // Delivered / Rented
-    lastLocation: 'Farmer Field Block B, Salem West',
+    lastLocation: 'Farmer Field Block B, Pollachi Road',
     distance: '1.8 km away',
   },
   {
     id: 'BK-2756',
-    equipment: 'Fieldking Rotavator 7ft',
-    cat: 'Rotavator',
-    img: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?auto=format&fit=crop&w=800&h=520&q=85',
-    location: 'Jaipur, Rajasthan',
+    equipment: 'Shaktiman Rotary Tiller',
+    cat: 'Ploughing & Tilling',
+    img: '/equipment/tillage/shaktiman-rotary-tiller.jpg',
+    location: 'Coimbatore, Tamil Nadu',
     from: '2026-08-28',
     to: '2026-08-30',
-    dailyRate: 850,
-    amount: '₹1,700',
-    totalNumeric: 1700,
+    dailyRate: 1100,
+    amount: '₹2,200',
+    totalNumeric: 2200,
     status: 'completed',
-    owner: 'Ravi Sharma',
-    ownerPhone: '+91 98290 11223',
+    owner: 'Selvam Murugan',
+    ownerPhone: '+91 98421 54321',
     trackingStage: 6,
-    lastLocation: 'Returned to Owner Depot, Jaipur',
+    lastLocation: 'Returned to Owner Depot, Coimbatore',
     distance: '4.1 km away',
   },
   {
     id: 'BK-2712',
-    equipment: 'Mahindra ARJUN 605 DI',
+    equipment: 'Mahindra 575 DI Yuvo Tech+',
     cat: 'Tractor',
-    img: 'https://images.unsplash.com/photo-1589820296156-2454bb8a6ad1?auto=format&fit=crop&w=800&h=520&q=85',
-    location: 'Nagpur, Maharashtra',
+    img: '/equipment/tractors/mahindra-575-di-yuvo-tech-plus.jpg',
+    location: 'Coimbatore, Tamil Nadu',
     from: '2026-07-20',
     to: '2026-07-22',
-    dailyRate: 2100,
-    amount: '₹4,200',
-    totalNumeric: 4200,
+    dailyRate: 1800,
+    amount: '₹3,600',
+    totalNumeric: 3600,
     status: 'completed',
-    owner: 'Suresh Patel',
-    ownerPhone: '+91 97654 32109',
+    owner: 'Karthik Subramanian',
+    ownerPhone: '+91 98421 23456',
     trackingStage: 6,
-    lastLocation: 'Nagpur Central Hub',
+    lastLocation: 'Coimbatore Central Hub',
     distance: '3.6 km away',
   },
   {
     id: 'BK-2688',
-    equipment: 'Fertilizer Spreader 500kg',
-    cat: 'Fertilizers',
-    img: 'https://images.unsplash.com/photo-1585314062340-f1a5a7c9328d?auto=format&fit=crop&w=800&h=520&q=85',
-    location: 'Coimbatore, Tamil Nadu',
+    equipment: 'Mahindra Seed Drill',
+    cat: 'Seeding',
+    img: '/equipment/seeding/mahindra-seed-drill.jpg',
+    location: 'Thanjavur, Tamil Nadu',
     from: '2026-09-21',
     to: '2026-09-25',
-    dailyRate: 600,
-    amount: '₹2,400',
-    totalNumeric: 2400,
+    dailyRate: 1400,
+    amount: '₹5,600',
+    totalNumeric: 5600,
     status: 'active',
-    owner: 'Muthu Kumar',
-    ownerPhone: '+91 98421 55667',
+    owner: 'Selvam Murugan',
+    ownerPhone: '+91 98421 54321',
     trackingStage: 3, // In Transit
-    lastLocation: 'Pollachi Main Road (4.2 km away)',
+    lastLocation: 'Kumbakonam Main Road (3.2 km away)',
     distance: '3.2 km away',
   },
   {
     id: 'BK-2645',
-    equipment: 'CLAAS Lexion 8700 Harvester',
+    equipment: 'Claas Crop Tiger 30',
     cat: 'Harvester',
-    img: 'https://images.unsplash.com/photo-1595974482597-4b8da8879bc5?auto=format&fit=crop&w=800&h=520&q=85',
-    location: 'Amritsar, Punjab',
+    img: '/equipment/harvesters/claas-crop-tiger-30.jpg',
+    location: 'Thanjavur, Tamil Nadu',
     from: '2026-07-01',
     to: '2026-07-05',
-    dailyRate: 6800,
-    amount: '₹27,200',
-    totalNumeric: 27200,
+    dailyRate: 4800,
+    amount: '₹19,200',
+    totalNumeric: 19200,
     status: 'cancelled',
     owner: 'Balvinder Singh',
-    ownerPhone: '+91 98140 99887',
+    ownerPhone: '+91 98140 87654',
     trackingStage: 0,
     lastLocation: 'Cancelled prior to dispatch',
     distance: '5.2 km away',
@@ -171,9 +173,8 @@ export function extendBookingRental(
 ): { success: boolean; error?: string; booking?: BookingItem; additionalCost?: number } {
   const list = getStoredBookings()
   const index = list.findIndex((b) => b.id === id)
-  if (index === -1) return { success: false, error: 'Booking not found' }
-
   const target = list[index]
+  if (!target) return { success: false, error: 'Booking not found' }
   if (target.status === 'cancelled') {
     return { success: false, error: 'Cannot extend a cancelled booking' }
   }
@@ -197,6 +198,7 @@ export function extendBookingRental(
 
   const updated: BookingItem = {
     ...target,
+    id: target.id,
     to: newEndDate,
     totalNumeric: updatedNumeric,
     amount: `₹${updatedNumeric.toLocaleString('en-IN')}`,
@@ -215,6 +217,7 @@ export function cancelBookingRental(
   if (index === -1) return { success: false, error: 'Booking not found' }
 
   const target = list[index]
+  if (!target) return { success: false, error: 'Booking not found' }
   if (target.status === 'cancelled') {
     return { success: false, error: 'Booking is already cancelled' }
   }
@@ -224,6 +227,7 @@ export function cancelBookingRental(
 
   const updated: BookingItem = {
     ...target,
+    id: target.id,
     status: 'cancelled',
     trackingStage: 0,
   }
@@ -247,6 +251,18 @@ export function createNewBooking(
   list.unshift(fullItem)
   saveBookings(list)
   return fullItem
+}
+
+export function hasActiveBookingForEquipment(equipmentNameOrId: string): boolean {
+  const list = getStoredBookings()
+  const lower = (equipmentNameOrId || '').toLowerCase().trim()
+  return list.some(
+    (b) =>
+      (b.id.toLowerCase() === lower ||
+        b.equipment.toLowerCase().includes(lower) ||
+        lower.includes(b.equipment.toLowerCase())) &&
+      (b.status === 'active' || b.status === 'pending' || b.status === 'confirmed')
+  )
 }
 
 export function onBookingsChange(callback: (bookings: BookingItem[]) => void): () => void {

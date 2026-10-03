@@ -31,7 +31,7 @@ const GOOGLE_ACCOUNTS = [
 
 export default function OAuthModal({ isOpen, onClose, onSuccess }: Props) {
   const [loading, setLoading] = useState(false)
-  const [selectedAccount, setSelectedAccount] = useState(GOOGLE_ACCOUNTS[0])
+  const [selectedAccount, setSelectedAccount] = useState<(typeof GOOGLE_ACCOUNTS)[number]>(GOOGLE_ACCOUNTS[0]!)
 
   if (!isOpen) return null
 

@@ -97,8 +97,8 @@ function handleAiChat(message: string, lang = "en") {
   if (q.includes("harvester") || q.includes("அறுவடை") || q.includes("நெல்") || q.includes("paddy")) {
     return {
       reply: isTa
-        ? "நெல் அறுவடைக்கு கிளாஸ் க்ராப் டைகர் 30 மற்றும் ப்ரீத் 987 அறுவடை இயந்திரங்கள் தயாராக உள்ளன. ஈர நிலங்களிலும் சக்கரம் புதையாமல் அறுவடை செய்யும் ட்ராக் அமைப்பும் உள்ளது."
-        : "For paddy & wheat harvest, the Preet 987 Combine and CLAAS CROP TIGER 30 Terra-Trac are available. They feature rubber caterpillar crawlers that operate smoothly even in saturated wetland soils.",
+        ? "நெல் அறுவடைக்கு கிளாஸ் க்ராப் டைகர் 30 மற்றும் குபோடா DC-68G அறுவடை இயந்திரங்கள் தயாராக உள்ளன. ஈர நிலங்களிலும் சக்கரம் புதையாமல் அறுவடை செய்யும் ட்ராக் அமைப்பும் உள்ளது."
+        : "For paddy & wheat harvest, the Claas Crop Tiger 30 and Kubota DC-68G Harvesters are available. They feature rubber caterpillar crawlers that operate smoothly even in saturated wetland soils.",
       recommendedEquipmentId: "eq-harvester-1",
       quickPills: isTa ? ["அறுவடை இயந்திரங்கள்", "வைக்கோல் பேலர்", "தானிய விதானம்"] : ["View Harvesters", "Straw Baler", "Grain Seeds"],
     };
@@ -149,16 +149,16 @@ function calculateAgriMatch(params: { acres: number; crop: string; soil: string;
     mechanizedCostPerAcre = 450;
   } else if (operation.toLowerCase().includes("harvest")) {
     recommendedCategory = "Harvester";
-    recommendedTool = "Preet 987 Self-Propelled Multi-Crop Combine Harvester";
+    recommendedTool = "Claas Crop Tiger 30";
     recommendedId = "eq-harvester-1";
     hoursPerAcre = 0.4;
     dieselPerAcre = 9.5;
     manualCostPerAcre = 4800;
     mechanizedCostPerAcre = 2200;
-  } else if (operation.toLowerCase().includes("level")) {
-    recommendedCategory = "Land Leveler";
-    recommendedTool = "Fieldking Dual-Mast Precision Laser Land Leveler";
-    recommendedId = "eq-leveler-1";
+  } else if (operation.toLowerCase().includes("level") || operation.toLowerCase().includes("plough") || operation.toLowerCase().includes("till")) {
+    recommendedCategory = "Ploughing & Tilling";
+    recommendedTool = "Mahindra MB Plough";
+    recommendedId = "eq-tillage-1";
     hoursPerAcre = 1.2;
     dieselPerAcre = 5.2;
     manualCostPerAcre = 3000;
@@ -435,11 +435,20 @@ export async function handleApiRequest(request: Request): Promise<Response | nul
         name: body.name,
         nameTa: body.nameTa || body.name,
         category: body.category,
+        brand: body.brand || body.name.split(" ")[0] || "Custom",
+        model: body.model || body.name,
+        imageUrl: body.imageUrl || body.img || "/equipment/tractors/mahindra-575-di-yuvo-tech-plus.jpg",
         description: body.description || "",
         location: body.location || "Tamil Nadu",
         pricePerDay: Number(body.pricePerDay),
+        pricePerHour: body.pricePerHour !== undefined ? Number(body.pricePerHour) : undefined,
+        condition: body.condition || "Excellent",
+        year: body.year || "2025",
+        minRentalDays: body.minRentalDays !== undefined ? Number(body.minRentalDays) : 1,
+        deliveryAvailable: body.deliveryAvailable !== undefined ? Boolean(body.deliveryAvailable) : false,
+        deliveryCharge: body.deliveryCharge !== undefined ? Number(body.deliveryCharge) : 0,
         available: true,
-        img: body.img || "https://images.unsplash.com/photo-1533062618053-d51e617307ec?auto=format&fit=crop&w=800&q=80",
+        img: body.img || body.imageUrl || "/equipment/tractors/mahindra-575-di-yuvo-tech-plus.jpg",
         rating: 5.0,
         reviews: 0,
         hp: body.hp,
@@ -461,6 +470,106 @@ export async function handleApiRequest(request: Request): Promise<Response | nul
       });
 
       return json({ listing: created }, 201);
+    }
+
+    // Update Equipment (Owner / Admin JWT Required)
+    if (request.method === "PUT" && pathname.startsWith("/api/listings/")) {
+      const jwtUser = getJwtFromHeader(request);
+      if (!jwtUser || (jwtUser.role !== "owner" && jwtUser.role !== "admin")) {
+        return json({ error: "Equipment owner or Admin authorization required" }, 403);
+      }
+
+      const id = pathname.replace("/api/listings/", "").trim();
+      const existing = storage.findListingById(id);
+      if (!existing) {
+        return json({ error: "Equipment listing not found" }, 404);
+      }
+
+      if (jwtUser.role !== "admin" && existing.ownerId !== jwtUser.userId) {
+        return json({ error: "You can only edit your own equipment listings" }, 403);
+      }
+
+      const body = await readBody<Partial<StoredListing>>(request);
+      if (!body) {
+        return json({ error: "Request body required" }, 400);
+      }
+
+      const updates: Partial<StoredListing> = {};
+      if (body.name !== undefined) updates.name = body.name;
+      if (body.nameTa !== undefined) updates.nameTa = body.nameTa;
+      if (body.category !== undefined) updates.category = body.category;
+      if (body.brand !== undefined) updates.brand = body.brand;
+      if (body.model !== undefined) updates.model = body.model;
+      if (body.description !== undefined) updates.description = body.description;
+      if (body.location !== undefined) updates.location = body.location;
+      if (body.pricePerDay !== undefined) updates.pricePerDay = Number(body.pricePerDay);
+      if (body.pricePerHour !== undefined) updates.pricePerHour = Number(body.pricePerHour);
+      if (body.securityDeposit !== undefined) updates.securityDeposit = Number(body.securityDeposit);
+      if (body.condition !== undefined) updates.condition = body.condition;
+      if (body.year !== undefined) updates.year = body.year;
+      if (body.minRentalDays !== undefined) updates.minRentalDays = Number(body.minRentalDays);
+      if (body.deliveryAvailable !== undefined) updates.deliveryAvailable = Boolean(body.deliveryAvailable);
+      if (body.deliveryCharge !== undefined) updates.deliveryCharge = Number(body.deliveryCharge);
+      if (body.available !== undefined) updates.available = Boolean(body.available);
+      if (body.img !== undefined) {
+        updates.img = body.img;
+        updates.imageUrl = body.img;
+      }
+      if (body.hp !== undefined) updates.hp = body.hp;
+      if (body.fuelType !== undefined) updates.fuelType = body.fuelType;
+      if (body.operatorIncluded !== undefined) updates.operatorIncluded = Boolean(body.operatorIncluded);
+      if (body.specs !== undefined) updates.specs = body.specs;
+      if (body.lat !== undefined) updates.lat = body.lat;
+      if (body.lng !== undefined) updates.lng = body.lng;
+
+      const updated = storage.updateListing(id, updates);
+      if (!updated) {
+        return json({ error: "Failed to update listing" }, 500);
+      }
+
+      storage.createNotification({
+        userId: jwtUser.userId,
+        title: "Equipment Listing Updated",
+        message: `Your listing "${updated.name}" has been updated successfully.`,
+        type: "equipment_updated",
+        read: false,
+        relatedId: updated.id,
+      });
+
+      return json({ listing: updated });
+    }
+
+    // Delete Equipment (Owner / Admin JWT Required + Booking Safety)
+    if (request.method === "DELETE" && pathname.startsWith("/api/listings/")) {
+      const jwtUser = getJwtFromHeader(request);
+      if (!jwtUser || (jwtUser.role !== "owner" && jwtUser.role !== "admin")) {
+        return json({ error: "Equipment owner or Admin authorization required" }, 403);
+      }
+
+      const id = pathname.replace("/api/listings/", "").trim();
+      const existing = storage.findListingById(id);
+      if (!existing) {
+        return json({ error: "Equipment listing not found" }, 404);
+      }
+
+      if (jwtUser.role !== "admin" && existing.ownerId !== jwtUser.userId) {
+        return json({ error: "You can only delete your own equipment listings" }, 403);
+      }
+
+      const res = storage.deleteListing(id);
+      if (!res.success) {
+        return json({ error: res.error || "Cannot delete listing" }, 400);
+      }
+
+      storage.createNotification({
+        userId: jwtUser.userId,
+        title: "Equipment Listing Removed",
+        message: `Your listing "${existing.name}" has been removed from the catalog.`,
+        type: "equipment_deleted",
+        read: false,
+      });
+
+      return json({ success: true, message: "Equipment removed successfully" });
     }
 
     // 8. Bookings (Create & List)
@@ -647,7 +756,7 @@ export async function handleApiRequest(request: Request): Promise<Response | nul
     // 10. Live Agricultural Weather API
     if (request.method === "GET" && pathname === "/api/weather") {
       const location = url.searchParams.get("location") || "Coimbatore";
-      const weather = WEATHER_DATABASE[location] || WEATHER_DATABASE.Coimbatore;
+      const weather = WEATHER_DATABASE[location] || WEATHER_DATABASE['Coimbatore'] || { temp: 29, humidity: 62, windSpeed: 8, rainProb: 10, condition: "Partly Cloudy", conditionTa: "பகுதி மேகமூட்டம்" };
       const spraySuitability = calculateSpraySuitability(weather);
 
       return json({

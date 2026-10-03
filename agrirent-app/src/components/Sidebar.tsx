@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useLanguage } from '../context/LanguageContext'
+import { useTheme } from '../context/ThemeContext'
 import { getStoredUser, UserSession } from '../lib/api-client'
 import { getUnreadCount, onNotificationsChange } from '../lib/notifications'
 
@@ -21,6 +22,7 @@ interface Props {
 
 export default function Sidebar({ activeItem, onNavigate, role }: Props) {
   const { t } = useLanguage()
+  const { openSettings } = useTheme()
   const [currentUser, setCurrentUser] = useState<UserSession | null>(() => getStoredUser())
   const userId = currentUser?.id || (role === 'farmer' ? 'usr-farmer-1' : 'usr-owner-1')
 
@@ -47,7 +49,7 @@ export default function Sidebar({ activeItem, onNavigate, role }: Props) {
 
   const ownerItems: SidebarItem[] = [
     { icon: '🏠', label: 'Dashboard', screen: 'owner-dashboard' },
-    { icon: '🚜', label: 'My Equipment', screen: 'add-equipment' },
+    { icon: '🚜', label: 'My Equipment', screen: 'owner-dashboard' },
     { icon: '➕', label: 'Add Equipment', screen: 'add-equipment' },
     { icon: '📋', label: 'Booking Requests', screen: 'owner-bookings', badge: 3 },
     { icon: '📊', label: 'Analytics', screen: 'analytics' },
@@ -205,6 +207,29 @@ export default function Sidebar({ activeItem, onNavigate, role }: Props) {
           </div>
           <span style={{ color: '#9CA3AF', fontSize: 14 }}>⚙️</span>
         </div>
+
+        <button
+          type="button"
+          onClick={openSettings}
+          style={{
+            width: '100%',
+            marginTop: 8,
+            padding: '8px 0',
+            background: 'rgba(21, 128, 61, 0.08)',
+            border: '1px solid rgba(21, 128, 61, 0.2)',
+            borderRadius: 10,
+            color: '#15803D',
+            fontWeight: 700,
+            fontSize: 13,
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 6,
+          }}
+        >
+          <span>🎨</span> {t('Settings & Themes')}
+        </button>
 
         <button
           onClick={() => onNavigate('login')}

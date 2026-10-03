@@ -132,6 +132,19 @@ export const api = {
     })
   },
 
+  async updateListing(id: string, data: any) {
+    return request<{ listing: any }>(`/api/listings/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    })
+  },
+
+  async deleteListing(id: string) {
+    return request<{ success: boolean; message: string }>(`/api/listings/${id}`, {
+      method: 'DELETE',
+    })
+  },
+
   // Notifications
   async getNotifications(userId?: string) {
     const query = userId ? `?userId=${encodeURIComponent(userId)}` : ''

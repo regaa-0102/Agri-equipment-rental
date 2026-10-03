@@ -12,6 +12,8 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { LanguageProvider } from "../context/LanguageContext";
+import { ThemeProvider } from "../context/ThemeContext";
+import SettingsModal from "../components/SettingsModal";
 import AgriRentApp from "../components/AgriRentApp";
 
 function NotFoundComponent() {
@@ -108,10 +110,14 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <LanguageProvider>
-        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-        <Outlet />
-      </LanguageProvider>
+      <ThemeProvider>
+        <LanguageProvider>
+          {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+          <Outlet />
+          <SettingsModal />
+        </LanguageProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 }
+

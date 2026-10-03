@@ -5,7 +5,8 @@ import AgriRentApp from './AgriRentApp'
 import { useLanguage } from '../context/LanguageContext'
 import ApiExplorerModal from './ApiExplorerModal'
 import JwtInspectorModal from './JwtInspectorModal'
-import { Tractor } from 'lucide-react'
+import { Tractor, Settings, ZoomIn, ZoomOut, Palette } from 'lucide-react'
+import { useTheme } from '../context/ThemeContext'
 
 export const SCREENS = [
   { id: 'home', path: '/', label: '1. Home / Equipment Catalog' },
@@ -44,6 +45,7 @@ export function usePrototypeNavigate() {
 
 export default function PrototypeShell({ children }: { children: ReactNode }) {
   const navigate = useNavigate()
+  const { theme, siteZoom, zoomIn, zoomOut, openSettings } = useTheme()
   const [apiModalOpen, setApiModalOpen] = useState(false)
   const [jwtModalOpen, setJwtModalOpen] = useState(false)
 
@@ -108,6 +110,98 @@ export default function PrototypeShell({ children }: { children: ReactNode }) {
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          {/* Zoom In & Zoom Out Quick Controls */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              background: 'rgba(255, 255, 255, 0.08)',
+              borderRadius: 8,
+              border: '1px solid rgba(255, 255, 255, 0.15)',
+              padding: '2px 4px',
+              gap: 4,
+            }}
+          >
+            <button
+              type="button"
+              onClick={zoomOut}
+              disabled={siteZoom <= 80}
+              title="Website Zoom Out (-)"
+              style={{
+                background: 'none',
+                border: 'none',
+                color: '#fff',
+                cursor: siteZoom <= 80 ? 'not-allowed' : 'pointer',
+                padding: '2px 4px',
+                borderRadius: 4,
+                display: 'flex',
+                alignItems: 'center',
+                opacity: siteZoom <= 80 ? 0.4 : 1,
+              }}
+            >
+              <ZoomOut size={13} />
+            </button>
+            <span
+              onClick={openSettings}
+              title="Click to change Zoom or Theme"
+              style={{
+                fontSize: 11,
+                fontWeight: 700,
+                color: '#4ADE80',
+                cursor: 'pointer',
+                padding: '0 2px',
+                minWidth: 32,
+                textAlign: 'center',
+              }}
+            >
+              {siteZoom}%
+            </span>
+            <button
+              type="button"
+              onClick={zoomIn}
+              disabled={siteZoom >= 150}
+              title="Website Zoom In (+)"
+              style={{
+                background: 'none',
+                border: 'none',
+                color: '#fff',
+                cursor: siteZoom >= 150 ? 'not-allowed' : 'pointer',
+                padding: '2px 4px',
+                borderRadius: 4,
+                display: 'flex',
+                alignItems: 'center',
+                opacity: siteZoom >= 150 ? 0.4 : 1,
+              }}
+            >
+              <ZoomIn size={13} />
+            </button>
+          </div>
+
+          {/* Settings & Theme Button */}
+          <button
+            type="button"
+            onClick={openSettings}
+            title="Open Settings (Themes, Display Zoom, Language)"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+              background: 'rgba(255, 255, 255, 0.1)',
+              border: '1px solid rgba(255, 255, 255, 0.2)',
+              borderRadius: 8,
+              color: '#F8FAFC',
+              padding: '5px 10px',
+              fontSize: 12,
+              fontWeight: 600,
+              cursor: 'pointer',
+              transition: 'background 0.2s',
+            }}
+          >
+            <Palette size={13} style={{ color: '#4ADE80' }} />
+            <span>Theme / Settings</span>
+            <Settings size={13} />
+          </button>
+
           {/* Language Selector */}
           <LanguageSelector />
         </div>

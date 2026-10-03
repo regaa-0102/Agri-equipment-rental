@@ -301,7 +301,7 @@ export default function MyBookings({ onNavigate }: Props) {
                             }}
                             onError={(e) => {
                               e.currentTarget.src =
-                                'https://images.unsplash.com/photo-1533062618053-d51e617307ec?auto=format&fit=crop&w=200&h=150&q=80'
+                                '/equipment/tractors/mahindra-575-di-yuvo-tech-plus.jpg'
                             }}
                           />
                           <div>

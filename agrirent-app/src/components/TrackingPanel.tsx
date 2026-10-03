@@ -4,11 +4,11 @@ import { BookingItem, TRACKING_STAGES } from '../lib/bookings'
 
 interface Props {
   booking: BookingItem
-  isOpen: boolean
+  isOpen?: boolean | undefined
   onClose: () => void
 }
 
-export default function TrackingPanel({ booking, isOpen, onClose }: Props) {
+export default function TrackingPanel({ booking, isOpen = true, onClose }: Props) {
   const { isTamil } = useLanguage()
 
   if (!isOpen) return null
@@ -131,7 +131,7 @@ export default function TrackingPanel({ booking, isOpen, onClose }: Props) {
             onError={(e) => {
               // fallback image if offline
               e.currentTarget.src =
-                'https://images.unsplash.com/photo-1533062618053-d51e617307ec?auto=format&fit=crop&w=400&h=300&q=80'
+                '/equipment/tractors/mahindra-575-di-yuvo-tech-plus.jpg'
             }}
           />
           <div style={{ flex: 1, minWidth: 0 }}>

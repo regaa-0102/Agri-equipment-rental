@@ -42,7 +42,7 @@ export default function CategoryCard({ category, isSelected = false, onClick }: 
           }}
           onError={(e) => {
             e.currentTarget.src =
-              'https://images.unsplash.com/photo-1533062618053-d51e617307ec?auto=format&fit=crop&w=300&h=200&q=80'
+              '/equipment/tractors/mahindra-575-di-yuvo-tech-plus.jpg'
           }}
         />
         <div
@@ -77,9 +77,31 @@ export default function CategoryCard({ category, isSelected = false, onClick }: 
         >
           {displayName}
         </div>
-        <div style={{ fontSize: 11, color: '#9CA3AF', fontWeight: 500, marginTop: 'auto' }}>
-          {category.count}
+        <div style={{ fontSize: 11, color: '#6B7280', fontWeight: 600, marginTop: 'auto', marginBottom: 8 }}>
+          {category.count} {isTamil ? 'கிடைக்கும்' : 'Available'}
         </div>
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation()
+            onClick(category.name)
+          }}
+          style={{
+            background: isSelected ? '#2E7D32' : '#F0FDF4',
+            color: isSelected ? '#fff' : '#15803D',
+            border: isSelected ? '1px solid #2E7D32' : '1px solid #BBF7D0',
+            borderRadius: 8,
+            padding: '5px 8px',
+            fontSize: 11,
+            fontWeight: 700,
+            cursor: 'pointer',
+            textAlign: 'center',
+            width: '100%',
+            transition: 'all 0.15s ease',
+          }}
+        >
+          {isTamil ? `பார் (${displayName})` : `View ${displayName}`}
+        </button>
       </div>
     </div>
   )

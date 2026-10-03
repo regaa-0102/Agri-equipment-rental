@@ -1,6 +1,6 @@
 import { createHmac } from "node:crypto";
 
-const JWT_SECRET = process.env.JWT_SECRET || "agrirent-secure-jwt-secret-key-2026";
+const JWT_SECRET = process.env['JWT_SECRET'] || "agrirent-secure-jwt-secret-key-2026";
 
 export interface JwtPayload {
   userId: string;
@@ -55,7 +55,11 @@ export function verifyJwt(token: string): JwtPayload | null {
     const parts = token.split(".");
     if (parts.length !== 3) return null;
 
-    const [encodedHeader, encodedPayload, signature] = parts;
+    const encodedHeader = parts[0];
+    const encodedPayload = parts[1];
+    const signature = parts[2];
+    if (!encodedHeader || !encodedPayload || !signature) return null;
+
     const expectedSignature = createHmac("sha256", JWT_SECRET)
       .update(`${encodedHeader}.${encodedPayload}`)
       .digest("base64")
@@ -83,8 +87,11 @@ export function decodeJwt(token: string): { header: unknown; payload: JwtPayload
   try {
     const parts = token.split(".");
     if (parts.length !== 3) return { header: null, payload: null };
-    const header = JSON.parse(base64UrlDecode(parts[0]));
-    const payload = JSON.parse(base64UrlDecode(parts[1])) as JwtPayload;
+    const p0 = parts[0];
+    const p1 = parts[1];
+    if (!p0 || !p1) return { header: null, payload: null };
+    const header = JSON.parse(base64UrlDecode(p0));
+    const payload = JSON.parse(base64UrlDecode(p1)) as JwtPayload;
     return { header, payload };
   } catch {
     return { header: null, payload: null };

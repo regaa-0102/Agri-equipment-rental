@@ -88,866 +88,389 @@
     {
       "id": "eq-tractor-1",
       "ownerId": "usr-owner-1",
-      "name": "John Deere 5310 4WD (55 HP) Tractor",
-      "nameTa": "ஜான் டீர் 5310 4WD (55 HP) டிராக்டர்",
+      "name": "Mahindra 575 DI Yuvo Tech+",
+      "nameTa": "மகிந்திரா 575 DI யுவோ டெக்+",
       "category": "Tractor",
-      "brand": "John Deere",
-      "model": "5310 4WD",
-      "imageUrl": "https://images.unsplash.com/photo-1533062618053-d51e617307ec?auto=format&fit=crop&w=900&h=600&q=85",
-      "description": "Heavy duty 55 HP 4-Wheel Drive John Deere tractor equipped with power steering, dual-clutch, oil immersed disc brakes and high hydraulic lift capacity (2000 kg). Ideal for heavy ploughing, rotary tillage and trailer haulage.",
+      "brand": "Mahindra",
+      "model": "575 DI Yuvo Tech+",
+      "imageUrl": "/equipment/tractors/mahindra-575-di-yuvo-tech-plus.jpg",
+      "description": "Official Mahindra 575 DI Yuvo Tech+ tractor with powerful 4-cylinder engine, 12F+3R transmission, superior fuel economy, and 1700 kg lift capacity ideal for rotary tillage, haulage, and puddling.",
       "location": "Coimbatore, Tamil Nadu",
       "lat": 11.0168,
       "lng": 76.9558,
       "pricePerDay": 1800,
       "available": true,
-      "img": "https://images.unsplash.com/photo-1533062618053-d51e617307ec?auto=format&fit=crop&w=900&h=600&q=85",
+      "img": "/equipment/tractors/mahindra-575-di-yuvo-tech-plus.jpg",
       "rating": 4.9,
-      "reviews": 58,
-      "hp": 55,
-      "fuelType": "Diesel",
-      "securityDeposit": 3000,
-      "operatorIncluded": false,
-      "specs": [
-        {
-          "label": "Engine Power",
-          "labelTa": "இயந்திர சக்தி",
-          "value": "55 HP @ 2400 RPM"
-        },
-        {
-          "label": "Drive",
-          "labelTa": "இயக்க வகை",
-          "value": "4 Wheel Drive (4WD)"
-        },
-        {
-          "label": "Hydraulic Lift",
-          "labelTa": "தூக்கும் திறன்",
-          "value": "2000 kg with Cat-II 3-Point Linkage"
-        },
-        {
-          "label": "Fuel Tank",
-          "labelTa": "எரிபொருள் தொட்டி",
-          "value": "68 Liters"
-        },
-        {
-          "label": "PTO Speed",
-          "labelTa": "பிடிஓ வேகம்",
-          "value": "540 RPM Dual Speed"
-        }
-      ],
-      "createdAt": "2026-09-10T18:10:34.625Z"
-    },
-    {
-      "id": "eq-tractor-2",
-      "ownerId": "usr-farmer-1",
-      "name": "Mahindra Yuvo Tech+ 575 DI (47 HP) Tractor",
-      "nameTa": "மகிந்திரா யுவோ டெக்+ 575 DI (47 HP) டிராக்டர்",
-      "category": "Tractor",
-      "brand": "Mahindra",
-      "model": "Yuvo Tech+ 575 DI",
-      "imageUrl": "https://images.unsplash.com/photo-1592878904946-b3cd8ae243d0?auto=format&fit=crop&w=900&h=600&q=85",
-      "description": "Modern 47 HP Mahindra Yuvo Tech+ tractor with 12 Forward + 3 Reverse gears. High fuel efficiency mZIP engine suitable for wetland puddling, rotavator operations and cotton/sugarcane fields.",
-      "location": "Thanjavur, Tamil Nadu",
-      "lat": 10.787,
-      "lng": 79.1378,
-      "pricePerDay": 1650,
-      "available": true,
-      "img": "https://images.unsplash.com/photo-1592878904946-b3cd8ae243d0?auto=format&fit=crop&w=900&h=600&q=85",
-      "rating": 4.8,
       "reviews": 42,
       "hp": 47,
       "fuelType": "Diesel",
-      "securityDeposit": 2500,
-      "operatorIncluded": false,
+      "securityDeposit": 3000,
+      "operatorIncluded": true,
       "specs": [
         {
           "label": "Engine Power",
-          "labelTa": "இயந்திர சக்தி",
-          "value": "47 HP, 4 Cylinder MDI Engine"
+          "labelTa": "என்ஜின் திறன்",
+          "value": "47 HP (4-Cylinder)"
         },
         {
           "label": "Transmission",
-          "labelTa": "கியர் அமைப்பு",
-          "value": "12F + 3R Side Shift Full Constant Mesh"
+          "labelTa": "டிரான்ஸ்மிஷன்",
+          "value": "12 Forward + 3 Reverse"
         },
         {
-          "label": "Hydraulic Lift",
+          "label": "Lift Capacity",
           "labelTa": "தூக்கும் திறன்",
-          "value": "1700 kg"
+          "value": "1,700 kg"
         },
         {
           "label": "Fuel Tank",
           "labelTa": "எரிபொருள் தொட்டி",
-          "value": "60 Liters"
+          "value": "60 Litres"
         }
       ],
-      "createdAt": "2026-09-10T18:10:34.625Z"
+      "createdAt": "2026-09-18T17:29:05.421Z"
     },
     {
-      "id": "eq-tractor-3",
+      "id": "eq-tractor-2",
       "ownerId": "usr-owner-1",
-      "name": "Sonalika DI 745 III Sikander (50 HP) Tractor",
-      "nameTa": "சோனாலிகா DI 745 சிக்கந்தர் (50 HP) டிராக்டர்",
+      "name": "John Deere 5310",
+      "nameTa": "ஜான் டீர் 5310",
       "category": "Tractor",
-      "brand": "Sonalika",
-      "model": "DI 745 III Sikander",
-      "imageUrl": "https://images.unsplash.com/photo-1589820296156-2454bb8a6ad1?auto=format&fit=crop&w=900&h=600&q=85",
-      "description": "Rugged 50 HP Sonalika Sikander with HDM engine delivering extraordinary drawbar pull. Fitted with heavy front bumper and rear wheel counterweights for zero slip during heavy deep tilling.",
-      "location": "Madurai, Tamil Nadu",
-      "lat": 9.9252,
-      "lng": 78.1198,
-      "pricePerDay": 1700,
+      "brand": "John Deere",
+      "model": "5310 PowerTech",
+      "imageUrl": "/equipment/tractors/john-deere-5310.jpg",
+      "description": "Heavy-duty John Deere 5310 utility tractor with 55 HP turbocharged PowerTech engine, Trem IV emission compliance, 2000 kg lift capacity, and oil-immersed disc brakes for heavy field operations.",
+      "location": "Thanjavur, Tamil Nadu",
+      "lat": 10.787,
+      "lng": 79.1378,
+      "pricePerDay": 2200,
       "available": true,
-      "img": "https://images.unsplash.com/photo-1589820296156-2454bb8a6ad1?auto=format&fit=crop&w=900&h=600&q=85",
-      "rating": 4.7,
-      "reviews": 36,
-      "hp": 50,
-      "fuelType": "Diesel",
-      "securityDeposit": 2500,
-      "operatorIncluded": false,
-      "specs": [
-        {
-          "label": "Engine Power",
-          "labelTa": "இயந்திர சக்தி",
-          "value": "50 HP @ 1900 RPM"
-        },
-        {
-          "label": "Torque",
-          "labelTa": "டார்க்",
-          "value": "205 Nm High Torque"
-        },
-        {
-          "label": "Hydraulics",
-          "labelTa": "ஹைட்ராலிக்ஸ்",
-          "value": "1800 kg ExSO Lift"
-        }
-      ],
-      "createdAt": "2026-09-10T18:10:34.625Z"
-    },
-    {
-      "id": "eq-tractor-4",
-      "ownerId": "usr-owner-1",
-      "name": "Swaraj 855 FE (52 HP) Tractor",
-      "nameTa": "ஸ்வராஜ் 855 FE (52 HP) டிராக்டர்",
-      "category": "Tractor",
-      "brand": "Swaraj",
-      "model": "855 FE",
-      "imageUrl": "https://images.unsplash.com/photo-1500937386664-56d1dfef3854?auto=format&fit=crop&w=900&h=600&q=85",
-      "description": "Iconic 52 HP Swaraj 855 FE built for the toughest clay soils. Features 3-cylinder water-cooled engine, multi-speed forward and reverse PTO, and cast iron front axle.",
-      "location": "Salem, Tamil Nadu",
-      "lat": 11.6643,
-      "lng": 78.146,
-      "pricePerDay": 1750,
-      "available": true,
-      "img": "https://images.unsplash.com/photo-1500937386664-56d1dfef3854?auto=format&fit=crop&w=900&h=600&q=85",
+      "img": "/equipment/tractors/john-deere-5310.jpg",
       "rating": 4.8,
-      "reviews": 51,
-      "hp": 52,
+      "reviews": 38,
+      "hp": 55,
       "fuelType": "Diesel",
-      "securityDeposit": 2800,
-      "operatorIncluded": false,
+      "securityDeposit": 3500,
+      "operatorIncluded": true,
       "specs": [
         {
           "label": "Engine Power",
-          "labelTa": "இயந்திர சக்தி",
-          "value": "52 HP, 3307 cc Water Cooled"
+          "labelTa": "என்ஜின் திறன்",
+          "value": "55 HP PowerTech Turbo"
         },
         {
-          "label": "PTO Type",
-          "labelTa": "பிடிஓ வகை",
-          "value": "Multi Speed Forward & Reverse PTO"
+          "label": "Transmission",
+          "labelTa": "டிரான்ஸ்மிஷன்",
+          "value": "9 Forward + 3 Reverse Collarshift"
         },
         {
-          "label": "Hydraulics",
-          "labelTa": "ஹைட்ராலிக்ஸ்",
-          "value": "1700 kg Automatic Depth Control"
-        }
-      ],
-      "createdAt": "2026-09-10T18:10:34.625Z"
-    },
-    {
-      "id": "eq-tractor-5",
-      "ownerId": "usr-owner-1",
-      "name": "Massey Ferguson 241 DI Maha Shakti (42 HP) Tractor",
-      "nameTa": "மேஸ்ஸி பெர்குசன் 241 DI மகா சக்தி (42 HP) டிராக்டர்",
-      "category": "Tractor",
-      "brand": "Massey Ferguson",
-      "model": "241 DI Maha Shakti",
-      "imageUrl": "https://images.unsplash.com/photo-1516253593875-bd7ba052fbc5?auto=format&fit=crop&w=900&h=600&q=85",
-      "description": "Ultra-reliable 42 HP Massey Ferguson with world-renowned Ferguson hydraulics system. Outstanding fuel efficiency for row crops, turmeric farming, and bund formation.",
-      "location": "Erode, Tamil Nadu",
-      "lat": 11.341,
-      "lng": 77.7172,
-      "pricePerDay": 1500,
-      "available": true,
-      "img": "https://images.unsplash.com/photo-1516253593875-bd7ba052fbc5?auto=format&fit=crop&w=900&h=600&q=85",
-      "rating": 4.8,
-      "reviews": 44,
-      "hp": 42,
-      "fuelType": "Diesel",
-      "securityDeposit": 2200,
-      "operatorIncluded": false,
-      "specs": [
-        {
-          "label": "Engine Power",
-          "labelTa": "இயந்திர சக்தி",
-          "value": "42 HP SIMPSONS Engine"
-        },
-        {
-          "label": "Hydraulics",
-          "labelTa": "ஹைட்ராலிக்ஸ்",
-          "value": "1700 kg Draft and Position Control"
+          "label": "Lift Capacity",
+          "labelTa": "தூக்கும் திறன்",
+          "value": "2,000 kg"
         },
         {
           "label": "Brakes",
           "labelTa": "பிரேக்",
-          "value": "Sealed Dry Disc Brakes"
+          "value": "Oil Immersed Disc Brakes"
         }
       ],
-      "createdAt": "2026-09-10T18:10:34.625Z"
+      "createdAt": "2026-09-18T17:29:05.423Z"
     },
     {
-      "id": "eq-tractor-6",
-      "ownerId": "usr-owner-2",
-      "name": "New Holland 3630 TX Plus (55 HP) Tractor",
-      "nameTa": "நியூ ஹாலண்ட் 3630 TX பிளஸ் (55 HP) டிராக்டர்",
+      "id": "eq-tractor-3",
+      "ownerId": "usr-owner-1",
+      "name": "New Holland 3630 TX Super",
+      "nameTa": "நியூ ஹாலந்து 3630 TX சூப்பர்",
       "category": "Tractor",
       "brand": "New Holland",
-      "model": "3630 TX Plus",
-      "imageUrl": "https://images.unsplash.com/photo-1595974482597-4b8da8879bc5?auto=format&fit=crop&w=900&h=600&q=85",
-      "description": "Premium 55 HP New Holland tractor with FPT Turbocharged engine and Constant Mesh Shuttle Shift. High hydraulic flow rate makes it perfect for heavy disc harrows, laser land levelers, and balers.",
-      "location": "Tiruchirappalli, Tamil Nadu",
-      "lat": 10.7905,
-      "lng": 78.7047,
-      "pricePerDay": 1900,
+      "model": "3630 TX Super",
+      "imageUrl": "/equipment/tractors/new-holland-3630-tx-super.jpg",
+      "description": "New Holland 3630 TX Super 50 HP tractor featuring high torque backup, double clutch with independent PTO lever, and robust 1,800 kg hydraulic lift capacity for commercial farm work.",
+      "location": "Madurai, Tamil Nadu",
+      "lat": 9.9252,
+      "lng": 78.1198,
+      "pricePerDay": 2000,
       "available": true,
-      "img": "https://images.unsplash.com/photo-1595974482597-4b8da8879bc5?auto=format&fit=crop&w=900&h=600&q=85",
-      "rating": 4.9,
-      "reviews": 39,
-      "hp": 55,
-      "fuelType": "Diesel",
-      "securityDeposit": 3000,
-      "operatorIncluded": false,
-      "specs": [
-        {
-          "label": "Engine Power",
-          "labelTa": "இயந்திர சக்தி",
-          "value": "55 HP @ 2300 RPM Turbocharged"
-        },
-        {
-          "label": "Hydraulic Capacity",
-          "labelTa": "ஹைட்ராலிக் தூக்குதல்",
-          "value": "2000 kg with Assist Ram"
-        },
-        {
-          "label": "Gears",
-          "labelTa": "கியர்கள்",
-          "value": "8 Forward + 2 Reverse / Optional Shuttle"
-        }
-      ],
-      "createdAt": "2026-09-10T18:10:34.625Z"
-    },
-    {
-      "id": "eq-tractor-7",
-      "ownerId": "usr-owner-1",
-      "name": "Kubota MU4501 2WD (45 HP) Japanese Engine Tractor",
-      "nameTa": "குபோடா MU4501 2WD (45 HP) ஜப்பானிய எஞ்சின் டிராக்டர்",
-      "category": "Tractor",
-      "brand": "Kubota",
-      "model": "MU4501 2WD",
-      "imageUrl": "https://images.unsplash.com/photo-1594771804886-a933bb2d609b?auto=format&fit=crop&w=900&h=600&q=85",
-      "description": "Precision Japanese engineering with Kubota 4-cylinder E-CDIS engine. Whisper-quiet, ultra-low vibration, and exceptional fuel economy for wetland paddy preparation and horticulture orchards.",
-      "location": "Coimbatore, Tamil Nadu",
-      "lat": 11.0168,
-      "lng": 76.9558,
-      "pricePerDay": 1600,
-      "available": true,
-      "img": "https://images.unsplash.com/photo-1594771804886-a933bb2d609b?auto=format&fit=crop&w=900&h=600&q=85",
-      "rating": 4.9,
-      "reviews": 33,
-      "hp": 45,
-      "fuelType": "Diesel",
-      "securityDeposit": 2500,
-      "operatorIncluded": false,
-      "specs": [
-        {
-          "label": "Engine Power",
-          "labelTa": "இயந்திர சக்தி",
-          "value": "45 HP 4 Cylinder Quad-Valve E-CDIS"
-        },
-        {
-          "label": "Hydraulics",
-          "labelTa": "தூக்கு திறன்",
-          "value": "1640 kg at Link Ends"
-        },
-        {
-          "label": "Turning Radius",
-          "labelTa": "திருப்பும் ஆரம்",
-          "value": "2.8 Meters (Ultra Compact)"
-        }
-      ],
-      "createdAt": "2026-09-10T18:10:34.625Z"
-    },
-    {
-      "id": "eq-tractor-8",
-      "ownerId": "usr-owner-1",
-      "name": "Eicher 380 Super DI (40 HP) Tractor",
-      "nameTa": "ஐச்சர் 380 சூப்பர் DI (40 HP) டிராக்டர்",
-      "category": "Tractor",
-      "brand": "Eicher",
-      "model": "380 Super DI",
-      "imageUrl": "https://images.unsplash.com/photo-1563245372-f21724e3856d?auto=format&fit=crop&w=900&h=600&q=85",
-      "description": "Proven workhorse with air-cooled 3-cylinder DI engine. Zero radiator maintenance, lowest operating cost per hour, and ideal for smallholder vegetable and grain farming.",
-      "location": "Dindigul, Tamil Nadu",
-      "lat": 10.3673,
-      "lng": 77.9803,
-      "pricePerDay": 1400,
-      "available": true,
-      "img": "https://images.unsplash.com/photo-1563245372-f21724e3856d?auto=format&fit=crop&w=900&h=600&q=85",
-      "rating": 4.7,
-      "reviews": 29,
-      "hp": 40,
-      "fuelType": "Diesel",
-      "securityDeposit": 2000,
-      "operatorIncluded": false,
-      "specs": [
-        {
-          "label": "Engine Power",
-          "labelTa": "இயந்திர சக்தி",
-          "value": "40 HP Air Cooled Engine"
-        },
-        {
-          "label": "Fuel Tank",
-          "labelTa": "எரிபொருள் தொட்டி",
-          "value": "45 Liters"
-        },
-        {
-          "label": "Lift Capacity",
-          "labelTa": "தூக்கும் திறன்",
-          "value": "1650 kg"
-        }
-      ],
-      "createdAt": "2026-09-10T18:10:34.625Z"
-    },
-    {
-      "id": "eq-tractor-9",
-      "ownerId": "usr-owner-1",
-      "name": "Powertrac Euro 50 Next (50 HP) Heavy Haulage Tractor",
-      "nameTa": "பவர்டிராக் யூரோ 50 நெக்ஸ்ட் (50 HP) டிராக்டர்",
-      "category": "Tractor",
-      "brand": "Powertrac",
-      "model": "Euro 50 Next",
-      "imageUrl": "https://images.unsplash.com/photo-1592982537447-7440770cbfc9?auto=format&fit=crop&w=900&h=600&q=85",
-      "description": "European-styled 50 HP tractor with Dual Clutch, Sensi-1 hydraulics, and metallic paint finish. Optimized for high road speeds with loaded agricultural trolleys and rotavator operations.",
-      "location": "Namakkal, Tamil Nadu",
-      "lat": 11.2189,
-      "lng": 78.1674,
-      "pricePerDay": 1650,
-      "available": true,
-      "img": "https://images.unsplash.com/photo-1592982537447-7440770cbfc9?auto=format&fit=crop&w=900&h=600&q=85",
+      "img": "/equipment/tractors/new-holland-3630-tx-super.jpg",
       "rating": 4.8,
-      "reviews": 25,
+      "reviews": 35,
       "hp": 50,
       "fuelType": "Diesel",
-      "securityDeposit": 2500,
-      "operatorIncluded": false,
-      "specs": [
-        {
-          "label": "Engine Power",
-          "labelTa": "இயந்திர சக்தி",
-          "value": "50 HP 3 Cylinder"
-        },
-        {
-          "label": "Gears",
-          "labelTa": "கியர்கள்",
-          "value": "12 Forward + 3 Reverse"
-        },
-        {
-          "label": "Hydraulic Lift",
-          "labelTa": "தூக்கும் திறன்",
-          "value": "2000 kg Sensi-1"
-        }
-      ],
-      "createdAt": "2026-09-10T18:10:34.625Z"
-    },
-    {
-      "id": "eq-tractor-10",
-      "ownerId": "usr-owner-1",
-      "name": "Farmtrac 60 Powermaxx (55 HP) Tractor",
-      "nameTa": "ஃபார்ம்டிராக் 60 பவர்மேக்ஸ் (55 HP) டிராக்டர்",
-      "category": "Tractor",
-      "brand": "Farmtrac",
-      "model": "60 Powermaxx",
-      "imageUrl": "https://images.unsplash.com/photo-1584473457406-6240486418e9?auto=format&fit=crop&w=900&h=600&q=85",
-      "description": "Heavy duty 55 HP Farmtrac equipped with T20 transmission (16 Forward + 4 Reverse speeds). High torque backup enables continuous tilling without engine stalling.",
-      "location": "Tiruppur, Tamil Nadu",
-      "lat": 11.1085,
-      "lng": 77.3411,
-      "pricePerDay": 1850,
-      "available": true,
-      "img": "https://images.unsplash.com/photo-1584473457406-6240486418e9?auto=format&fit=crop&w=900&h=600&q=85",
-      "rating": 4.8,
-      "reviews": 31,
-      "hp": 55,
-      "fuelType": "Diesel",
       "securityDeposit": 3000,
-      "operatorIncluded": false,
+      "operatorIncluded": true,
       "specs": [
         {
           "label": "Engine Power",
-          "labelTa": "இயந்திர சக்தி",
-          "value": "55 HP @ 2000 RPM"
+          "labelTa": "என்ஜின் திறன்",
+          "value": "50 HP FPT Engine"
         },
         {
           "label": "Transmission",
-          "labelTa": "கியர் அமைப்பு",
-          "value": "T20 (16F + 4R) Full Constant Mesh"
+          "labelTa": "டிரான்ஸ்மிஷன்",
+          "value": "8 Forward + 2 Reverse Constant Mesh"
         },
         {
           "label": "Lift Capacity",
           "labelTa": "தூக்கும் திறன்",
-          "value": "2500 kg Heavy Lift"
+          "value": "1,800 kg"
+        },
+        {
+          "label": "Clutch",
+          "labelTa": "கிளட்ச்",
+          "value": "Double Clutch Independent PTO"
         }
       ],
-      "createdAt": "2026-09-10T18:10:34.625Z"
-    },
-    {
-      "id": "eq-tractor-11",
-      "ownerId": "usr-owner-1",
-      "name": "Mahindra Arjun Novo 605 DI-i (57 HP) Heavy Duty Tractor",
-      "nameTa": "மகிந்திரா அர்ஜுன் நோவோ 605 DI-i (57 HP) டிராக்டர்",
-      "category": "Tractor",
-      "brand": "Mahindra",
-      "model": "Arjun Novo 605 DI-i",
-      "imageUrl": "https://images.unsplash.com/photo-1625246333195-78d9c38ad449?auto=format&fit=crop&w=900&h=600&q=85",
-      "description": "Top-tier 57 HP tractor with synchromesh transmission and forward-reverse shuttle lever. Unmatched speed for heavy laser land levelers, multiple furrow reversible ploughs, and heavy disc harrows.",
-      "location": "Coimbatore, Tamil Nadu",
-      "lat": 11.0168,
-      "lng": 76.9558,
-      "pricePerDay": 2100,
-      "available": true,
-      "img": "https://images.unsplash.com/photo-1625246333195-78d9c38ad449?auto=format&fit=crop&w=900&h=600&q=85",
-      "rating": 4.9,
-      "reviews": 64,
-      "hp": 57,
-      "fuelType": "Diesel",
-      "securityDeposit": 3500,
-      "operatorIncluded": false,
-      "specs": [
-        {
-          "label": "Engine Power",
-          "labelTa": "இயந்திர சக்தி",
-          "value": "57 HP 4-Cylinder 3531 cc"
-        },
-        {
-          "label": "Hydraulic Capacity",
-          "labelTa": "தூக்கும் திறன்",
-          "value": "2200 kg High Precision Fast Lift"
-        },
-        {
-          "label": "Shuttle Shift",
-          "labelTa": "ஷட்டில் ஷிப்ட்",
-          "value": "Forward / Reverse Lever without gear change"
-        }
-      ],
-      "createdAt": "2026-09-10T18:10:34.625Z"
-    },
-    {
-      "id": "eq-tractor-12",
-      "ownerId": "usr-owner-1",
-      "name": "Captain 283 4WD Mini Orchard & Vineyard Tractor (28 HP)",
-      "nameTa": "கேப்டன் 283 4WD மினி பழத்தோட்ட டிராக்டர் (28 HP)",
-      "category": "Tractor",
-      "brand": "Captain",
-      "model": "283 4WD Mini",
-      "imageUrl": "https://images.unsplash.com/photo-1527842891421-42eec6e703ea?auto=format&fit=crop&w=900&h=600&q=85",
-      "description": "Compact 4WD 28 HP mini tractor designed specifically for narrow inter-row crop spacing in banana plantations, coconut groves, vineyards, and pomegranate orchards.",
-      "location": "Theni, Tamil Nadu",
-      "lat": 10.0104,
-      "lng": 77.4768,
-      "pricePerDay": 1200,
-      "available": true,
-      "img": "https://images.unsplash.com/photo-1527842891421-42eec6e703ea?auto=format&fit=crop&w=900&h=600&q=85",
-      "rating": 4.8,
-      "reviews": 20,
-      "hp": 28,
-      "fuelType": "Diesel",
-      "securityDeposit": 1800,
-      "operatorIncluded": false,
-      "specs": [
-        {
-          "label": "Engine Power",
-          "labelTa": "இயந்திர சக்தி",
-          "value": "28 HP Fuel-Efficient Diesel"
-        },
-        {
-          "label": "Drive",
-          "labelTa": "இயக்க வகை",
-          "value": "Selectable 4WD / 2WD"
-        },
-        {
-          "label": "Track Width",
-          "labelTa": "டிராக்டர் அகலம்",
-          "value": "Under 1.0 Meter (Ultra Slim)"
-        }
-      ],
-      "createdAt": "2026-09-10T18:10:34.625Z"
+      "createdAt": "2026-09-18T17:29:05.423Z"
     },
     {
       "id": "eq-harvester-1",
       "ownerId": "usr-owner-2",
-      "name": "Preet 987 Self-Propelled Multi-Crop Combine Harvester",
-      "nameTa": "ப்ரீத் 987 பலபயிர் ஒருங்கிணைந்த அறுவடை இயந்திரம்",
+      "name": "Claas Crop Tiger 30",
+      "nameTa": "கிளாஸ் கிராப் டைகர் 30",
       "category": "Harvester",
-      "brand": "Preet",
-      "model": "987 Multi-Crop",
-      "imageUrl": "https://images.unsplash.com/photo-1635174815612-fd9636f70146?auto=format&fit=crop&w=900&h=600&q=85",
-      "description": "Heavy duty 101 HP self-propelled combine harvester equipped with 14-foot cutter bar, heavy thresher drum, clean grain elevator, and hydraulic unloading auger. Harvests paddy, wheat, soybeans and pulses with minimum grain breakage (<1.5%). Includes experienced certified master operator.",
-      "location": "Thanjavur (Cauvery Delta), Tamil Nadu",
+      "brand": "Claas",
+      "model": "Crop Tiger 30 Terra Trac",
+      "imageUrl": "/equipment/harvesters/claas-crop-tiger-30.jpg",
+      "description": "Claas Crop Tiger 30 Terra Trac multi-crop combine harvester equipped with 60 HP engine, Tangential Axial Flow (TAF) threshing, and rubber tracks for muddy and wet paddy fields.",
+      "location": "Thanjavur, Tamil Nadu",
       "lat": 10.787,
       "lng": 79.1378,
-      "pricePerDay": 2600,
+      "pricePerDay": 4800,
       "available": true,
-      "img": "https://images.unsplash.com/photo-1635174815612-fd9636f70146?auto=format&fit=crop&w=900&h=600&q=85",
+      "img": "/equipment/harvesters/claas-crop-tiger-30.jpg",
       "rating": 4.9,
-      "reviews": 67,
-      "hp": 101,
+      "reviews": 51,
+      "hp": 60,
       "fuelType": "Diesel",
-      "securityDeposit": 5000,
+      "securityDeposit": 7500,
       "operatorIncluded": true,
       "specs": [
         {
-          "label": "Engine Power",
-          "labelTa": "இயந்திர சக்தி",
-          "value": "101 HP 6-Cylinder Water Cooled"
+          "label": "Engine",
+          "labelTa": "என்ஜின்",
+          "value": "60 HP Tata 4SP RTV Diesel"
         },
         {
           "label": "Cutter Bar Width",
           "labelTa": "கட்டர் பார் அகலம்",
-          "value": "14 Feet (4.2 Meters)"
+          "value": "7.0 Feet (2.1 m)"
         },
         {
-          "label": "Grain Tank Capacity",
-          "labelTa": "தானிய தொட்டி கொள்ளளவு",
-          "value": "2400 Liters (approx 1.8 Tons)"
+          "label": "Grain Tank",
+          "labelTa": "தானிய தொட்டி",
+          "value": "1,200 Litres"
         },
         {
-          "label": "Harvesting Capacity",
-          "labelTa": "அறுவடை திறன்",
-          "value": "1.5 - 2.0 Acres / Hour"
+          "label": "Drive Type",
+          "labelTa": "இயக்க வகை",
+          "value": "Terra Trac Rubber Track"
         }
       ],
-      "createdAt": "2026-09-10T18:10:34.625Z"
+      "createdAt": "2026-09-18T17:29:05.423Z"
     },
     {
       "id": "eq-harvester-2",
       "ownerId": "usr-owner-2",
-      "name": "Claas Crop Tiger 30 Terra Trac Rubber Track Paddy Harvester",
-      "nameTa": "கிளாஸ் கிராப் டைகர் 30 ரப்பர் டிராக் நெல் அறுவடை இயந்திரம்",
+      "name": "Kubota DC-68G",
+      "nameTa": "குபோடா DC-68G",
       "category": "Harvester",
-      "brand": "Claas",
-      "model": "Crop Tiger 30 Terra Trac",
-      "imageUrl": "https://images.unsplash.com/photo-1523741543316-beb7fc7023d8?auto=format&fit=crop&w=900&h=600&q=85",
-      "description": "Specialized rubber crawler track harvester engineered for wet, marshy, waterlogged paddy fields. Generates ultra-low ground pressure (0.19 kg/cm²) preventing machine bog-down in deep mud during monsoon harvest.",
-      "location": "Tiruvarur, Tamil Nadu",
-      "lat": 10.7725,
-      "lng": 79.6366,
-      "pricePerDay": 2800,
+      "brand": "Kubota",
+      "model": "DC-68G Harvesking",
+      "imageUrl": "/equipment/harvesters/kubota-dc-68g.jpg",
+      "description": "Authentic Kubota DC-68G Harvesking paddy combine harvester featuring 68 HP diesel engine, Hydrostatic Transmission (HST), and crawler tracks for maximum efficiency with minimal grain loss.",
+      "location": "Erode, Tamil Nadu",
+      "lat": 11.341,
+      "lng": 77.7172,
+      "pricePerDay": 5200,
       "available": true,
-      "img": "https://images.unsplash.com/photo-1523741543316-beb7fc7023d8?auto=format&fit=crop&w=900&h=600&q=85",
-      "rating": 5,
-      "reviews": 48,
-      "hp": 76,
+      "img": "/equipment/harvesters/kubota-dc-68g.jpg",
+      "rating": 4.9,
+      "reviews": 47,
+      "hp": 68,
       "fuelType": "Diesel",
-      "securityDeposit": 6000,
+      "securityDeposit": 8000,
       "operatorIncluded": true,
       "specs": [
         {
-          "label": "Engine Power",
-          "labelTa": "இயந்திர சக்தி",
-          "value": "76 HP Turbo Diesel"
+          "label": "Engine",
+          "labelTa": "என்ஜின்",
+          "value": "68 HP Kubota Diesel Turbo"
         },
         {
-          "label": "Track Type",
-          "labelTa": "டிராக் வகை",
-          "value": "Terra Trac 400mm Wide Rubber Crawlers"
-        },
-        {
-          "label": "Ground Pressure",
-          "labelTa": "தரை அழுத்தம்",
-          "value": "0.19 kg/cm² (Zero Sinking)"
-        }
-      ],
-      "createdAt": "2026-09-10T18:10:34.625Z"
-    },
-    {
-      "id": "eq-harvester-3",
-      "ownerId": "usr-owner-2",
-      "name": "Dasmesh 9100 Paddy Special Combine Harvester",
-      "nameTa": "தஷ்மேஷ் 9100 நெல் சிறப்பு ஒருங்கிணைந்த அறுவடை இயந்திரம்",
-      "category": "Harvester",
-      "brand": "Dasmesh",
-      "model": "9100 Paddy Special",
-      "imageUrl": "https://images.unsplash.com/photo-1595113316349-9fa4eb24f884?auto=format&fit=crop&w=900&h=600&q=85",
-      "description": "Renowned Punjab combine harvester designed for rapid wheat and paddy harvesting. Features massive rasp-bar cylinder, wide cleaning sieves, and heavy duty straw walker system.",
-      "location": "Ludhiana, Punjab",
-      "lat": 30.901,
-      "lng": 75.8573,
-      "pricePerDay": 2500,
-      "available": true,
-      "img": "https://images.unsplash.com/photo-1595113316349-9fa4eb24f884?auto=format&fit=crop&w=900&h=600&q=85",
-      "rating": 4.8,
-      "reviews": 55,
-      "hp": 101,
-      "fuelType": "Diesel",
-      "securityDeposit": 5000,
-      "operatorIncluded": true,
-      "specs": [
-        {
-          "label": "Engine Power",
-          "labelTa": "இயந்திர சக்தி",
-          "value": "101 HP 6-Cylinder Ashok Leyland"
+          "label": "Transmission",
+          "labelTa": "டிரான்ஸ்மிஷன்",
+          "value": "Hydrostatic Transmission (HST)"
         },
         {
           "label": "Cutter Bar",
           "labelTa": "கட்டர் பார்",
-          "value": "13.5 Feet"
+          "value": "2.0 m width"
         },
         {
-          "label": "Grain Tank",
-          "labelTa": "தானிய தொட்டி",
-          "value": "2200 Liters"
+          "label": "Ground Clearance",
+          "labelTa": "தரை இடைவெளி",
+          "value": "High-Clearance Crawler Track"
         }
       ],
-      "createdAt": "2026-09-10T18:10:34.625Z"
+      "createdAt": "2026-09-18T17:29:05.423Z"
     },
     {
-      "id": "eq-harvester-4",
-      "ownerId": "usr-owner-1",
-      "name": "Kartar 4000 Self-Propelled Multi-Crop Combine Harvester",
-      "nameTa": "கர்தார் 4000 பலபயிர் ஒருங்கிணைந்த அறுவடை இயந்திரம்",
-      "category": "Harvester",
-      "brand": "Kartar",
-      "model": "4000 Multi-Crop",
-      "imageUrl": "https://images.unsplash.com/photo-1508873696983-2df5703bc20d?auto=format&fit=crop&w=900&h=600&q=85",
-      "description": "High capacity multi-crop combine suitable for rice, wheat, corn, mustard, and sunflower. Features adjustable concave clearance and variable reel speed.",
-      "location": "Madurai, Tamil Nadu",
-      "lat": 9.9252,
-      "lng": 78.1198,
-      "pricePerDay": 2450,
-      "available": true,
-      "img": "https://images.unsplash.com/photo-1508873696983-2df5703bc20d?auto=format&fit=crop&w=900&h=600&q=85",
-      "rating": 4.8,
-      "reviews": 38,
-      "hp": 101,
-      "fuelType": "Diesel",
-      "securityDeposit": 5000,
-      "operatorIncluded": true,
-      "specs": [
-        {
-          "label": "Engine Power",
-          "labelTa": "இயந்திர சக்தி",
-          "value": "101 HP Turbo Diesel"
-        },
-        {
-          "label": "Cutter Width",
-          "labelTa": "கட்டர் அகலம்",
-          "value": "14 Feet"
-        },
-        {
-          "label": "Throughput",
-          "labelTa": "வேலை திறன்",
-          "value": "1.8 Acres / Hour"
-        }
-      ],
-      "createdAt": "2026-09-10T18:10:34.625Z"
-    },
-    {
-      "id": "eq-harvester-5",
+      "id": "eq-harvester-3",
       "ownerId": "usr-owner-2",
-      "name": "Standard Combine 4000 Track Type Grain Harvester",
-      "nameTa": "ஸ்டாண்டர்ட் கம்பைன் 4000 டிராக் நெல் அறுவடை இயந்திரம்",
+      "name": "New Holland TC5.30",
+      "nameTa": "நியூ ஹாலந்து TC5.30",
       "category": "Harvester",
-      "brand": "Standard",
-      "model": "Combine 4000 Track",
-      "imageUrl": "https://images.unsplash.com/photo-1574943320219-553eb213f72d?auto=format&fit=crop&w=900&h=600&q=85",
-      "description": "Track-mounted combine specifically built for coastal delta delta soil and high-moisture paddy fields. Heavy rubber crawler ensures 100% mobility in wet wetlands.",
-      "location": "Nagapattinam, Tamil Nadu",
-      "lat": 10.7656,
-      "lng": 79.8424,
-      "pricePerDay": 2700,
+      "brand": "New Holland",
+      "model": "TC5.30 Multi-Crop",
+      "imageUrl": "/equipment/harvesters/new-holland-tc5-30.jpg",
+      "description": "High-capacity New Holland TC5.30 multi-crop combine harvester with 130 HP turbocharged engine, 15-foot cutterbar, 3000-litre grain tank, and rotary separator for extensive commercial acreage.",
+      "location": "Salem, Tamil Nadu",
+      "lat": 11.6643,
+      "lng": 78.146,
+      "pricePerDay": 5800,
       "available": true,
-      "img": "https://images.unsplash.com/photo-1574943320219-553eb213f72d?auto=format&fit=crop&w=900&h=600&q=85",
-      "rating": 4.9,
-      "reviews": 41,
-      "hp": 95,
+      "img": "/equipment/harvesters/new-holland-tc5-30.jpg",
+      "rating": 4.8,
+      "reviews": 36,
+      "hp": 130,
       "fuelType": "Diesel",
-      "securityDeposit": 5500,
+      "securityDeposit": 9000,
       "operatorIncluded": true,
       "specs": [
         {
           "label": "Engine Power",
-          "labelTa": "இயந்திர சக்தி",
-          "value": "95 HP Turbocharged"
+          "labelTa": "என்ஜின் திறன்",
+          "value": "130 HP Turbocharged"
         },
         {
-          "label": "Track System",
-          "labelTa": "டிராக் அமைப்பு",
-          "value": "Heavy Duty 500mm Rubber Crawlers"
-        },
-        {
-          "label": "Grain Tank",
-          "labelTa": "தானிய கொள்ளளவு",
-          "value": "2000 Liters"
-        }
-      ],
-      "createdAt": "2026-09-10T18:10:34.625Z"
-    },
-    {
-      "id": "eq-harvester-6",
-      "ownerId": "usr-owner-1",
-      "name": "Yanmar AW70V High-Speed Rubber Crawler Rice Combine Harvester",
-      "nameTa": "யன்மார் AW70V அதிவேக ரப்பர் டிராக் நெல் அறுவடை இயந்திரம்",
-      "category": "Harvester",
-      "brand": "Yanmar",
-      "model": "AW70V Crawler",
-      "imageUrl": "https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=900&h=600&q=85",
-      "description": "Japanese Yanmar 70 HP direct-injection diesel crawler combine. Operates at up to 1.85 m/s travel speed while producing exceptionally clean paddy grain samples with zero husk bruising.",
-      "location": "Thanjavur, Tamil Nadu",
-      "lat": 10.787,
-      "lng": 79.1378,
-      "pricePerDay": 2900,
-      "available": true,
-      "img": "https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=900&h=600&q=85",
-      "rating": 5,
-      "reviews": 52,
-      "hp": 70,
-      "fuelType": "Diesel",
-      "securityDeposit": 6000,
-      "operatorIncluded": true,
-      "specs": [
-        {
-          "label": "Engine Power",
-          "labelTa": "இயந்திர சக்தி",
-          "value": "70 HP Yanmar 4TNV98 Direct Injection"
-        },
-        {
-          "label": "Cutting Width",
-          "labelTa": "அறுக்கும் அகலம்",
-          "value": "2.0 Meters High Speed"
+          "label": "Cutterbar Width",
+          "labelTa": "கட்டர் பார் அகலம்",
+          "value": "15 Feet (4.6 m)"
         },
         {
           "label": "Grain Tank",
           "labelTa": "தானிய தொட்டி",
-          "value": "1400 Liters with Automatic Level Sensor"
+          "value": "3,000 Litres"
+        },
+        {
+          "label": "Separation",
+          "labelTa": "பிரிப்பு அமைப்பு",
+          "value": "Rotary Separator with 5 Walkers"
         }
       ],
-      "createdAt": "2026-09-10T18:10:34.625Z"
+      "createdAt": "2026-09-18T17:29:05.423Z"
     },
     {
-      "id": "eq-tiller-1",
+      "id": "eq-tillage-1",
       "ownerId": "usr-owner-1",
-      "name": "Shaktiman Regular Plus Semi-Champion Rotavator (7 Feet)",
-      "nameTa": "சக்திமான் ரெகுலர் பிளஸ் செமி-சாம்பியன் ரோட்டாவேட்டர் (7 அடி)",
+      "name": "Mahindra MB Plough",
+      "nameTa": "மகிந்திரா MB ஏர் கலப்பை",
       "category": "Ploughing & Tilling",
-      "brand": "Shaktiman",
-      "model": "Regular Plus 7Ft",
-      "imageUrl": "https://images.unsplash.com/photo-1571509107684-7e3034a90012?auto=format&fit=crop&w=900&h=600&q=85",
-      "description": "Heavy duty 7-foot tractor PTO driven rotavator with 48 Boron steel L-type blades, multispeed gearbox and side gear drive. Pulverizes dense clods into super fine seedbeds in a single pass. Requires 45-60 HP tractor.",
-      "location": "Coimbatore, Tamil Nadu",
-      "lat": 11.0168,
-      "lng": 76.9558,
-      "pricePerDay": 750,
+      "brand": "Mahindra",
+      "model": "Dharti Mitra MB Plough",
+      "imageUrl": "/equipment/tillage/mahindra-mb-plough.jpg",
+      "description": "Mahindra Dharti Mitra reversible mouldboard plough engineered for deep soil aeration, hardpan penetration, weed burial, and post-monsoon seedbed tillage.",
+      "location": "Tiruchirappalli, Tamil Nadu",
+      "lat": 10.7905,
+      "lng": 78.7047,
+      "pricePerDay": 850,
       "available": true,
-      "img": "https://images.unsplash.com/photo-1571509107684-7e3034a90012?auto=format&fit=crop&w=900&h=600&q=85",
-      "rating": 4.9,
-      "reviews": 73,
+      "img": "/equipment/tillage/mahindra-mb-plough.jpg",
+      "rating": 4.8,
+      "reviews": 29,
       "hp": 45,
       "fuelType": "Diesel",
       "securityDeposit": 1500,
       "operatorIncluded": false,
       "specs": [
         {
-          "label": "Tillage Width",
-          "labelTa": "உழவு அகலம்",
-          "value": "2.1 Meters (7 Feet)"
+          "label": "Working Depth",
+          "labelTa": "வேலை ஆழம்",
+          "value": "10 - 15 cm"
         },
         {
-          "label": "Blades",
-          "labelTa": "கத்திகள்",
-          "value": "48 L-Type Boron Steel Blades"
+          "label": "Plough Bottoms",
+          "labelTa": "கலப்பை அடி",
+          "value": "2 or 3 Furrows Reversible"
         },
         {
           "label": "Tractor Required",
           "labelTa": "டிராக்டர் தேவை",
-          "value": "45 - 60 HP PTO"
+          "value": "40 - 55 HP"
         },
         {
-          "label": "Gearbox",
-          "labelTa": "கியர்பாக்ஸ்",
-          "value": "Multi Speed with 4 Gear Combinations"
+          "label": "Blades",
+          "labelTa": "பிளேடுகள்",
+          "value": "High Boron Hardened Steel"
         }
       ],
-      "createdAt": "2026-09-10T18:10:34.625Z"
+      "createdAt": "2026-09-18T17:29:05.423Z"
     },
     {
-      "id": "eq-tiller-2",
+      "id": "eq-tillage-2",
       "ownerId": "usr-owner-1",
-      "name": "Lemken Opal 090 Hydraulic Reversible 2-Furrow Plough",
-      "nameTa": "லெம்கன் ஓபல் 090 ஹைட்ராலிக் இருபக்க ஏர் கலப்பை",
+      "name": "Shaktiman Rotary Tiller",
+      "nameTa": "சக்திமான் ரோட்டரி டில்லர்",
       "category": "Ploughing & Tilling",
-      "brand": "Lemken",
-      "model": "Opal 090 2-Furrow",
-      "imageUrl": "https://images.unsplash.com/photo-1589923188900-85dae523342b?auto=format&fit=crop&w=900&h=600&q=85",
-      "description": "Precision German engineered hydraulic reversible mouldboard plough. Flips automatically at field borders via tractor hydraulic valve, eliminating non-working return travel and keeping fields perfectly flat without dead furrows.",
-      "location": "Salem, Tamil Nadu",
-      "lat": 11.6643,
-      "lng": 78.146,
-      "pricePerDay": 850,
+      "brand": "Shaktiman",
+      "model": "Regular Plus Series Rotavator",
+      "imageUrl": "/equipment/tillage/shaktiman-rotary-tiller.jpg",
+      "description": "Shaktiman Regular Plus rotary tiller with 48 boron steel blades and multi-speed drive for single-pass soil pulverization in both dry and wet agricultural fields.",
+      "location": "Coimbatore, Tamil Nadu",
+      "lat": 11.0168,
+      "lng": 76.9558,
+      "pricePerDay": 1100,
       "available": true,
-      "img": "https://images.unsplash.com/photo-1589923188900-85dae523342b?auto=format&fit=crop&w=900&h=600&q=85",
-      "rating": 4.8,
-      "reviews": 34,
-      "hp": 50,
+      "img": "/equipment/tillage/shaktiman-rotary-tiller.jpg",
+      "rating": 4.9,
+      "reviews": 64,
+      "hp": 40,
       "fuelType": "Diesel",
       "securityDeposit": 2000,
       "operatorIncluded": false,
       "specs": [
         {
-          "label": "Furrows",
-          "labelTa": "கொழுக்கள்",
-          "value": "2-Furrow Hydraulic Reversible"
+          "label": "Tillage Width",
+          "labelTa": "உழவு அகலம்",
+          "value": "7.0 Feet (2.1 m)"
         },
         {
-          "label": "Working Depth",
-          "labelTa": "உழவு ஆழம்",
-          "value": "Up to 35 cm (14 Inches)"
+          "label": "Blades",
+          "labelTa": "பிளேடுகள்",
+          "value": "48 L-type Boron Steel Blades"
         },
         {
-          "label": "Tractor HP",
+          "label": "Gearbox",
+          "labelTa": "கியர்பாக்ஸ்",
+          "value": "Multi-Speed Side Gear Drive"
+        },
+        {
+          "label": "Tractor Required",
           "labelTa": "டிராக்டர் தேவை",
-          "value": "50 - 65 HP"
+          "value": "45 - 60 HP"
         }
       ],
-      "createdAt": "2026-09-10T18:10:34.625Z"
+      "createdAt": "2026-09-18T17:29:05.423Z"
     },
     {
-      "id": "eq-tiller-3",
-      "ownerId": "usr-farmer-1",
-      "name": "Fieldking Heavy Duty Trailed Offset Disc Harrow (16 Disc)",
-      "nameTa": "ஃபீல்ட்கிங் ஹெவி டியூட்டி ஆஃப்செட் டிஸ்க் ஹாரோ (16 தட்டுகள்)",
+      "id": "eq-tillage-3",
+      "ownerId": "usr-owner-1",
+      "name": "John Deere Disc Harrow",
+      "nameTa": "ஜான் டீர் டிஸ்க் ஹாரோ",
       "category": "Ploughing & Tilling",
-      "brand": "Fieldking",
-      "model": "Offset 16-Disc",
-      "imageUrl": "https://images.unsplash.com/photo-1509099836639-18ba1795216d?auto=format&fit=crop&w=900&h=600&q=85",
-      "description": "Heavy duty 16-disc offset harrow with notched front discs for slicing crop stubble (cotton, maize, sugarcane roots) and plain rear discs for fine pulverization. Fitted with heavy oil-sealed bearings.",
-      "location": "Thanjavur, Tamil Nadu",
-      "lat": 10.787,
-      "lng": 79.1378,
-      "pricePerDay": 700,
+      "brand": "John Deere",
+      "model": "GreenSystem Disc Harrow",
+      "imageUrl": "/equipment/tillage/john-deere-disc-harrow.jpg",
+      "description": "John Deere GreenSystem heavy tandem disc harrow with 16 boron discs designed for chopping heavy crop residues, clod breaking, and thorough secondary tillage.",
+      "location": "Madurai, Tamil Nadu",
+      "lat": 9.9252,
+      "lng": 78.1198,
+      "pricePerDay": 950,
       "available": true,
-      "img": "https://images.unsplash.com/photo-1509099836639-18ba1795216d?auto=format&fit=crop&w=900&h=600&q=85",
+      "img": "/equipment/tillage/john-deere-disc-harrow.jpg",
       "rating": 4.7,
-      "reviews": 40,
+      "reviews": 31,
       "hp": 45,
       "fuelType": "Diesel",
       "securityDeposit": 1500,
@@ -955,1071 +478,485 @@
       "specs": [
         {
           "label": "Discs",
-          "labelTa": "தட்டுகள் எண்ணிக்கை",
-          "value": "16 Discs (8 Notched Front + 8 Plain Rear)"
+          "labelTa": "டிஸ்க்குகள்",
+          "value": "16 Discs (Notched + Plain)"
         },
         {
           "label": "Disc Diameter",
-          "labelTa": "தட்டின் விட்டம்",
-          "value": "560 mm (22 Inches) Boron Steel"
+          "labelTa": "டிஸ்க் விட்டம்",
+          "value": "560 mm Boron Steel"
         },
         {
-          "label": "Weight",
-          "labelTa": "எடை",
-          "value": "540 kg Heavy Frame"
-        }
-      ],
-      "createdAt": "2026-09-10T18:10:34.625Z"
-    },
-    {
-      "id": "eq-tiller-4",
-      "ownerId": "usr-owner-1",
-      "name": "Khedut Heavy Duty Power Harrow (6 Feet)",
-      "nameTa": "கேதுத் ஹெவி டியூட்டி பவர் ஹாரோ (6 அடி)",
-      "category": "Ploughing & Tilling",
-      "brand": "Khedut",
-      "model": "KDPH-180 (6 Ft)",
-      "imageUrl": "https://images.unsplash.com/photo-1605000797499-95a51c5269ae?auto=format&fit=crop&w=900&h=600&q=85",
-      "description": "Vertical rotating tines cultivate soil without inverting horizons or creating hard plough pans. Rear levelling bar and cage roller leave an impeccably level, moisture-retaining seedbed.",
-      "location": "Coimbatore, Tamil Nadu",
-      "lat": 11.0168,
-      "lng": 76.9558,
-      "pricePerDay": 900,
-      "available": true,
-      "img": "https://images.unsplash.com/photo-1605000797499-95a51c5269ae?auto=format&fit=crop&w=900&h=600&q=85",
-      "rating": 4.9,
-      "reviews": 28,
-      "hp": 55,
-      "fuelType": "Diesel",
-      "securityDeposit": 2200,
-      "operatorIncluded": false,
-      "specs": [
-        {
-          "label": "Working Width",
-          "labelTa": "வேலை அகலம்",
-          "value": "1.8 Meters (6 Feet)"
+          "label": "Gang Angle",
+          "labelTa": "சாய்வு கோணம்",
+          "value": "Adjustable 0° - 20°"
         },
         {
-          "label": "Tines",
-          "labelTa": "கத்திகள் வகை",
-          "value": "Vertical Rotors with Hardened Boron Tines"
-        },
-        {
-          "label": "Roller",
-          "labelTa": "ரோலர் வகை",
-          "value": "Rear Crumbler Roller for Depth Control"
-        }
-      ],
-      "createdAt": "2026-09-10T18:10:34.625Z"
-    },
-    {
-      "id": "eq-tiller-5",
-      "ownerId": "usr-owner-1",
-      "name": "Sonalika Heavy Duty Rigid Cultivator / Tiller (9 Tyne)",
-      "nameTa": "சோனாலிகா ஹெவி டியூட்டி கல்டிவேட்டர் (9 கொத்து)",
-      "category": "Ploughing & Tilling",
-      "brand": "Sonalika",
-      "model": "Rigid 9-Tyne",
-      "imageUrl": "https://images.unsplash.com/photo-1464226184884-fa280b87c399?auto=format&fit=crop&w=900&h=600&q=85",
-      "description": "Heavy duty 9-tyne rigid frame tiller designed for initial land breaking and aeration. Equipped with reversible shovel points made from forged spring steel for double operating life.",
-      "location": "Madurai, Tamil Nadu",
-      "lat": 9.9252,
-      "lng": 78.1198,
-      "pricePerDay": 550,
-      "available": true,
-      "img": "https://images.unsplash.com/photo-1464226184884-fa280b87c399?auto=format&fit=crop&w=900&h=600&q=85",
-      "rating": 4.8,
-      "reviews": 62,
-      "hp": 35,
-      "fuelType": "Diesel",
-      "securityDeposit": 1200,
-      "operatorIncluded": false,
-      "specs": [
-        {
-          "label": "Tynes",
-          "labelTa": "கொத்துகள் எண்ணிக்கை",
-          "value": "9 Tynes in 2 Rows"
-        },
-        {
-          "label": "Frame",
-          "labelTa": "பிரேம்",
-          "value": "Channel Section Heavy Structural Steel"
-        },
-        {
-          "label": "Tractor HP",
+          "label": "Tractor Required",
           "labelTa": "டிராக்டர் தேவை",
-          "value": "35 HP & Above"
+          "value": "40 - 55 HP"
         }
       ],
-      "createdAt": "2026-09-10T18:10:34.625Z"
+      "createdAt": "2026-09-18T17:29:05.423Z"
     },
     {
-      "id": "eq-tiller-6",
+      "id": "eq-seeding-1",
       "ownerId": "usr-owner-1",
-      "name": "Bull Agro Hydraulic Heavy Subsoiler / Chisel Plough",
-      "nameTa": "புல் அக்ரோ ஹைட்ராலிக் சப்சாய்லர் ஆழ உழவு கலப்பை",
-      "category": "Ploughing & Tilling",
-      "brand": "Bull Agro",
-      "model": "BAS-03 Chisel",
-      "imageUrl": "https://images.unsplash.com/photo-1500937386664-56d1dfef3854?auto=format&fit=crop&w=900&h=600&q=85",
-      "description": "Deep penetrating 3-shank subsoiler capable of reaching depths of 55 cm (22 inches). Shatters underground hardpan compaction created by repeated shallow tilling, restoring deep root penetration and rainwater percolation.",
-      "location": "Erode, Tamil Nadu",
-      "lat": 11.341,
-      "lng": 77.7172,
-      "pricePerDay": 800,
-      "available": true,
-      "img": "https://images.unsplash.com/photo-1500937386664-56d1dfef3854?auto=format&fit=crop&w=900&h=600&q=85",
-      "rating": 4.9,
-      "reviews": 26,
-      "hp": 55,
-      "fuelType": "Diesel",
-      "securityDeposit": 2000,
-      "operatorIncluded": false,
-      "specs": [
-        {
-          "label": "Tillage Depth",
-          "labelTa": "உழவு ஆழம்",
-          "value": "45 - 55 cm (Ultra Deep)"
-        },
-        {
-          "label": "Shanks",
-          "labelTa": "கொழுக்கள்",
-          "value": "3 Heavy Steel Shanks with Replaceable Points"
-        },
-        {
-          "label": "Tractor HP",
-          "labelTa": "டிராக்டர் தேவை",
-          "value": "55 - 75 HP"
-        }
-      ],
-      "createdAt": "2026-09-10T18:10:34.626Z"
-    },
-    {
-      "id": "eq-seeder-1",
-      "ownerId": "usr-owner-1",
-      "name": "National Pneumatic Precision Multi-Crop Planter (6 Row)",
-      "nameTa": "நேஷனல் துல்லிய காற்று விசை விதைப்பான் (6 வரிசை)",
-      "category": "Seeder",
-      "brand": "National Agro",
-      "model": "PN-06 Precision",
-      "imageUrl": "https://images.unsplash.com/photo-1507662228758-08d030c4820b?auto=format&fit=crop&w=900&h=600&q=85",
-      "description": "High-precision vacuum air suction planter delivering single seed placement for maize, cotton, sunflower, soybean and groundnut. Guarantees uniform inter-plant spacing and optimal germination depth with zero seed wastage.",
-      "location": "Coimbatore, Tamil Nadu",
-      "lat": 11.0168,
-      "lng": 76.9558,
-      "pricePerDay": 1200,
-      "available": true,
-      "img": "https://images.unsplash.com/photo-1507662228758-08d030c4820b?auto=format&fit=crop&w=900&h=600&q=85",
-      "rating": 4.9,
-      "reviews": 45,
-      "hp": 45,
-      "fuelType": "Diesel",
-      "securityDeposit": 2500,
-      "operatorIncluded": false,
-      "specs": [
-        {
-          "label": "Rows",
-          "labelTa": "வரிசைகள்",
-          "value": "6 Rows with Adjustable Width (45 - 75 cm)"
-        },
-        {
-          "label": "Singulation Method",
-          "labelTa": "விதைக்கும் முறை",
-          "value": "PTO Vacuum Suction Disc"
-        },
-        {
-          "label": "Seed Savings",
-          "labelTa": "விதை சேமிப்பு",
-          "value": "Save 30-40% expensive hybrid seed"
-        }
-      ],
-      "createdAt": "2026-09-10T18:10:34.626Z"
-    },
-    {
-      "id": "eq-seeder-2",
-      "ownerId": "usr-owner-2",
-      "name": "Fieldking Multi-Crop Zero-Till Seed Drill (9 Row)",
-      "nameTa": "ஃபீல்ட்கிங் ஜீரோ டில் உழவில்லா விதைப்பான் (9 வரிசை)",
-      "category": "Seeder",
-      "brand": "Fieldking",
-      "model": "FKZTSD-09 Zero-Till",
-      "imageUrl": "https://images.unsplash.com/photo-1597916829826-02e5bb4a54e0?auto=format&fit=crop&w=900&h=600&q=85",
-      "description": "Sows wheat, pulses, and oilseeds directly into standing paddy stubble without previous land tillage. Saves ₹2,500/acre in diesel ploughing costs and retains critical soil moisture.",
-      "location": "Ludhiana, Punjab",
-      "lat": 30.901,
-      "lng": 75.8573,
-      "pricePerDay": 950,
-      "available": true,
-      "img": "https://images.unsplash.com/photo-1597916829826-02e5bb4a54e0?auto=format&fit=crop&w=900&h=600&q=85",
-      "rating": 4.8,
-      "reviews": 58,
-      "hp": 40,
-      "fuelType": "Diesel",
-      "securityDeposit": 2000,
-      "operatorIncluded": false,
-      "specs": [
-        {
-          "label": "Rows",
-          "labelTa": "வரிசைகள்",
-          "value": "9 Rows at 20 cm Spacing"
-        },
-        {
-          "label": "Furrow Openers",
-          "labelTa": "கொழுக்கள்",
-          "value": "Inverted T-Type Tungsten Tipped"
-        },
-        {
-          "label": "Boxes",
-          "labelTa": "பெட்டிகள்",
-          "value": "Dual Seed & Fertilizer Metering Box"
-        }
-      ],
-      "createdAt": "2026-09-10T18:10:34.626Z"
-    },
-    {
-      "id": "eq-seeder-3",
-      "ownerId": "usr-owner-1",
-      "name": "Landforce Automatic 2-Row Potato Planter with Fertilizer Attachment",
-      "nameTa": "லேண்ட்போர்ஸ் தானியங்கி 2-வரிசை உருளைக்கிழங்கு விதைப்பான்",
-      "category": "Seeder",
-      "brand": "Landforce",
-      "model": "APP-02 Automatic",
-      "imageUrl": "https://images.unsplash.com/photo-1523348837708-15d4a09cfac2?auto=format&fit=crop&w=900&h=600&q=85",
-      "description": "Fully automatic cup-chain conveyor potato planter. Performs furrow opening, tuber planting, fertilizer placement, and ridge earthing up in a single synchronous pass.",
-      "location": "Dindigul & Nilgiris, Tamil Nadu",
-      "lat": 10.3673,
-      "lng": 77.9803,
-      "pricePerDay": 1100,
-      "available": true,
-      "img": "https://images.unsplash.com/photo-1523348837708-15d4a09cfac2?auto=format&fit=crop&w=900&h=600&q=85",
-      "rating": 4.8,
-      "reviews": 22,
-      "hp": 40,
-      "fuelType": "Diesel",
-      "securityDeposit": 2200,
-      "operatorIncluded": false,
-      "specs": [
-        {
-          "label": "Rows",
-          "labelTa": "வரிசைகள்",
-          "value": "2 Rows (Adjustable 55 - 65 cm)"
-        },
-        {
-          "label": "Planting Distance",
-          "labelTa": "நடும் இடைவெளி",
-          "value": "18 - 28 cm Adjustable"
-        },
-        {
-          "label": "Hopper Capacity",
-          "labelTa": "விதை தொட்டி",
-          "value": "250 kg Potato Tubers"
-        }
-      ],
-      "createdAt": "2026-09-10T18:10:34.626Z"
-    },
-    {
-      "id": "eq-seeder-4",
-      "ownerId": "usr-owner-2",
-      "name": "Kubota NSP-4W Walk-Behind High-Speed 4-Row Rice Transplanter",
-      "nameTa": "குபோடா NSP-4W 4-வரிசை நெல் நாற்று நடும் இயந்திரம்",
-      "category": "Seeder",
-      "brand": "Kubota",
-      "model": "NSP-4W High Speed",
-      "imageUrl": "https://images.unsplash.com/photo-1586771107445-d3ca888129ff?auto=format&fit=crop&w=900&h=600&q=85",
-      "description": "Engineered in Japan, this lightweight 4-row rice transplanter transplants mat nursery paddy seedlings at an astonishing speed of 3-4 acres/day. Solves farm labor shortages during transplanting season.",
-      "location": "Thanjavur (Cauvery Delta), Tamil Nadu",
-      "lat": 10.787,
-      "lng": 79.1378,
-      "pricePerDay": 1500,
-      "available": true,
-      "img": "https://images.unsplash.com/photo-1586771107445-d3ca888129ff?auto=format&fit=crop&w=900&h=600&q=85",
-      "rating": 4.9,
-      "reviews": 49,
-      "hp": 4.5,
-      "fuelType": "Petrol",
-      "securityDeposit": 3000,
-      "operatorIncluded": false,
-      "specs": [
-        {
-          "label": "Planting Rows",
-          "labelTa": "நடும் வரிசைகள்",
-          "value": "4 Rows at 30 cm Fixed Spacing"
-        },
-        {
-          "label": "Engine",
-          "labelTa": "இயந்திரம்",
-          "value": "Kubota OHV 4.5 HP 4-Stroke Petrol"
-        },
-        {
-          "label": "Hill Space",
-          "labelTa": "நாற்று இடைவெளி",
-          "value": "12 - 21 cm Adjustable"
-        }
-      ],
-      "createdAt": "2026-09-10T18:10:34.626Z"
-    },
-    {
-      "id": "eq-seeder-5",
-      "ownerId": "usr-owner-1",
-      "name": "Shaktiman Direct Seeded Rice (DSR) Drum Seeder (8 Row)",
-      "nameTa": "சக்திமான் நேரடி நெல் விதைப்பான் டிரப் சீடர் (8 வரிசை)",
-      "category": "Seeder",
-      "brand": "Shaktiman",
-      "model": "DSR-08 Drum",
-      "imageUrl": "https://images.unsplash.com/photo-1530507629858-e4977d30e9e0?auto=format&fit=crop&w=900&h=600&q=85",
-      "description": "Manual lightweight 8-row drum seeder for direct sprouted paddy seeding on wetland puddled soil. Requires zero tractor fuel and enables one person to seed 2 acres per day.",
-      "location": "Madurai, Tamil Nadu",
-      "lat": 9.9252,
-      "lng": 78.1198,
-      "pricePerDay": 400,
-      "available": true,
-      "img": "https://images.unsplash.com/photo-1530507629858-e4977d30e9e0?auto=format&fit=crop&w=900&h=600&q=85",
-      "rating": 4.7,
-      "reviews": 31,
-      "hp": 0,
-      "securityDeposit": 800,
-      "operatorIncluded": false,
-      "specs": [
-        {
-          "label": "Rows",
-          "labelTa": "வரிசைகள்",
-          "value": "8 Rows at 20 cm Spacing"
-        },
-        {
-          "label": "Operation",
-          "labelTa": "இயக்க முறை",
-          "value": "Manual Pull / Wheel Drive"
-        },
-        {
-          "label": "Capacity",
-          "labelTa": "வேலை திறன்",
-          "value": "1.5 - 2.0 Acres / Day"
-        }
-      ],
-      "createdAt": "2026-09-10T18:10:34.626Z"
-    },
-    {
-      "id": "eq-seeder-6",
-      "ownerId": "usr-owner-1",
-      "name": "Khedut Automatic Precision Maize & Cotton Seed Drill",
-      "nameTa": "கேதுத் தானியங்கி மக்காச்சோளம் & பருத்தி விதைப்பான்",
-      "category": "Seeder",
-      "brand": "Khedut",
-      "model": "KPSD-04 Precision",
-      "imageUrl": "https://images.unsplash.com/photo-1492496913980-501348b61469?auto=format&fit=crop&w=900&h=600&q=85",
-      "description": "4-row tractor mounted automatic inclined plate seed drill. Interchangeable rotor cell plates plant maize, cotton, groundnut, castor, and chickpea with surgical accuracy.",
-      "location": "Salem, Tamil Nadu",
-      "lat": 11.6643,
-      "lng": 78.146,
-      "pricePerDay": 850,
-      "available": true,
-      "img": "https://images.unsplash.com/photo-1492496913980-501348b61469?auto=format&fit=crop&w=900&h=600&q=85",
-      "rating": 4.8,
-      "reviews": 27,
-      "hp": 35,
-      "fuelType": "Diesel",
-      "securityDeposit": 1800,
-      "operatorIncluded": false,
-      "specs": [
-        {
-          "label": "Rows",
-          "labelTa": "வரிசைகள்",
-          "value": "4 Rows (Adjustable 45 - 90 cm)"
-        },
-        {
-          "label": "Seed Metering",
-          "labelTa": "விதை அளவீடு",
-          "value": "Vertical Inclined Cell Plate Mechanism"
-        },
-        {
-          "label": "Tractor HP",
-          "labelTa": "டிராக்டர் தேவை",
-          "value": "35 HP & Above"
-        }
-      ],
-      "createdAt": "2026-09-10T18:10:34.626Z"
-    },
-    {
-      "id": "eq-sprayer-1",
-      "ownerId": "usr-owner-1",
-      "name": "ASPEE HTP Tractor-Mounted Boom Sprayer (400 Liters, 14 Nozzles)",
-      "nameTa": "அஸ்பி HTP டிராக்டர் தெளிப்பான் (400 லிட்டர், 14 முனைகள்)",
-      "category": "Water Sprayer",
-      "brand": "ASPEE",
-      "model": "HTP-400B Boom",
-      "imageUrl": "https://images.unsplash.com/photo-1563514227147-6d2ff665a6a0?auto=format&fit=crop&w=900&h=600&q=85",
-      "description": "Heavy duty 400-liter polyethylene tank boom sprayer with ASPEE 3-cylinder brass HTP pump. 14 anti-drip fan nozzles cover a wide 36-foot swath per pass. Covers 25-30 acres per day.",
-      "location": "Coimbatore, Tamil Nadu",
-      "lat": 11.0168,
-      "lng": 76.9558,
-      "pricePerDay": 950,
-      "available": true,
-      "img": "https://images.unsplash.com/photo-1563514227147-6d2ff665a6a0?auto=format&fit=crop&w=900&h=600&q=85",
-      "rating": 4.8,
-      "reviews": 53,
-      "hp": 35,
-      "fuelType": "Diesel",
-      "securityDeposit": 2000,
-      "operatorIncluded": false,
-      "specs": [
-        {
-          "label": "Tank Capacity",
-          "labelTa": "தொட்டி கொள்ளளவு",
-          "value": "400 Liters UV-Stabilized Polyethylene"
-        },
-        {
-          "label": "Boom Width",
-          "labelTa": "பூம் அகலம்",
-          "value": "11 Meters (36 Feet Swath)"
-        },
-        {
-          "label": "Pump",
-          "labelTa": "பம்ப்",
-          "value": "Triplex Brass HTP 50 LPM @ 40 Bar"
-        },
-        {
-          "label": "Daily Coverage",
-          "labelTa": "தினசரி பரப்பு",
-          "value": "25 - 30 Acres / Day"
-        }
-      ],
-      "createdAt": "2026-09-10T18:10:34.626Z"
-    },
-    {
-      "id": "eq-sprayer-2",
-      "ownerId": "usr-farmer-1",
-      "name": "Neptune Simpli-Spray 4-Stroke Knapsack Power Sprayer (25L)",
-      "nameTa": "நெப்டியூன் 4-ஸ்ட்ரோக் முதுகுப்புற பவர் தெளிப்பான் (25 லிட்டர்)",
-      "category": "Water Sprayer",
-      "brand": "Neptune",
-      "model": "Simpli-Spray 25L",
-      "imageUrl": "https://images.unsplash.com/photo-1560493676-04071c5f467b?auto=format&fit=crop&w=900&h=600&q=85",
-      "description": "Portable 25-liter backpack sprayer powered by Honda-type 31cc 4-stroke petrol engine. Eliminates oil-petrol mixing hassles and delivers high pressure mist for paddy, sugarcane and chillies.",
+      "name": "Mahindra Seed Drill",
+      "nameTa": "மகிந்திரா விதைப்பான்",
+      "category": "Seeding",
+      "brand": "Mahindra",
+      "model": "Dharti Mitra Super Seeder",
+      "imageUrl": "/equipment/seeding/mahindra-seed-drill.jpg",
+      "description": "Mahindra Super Seeder 3-in-1 seeding implement combining rotavator tillage, precision seed dispensing, and fertilizer placement directly into paddy residue without field burning.",
       "location": "Thanjavur, Tamil Nadu",
       "lat": 10.787,
       "lng": 79.1378,
-      "pricePerDay": 350,
-      "available": true,
-      "img": "https://images.unsplash.com/photo-1560493676-04071c5f467b?auto=format&fit=crop&w=900&h=600&q=85",
-      "rating": 4.8,
-      "reviews": 64,
-      "hp": 1.2,
-      "fuelType": "Petrol",
-      "securityDeposit": 700,
-      "operatorIncluded": false,
-      "specs": [
-        {
-          "label": "Tank Capacity",
-          "labelTa": "தொட்டி கொள்ளளவு",
-          "value": "25 Liters"
-        },
-        {
-          "label": "Engine",
-          "labelTa": "எஞ்சின்",
-          "value": "31cc 4-Stroke OHV Engine"
-        },
-        {
-          "label": "Working Pressure",
-          "labelTa": "அழுத்தம்",
-          "value": "15 - 25 kg/cm²"
-        }
-      ],
-      "createdAt": "2026-09-10T18:10:34.626Z"
-    },
-    {
-      "id": "eq-sprayer-3",
-      "ownerId": "usr-owner-1",
-      "name": "STIHL SR 450 Backpack Petrol Mistblower & Duster",
-      "nameTa": "ஸ்டீல் SR 450 பெட்ரோல் மிஸ்ட்ப்ளோவர் & தெளிப்பான்",
-      "category": "Water Sprayer",
-      "brand": "STIHL",
-      "model": "SR 450 Professional",
-      "imageUrl": "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&w=900&h=600&q=85",
-      "description": "German STIHL high-performance mistblower with air-assist atomization. Converts liquid droplets into fine micron fog for dense canopy penetration in turmeric, banana and fruit orchards.",
-      "location": "Erode, Tamil Nadu",
-      "lat": 11.341,
-      "lng": 77.7172,
-      "pricePerDay": 550,
-      "available": true,
-      "img": "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&w=900&h=600&q=85",
-      "rating": 4.9,
-      "reviews": 36,
-      "hp": 3.9,
-      "fuelType": "Petrol",
-      "securityDeposit": 1200,
-      "operatorIncluded": false,
-      "specs": [
-        {
-          "label": "Engine Power",
-          "labelTa": "இயந்திர சக்தி",
-          "value": "3.9 HP STIHL 2-MIX Engine"
-        },
-        {
-          "label": "Horizontal Range",
-          "labelTa": "தெளிக்கும் தூரம்",
-          "value": "Up to 14.5 Meters"
-        },
-        {
-          "label": "Tank Volume",
-          "labelTa": "தொட்டி கொள்ளளவு",
-          "value": "14 Liters"
-        }
-      ],
-      "createdAt": "2026-09-10T18:10:34.626Z"
-    },
-    {
-      "id": "eq-sprayer-4",
-      "ownerId": "usr-owner-1",
-      "name": "Mitra Airotec Cyclone 600L Orchard & Vineyard Air Blast Sprayer",
-      "nameTa": "மித்ரா ஏரோடெக் சைக்ளோன் 600L பழத்தோட்ட தெளிப்பான்",
-      "category": "Water Sprayer",
-      "brand": "Mitra",
-      "model": "Cyclone 600L",
-      "imageUrl": "https://images.unsplash.com/photo-1598970434795-0c54fe7c0648?auto=format&fit=crop&w=900&h=600&q=85",
-      "description": "High velocity axial fan air-blast sprayer with 600-liter chemical tank. Wraps pesticide mist around both sides of tree leaves in grapes, mango, citrus, and pomegranate groves.",
-      "location": "Theni, Tamil Nadu",
-      "lat": 10.0104,
-      "lng": 77.4768,
       "pricePerDay": 1400,
       "available": true,
-      "img": "https://images.unsplash.com/photo-1598970434795-0c54fe7c0648?auto=format&fit=crop&w=900&h=600&q=85",
+      "img": "/equipment/seeding/mahindra-seed-drill.jpg",
       "rating": 4.9,
-      "reviews": 29,
-      "hp": 45,
+      "reviews": 39,
+      "hp": 50,
       "fuelType": "Diesel",
-      "securityDeposit": 3000,
+      "securityDeposit": 2500,
       "operatorIncluded": false,
       "specs": [
         {
-          "label": "Tank Volume",
-          "labelTa": "தொட்டி கொள்ளளவு",
-          "value": "600 Liters Reinforced Fibreglass"
+          "label": "Row Capacity",
+          "labelTa": "வரிசை திறன்",
+          "value": "9 or 11 Tynes"
         },
         {
-          "label": "Fan System",
-          "labelTa": "காற்றாலை விசிறி",
-          "value": "28-Inch Aerodynamic Axial Fan"
+          "label": "Mechanism",
+          "labelTa": "இயங்கும் முறை",
+          "value": "Rotary Tiller + Seed/Fertilizer Delivery"
         },
         {
-          "label": "Tractor HP",
-          "labelTa": "டிராக்டர் தேவை",
-          "value": "45 - 60 HP PTO"
+          "label": "Seed Hopper",
+          "labelTa": "விதை தொட்டி",
+          "value": "80 kg Capacity"
+        },
+        {
+          "label": "Fertilizer Hopper",
+          "labelTa": "உர தொட்டி",
+          "value": "80 kg Capacity"
         }
       ],
-      "createdAt": "2026-09-10T18:10:34.626Z"
+      "createdAt": "2026-09-18T17:29:05.423Z"
     },
     {
-      "id": "eq-sprayer-5",
+      "id": "eq-seeding-2",
       "ownerId": "usr-owner-1",
-      "name": "ASPEE Battery Cum Hand Operated Knapsack Sprayer (16 Liters)",
-      "nameTa": "அஸ்பி பேட்டரி மற்றும் கை தெளிப்பான் (16 லிட்டர்)",
-      "category": "Water Sprayer",
-      "brand": "ASPEE",
-      "model": "V2007 Battery 16L",
-      "imageUrl": "https://images.unsplash.com/photo-1592417817098-8f3d6ef23755?auto=format&fit=crop&w=900&h=600&q=85",
-      "description": "16-liter lithium-battery powered knapsack sprayer. Sprays 15-20 tanks (approx 300 liters) on a single battery charge with zero hand pumping exertion. Ideal for vegetable plots and floriculture.",
-      "location": "Coimbatore, Tamil Nadu",
-      "lat": 11.0168,
-      "lng": 76.9558,
-      "pricePerDay": 250,
-      "available": true,
-      "img": "https://images.unsplash.com/photo-1592417817098-8f3d6ef23755?auto=format&fit=crop&w=900&h=600&q=85",
-      "rating": 4.8,
-      "reviews": 57,
-      "hp": 0.2,
-      "fuelType": "Battery / Hybrid",
-      "securityDeposit": 500,
-      "operatorIncluded": false,
-      "specs": [
-        {
-          "label": "Tank",
-          "labelTa": "தொட்டி",
-          "value": "16 Liters Seamless Molded"
-        },
-        {
-          "label": "Battery",
-          "labelTa": "பேட்டரி",
-          "value": "12V 12Ah High Capacity"
-        },
-        {
-          "label": "Discharge",
-          "labelTa": "வெளியேற்றம்",
-          "value": "3.1 Liters/Min Micro Diaphragm Pump"
-        }
-      ],
-      "createdAt": "2026-09-10T18:10:34.626Z"
-    },
-    {
-      "id": "eq-sprayer-6",
-      "ownerId": "usr-owner-1",
-      "name": "Bull Agro High-Clearance Self-Propelled Crop Sprayer (1000L)",
-      "nameTa": "புல் அக்ரோ அதிஉயர சுய இயங்கும் தெளிப்பான் (1000 லிட்டர்)",
-      "category": "Water Sprayer",
-      "brand": "Bull Agro",
-      "model": "BAP-1000 High-Clearance",
-      "imageUrl": "https://images.unsplash.com/photo-1599818816942-7078278f2441?auto=format&fit=crop&w=900&h=600&q=85",
-      "description": "Self-propelled 1.8-meter ground clearance sprayer designed for tall standing cotton, maize and sugarcane crops without crop crushing. 1000-liter capacity covers 60-80 acres per day.",
+      "name": "John Deere Seed Drill",
+      "nameTa": "ஜான் டீர் சீட் கம் உரம் டிரில்",
+      "category": "Seeding",
+      "brand": "John Deere",
+      "model": "GreenSystem Seed Cum Fertilizer Drill",
+      "imageUrl": "/equipment/seeding/john-deere-seed-drill.jpg",
+      "description": "John Deere GreenSystem Seed Cum Fertilizer Drill with fluted roller metering ensuring uniform seed spacing and simultaneous root-zone fertilizer placement for wheat, pulses, and oilseeds.",
       "location": "Salem, Tamil Nadu",
       "lat": 11.6643,
       "lng": 78.146,
-      "pricePerDay": 2200,
+      "pricePerDay": 1350,
       "available": true,
-      "img": "https://images.unsplash.com/photo-1599818816942-7078278f2441?auto=format&fit=crop&w=900&h=600&q=85",
-      "rating": 4.9,
-      "reviews": 21,
-      "hp": 40,
-      "fuelType": "Diesel",
-      "securityDeposit": 4000,
-      "operatorIncluded": true,
-      "specs": [
-        {
-          "label": "Ground Clearance",
-          "labelTa": "தரை இடைவெளி",
-          "value": "1.8 Meters (Extra Tall)"
-        },
-        {
-          "label": "Tank Volume",
-          "labelTa": "தொட்டி கொள்ளளவு",
-          "value": "1000 Liters"
-        },
-        {
-          "label": "Boom Width",
-          "labelTa": "பூம் அகலம்",
-          "value": "15 Meters (50 Feet)"
-        }
-      ],
-      "createdAt": "2026-09-10T18:10:34.626Z"
-    },
-    {
-      "id": "eq-drone-1",
-      "ownerId": "usr-owner-1",
-      "name": "DJI Agras T40 Agricultural Spraying & Spreading Drone (40L)",
-      "nameTa": "டிஜேஐ அக்ராஸ் T40 விவசாய தெளிப்பு & உரம் தூவும் ட்ரோன் (40L)",
-      "category": "Drone & Tech",
-      "brand": "DJI",
-      "model": "Agras T40",
-      "imageUrl": "https://images.unsplash.com/photo-1508614589041-895b88991e3e?auto=format&fit=crop&w=900&h=600&q=85",
-      "description": "Flagship commercial agricultural drone with 40-liter liquid payload and 50 kg solid granule spreading capacity. Sprays 1 acre in 6 minutes with dual centrifugal atomizing nozzles. DGCA-certified pilot, smart batteries, and high-speed generator included.",
-      "location": "Coimbatore & Pollachi, Tamil Nadu",
-      "lat": 11.0168,
-      "lng": 76.9558,
-      "pricePerDay": 550,
-      "available": true,
-      "img": "https://images.unsplash.com/photo-1508614589041-895b88991e3e?auto=format&fit=crop&w=900&h=600&q=85",
-      "rating": 5,
-      "reviews": 95,
-      "hp": 12,
-      "fuelType": "Battery / Hybrid",
-      "securityDeposit": 3000,
-      "operatorIncluded": true,
-      "specs": [
-        {
-          "label": "Liquid Payload",
-          "labelTa": "திரவ கொள்ளளவு",
-          "value": "40 Liters"
-        },
-        {
-          "label": "Granule Spreader",
-          "labelTa": "உரம் தூவும் திறன்",
-          "value": "50 kg Granular Fertilizer / Seeds"
-        },
-        {
-          "label": "Spray Rate",
-          "labelTa": "தெளிக்கும் வேகம்",
-          "value": "1 Acre in 6 Minutes (40 Acres/Day)"
-        },
-        {
-          "label": "Radar",
-          "labelTa": "ரேடார் பாதுகாப்பு",
-          "value": "Active Phased Array Omnidirectional Obstacle Sensing"
-        }
-      ],
-      "createdAt": "2026-09-10T18:10:34.626Z"
-    },
-    {
-      "id": "eq-drone-2",
-      "ownerId": "usr-owner-1",
-      "name": "Garuda Aerospace Kisan Agro Drone (16 Liters Dual Spray)",
-      "nameTa": "கருடா ஏரோஸ்பேஸ் கிசான் அக்ரோ ட்ரோன் (16 லிட்டர்)",
-      "category": "Drone & Tech",
-      "brand": "Garuda Aerospace",
-      "model": "Kisan Agro 16L",
-      "imageUrl": "https://images.unsplash.com/photo-1527977966376-1c8408f9f108?auto=format&fit=crop&w=900&h=600&q=85",
-      "description": "Made in India 16-liter carbon fiber agro drone by Garuda Aerospace. Optimized for nano-urea and bio-pesticide spraying on paddy, cotton, maize, and sugarcane. Includes DGCA pilot and 4 swap batteries.",
-      "location": "Madurai & Theni, Tamil Nadu",
-      "lat": 9.9252,
-      "lng": 78.1198,
-      "pricePerDay": 450,
-      "available": true,
-      "img": "https://images.unsplash.com/photo-1527977966376-1c8408f9f108?auto=format&fit=crop&w=900&h=600&q=85",
+      "img": "/equipment/seeding/john-deere-seed-drill.jpg",
       "rating": 4.8,
-      "reviews": 61,
-      "hp": 8,
-      "fuelType": "Battery / Hybrid",
-      "securityDeposit": 2500,
-      "operatorIncluded": true,
-      "specs": [
-        {
-          "label": "Payload",
-          "labelTa": "கொள்ளளவு",
-          "value": "16 Liters"
-        },
-        {
-          "label": "Coverage",
-          "labelTa": "வேலை வேகம்",
-          "value": "25 - 30 Acres / Day"
-        },
-        {
-          "label": "Terrain Following",
-          "labelTa": "தரை உயர உணரி",
-          "value": "Millimeter-Wave Radar Terrain Following"
-        }
-      ],
-      "createdAt": "2026-09-10T18:10:34.626Z"
-    },
-    {
-      "id": "eq-drone-3",
-      "ownerId": "usr-owner-2",
-      "name": "IoTechWorld Agribot Autonomous Pesticide Spraying Drone (10L)",
-      "nameTa": "ஐஓடெக்வேர்ல்ட் அக்ரிபாட் தானியங்கி ட்ரோன் (10 லிட்டர்)",
-      "category": "Drone & Tech",
-      "brand": "IoTechWorld",
-      "model": "Agribot 10L",
-      "imageUrl": "https://images.unsplash.com/photo-1507582020432-2a3bc41e2321?auto=format&fit=crop&w=900&h=600&q=85",
-      "description": "Type-certified autonomous spraying drone with automated waypoint mission planning. Delivers surgical droplet distribution on wheat and paddy canopies with 90% water savings.",
-      "location": "Ludhiana, Punjab",
-      "lat": 30.901,
-      "lng": 75.8573,
-      "pricePerDay": 400,
-      "available": true,
-      "img": "https://images.unsplash.com/photo-1507582020432-2a3bc41e2321?auto=format&fit=crop&w=900&h=600&q=85",
-      "rating": 4.8,
-      "reviews": 44,
-      "hp": 6,
-      "fuelType": "Battery / Hybrid",
-      "securityDeposit": 2000,
-      "operatorIncluded": true,
-      "specs": [
-        {
-          "label": "Payload",
-          "labelTa": "கொள்ளளவு",
-          "value": "10 Liters"
-        },
-        {
-          "label": "Water Savings",
-          "labelTa": "தண்ணீர் சேமிப்பு",
-          "value": "90% Less Water vs Conventional"
-        },
-        {
-          "label": "Flight Speed",
-          "labelTa": "பறக்கும் வேகம்",
-          "value": "3 - 5 m/s"
-        }
-      ],
-      "createdAt": "2026-09-10T18:10:34.626Z"
-    },
-    {
-      "id": "eq-drone-4",
-      "ownerId": "usr-owner-2",
-      "name": "Marut Drones SeedCopter Agricultural Reforestation & Seeding Drone",
-      "nameTa": "மாருத் ட்ரோன்ஸ் சீட்காப்டர் நேரடி விதைப்பு ட்ரோன்",
-      "category": "Drone & Tech",
-      "brand": "Marut Drones",
-      "model": "SeedCopter V2",
-      "imageUrl": "https://images.unsplash.com/photo-1473968512647-3e447244af8f?auto=format&fit=crop&w=900&h=600&q=85",
-      "description": "High capacity aerial seed ball dispenser and bio-fertilizer broadcasting drone. Enables rapid aerial planting of pulses, green manure (sunn hemp), and pastures across 50 acres per day.",
-      "location": "Thanjavur, Tamil Nadu",
-      "lat": 10.787,
-      "lng": 79.1378,
-      "pricePerDay": 600,
-      "available": true,
-      "img": "https://images.unsplash.com/photo-1473968512647-3e447244af8f?auto=format&fit=crop&w=900&h=600&q=85",
-      "rating": 4.9,
-      "reviews": 19,
-      "hp": 10,
-      "fuelType": "Battery / Hybrid",
-      "securityDeposit": 3000,
-      "operatorIncluded": true,
-      "specs": [
-        {
-          "label": "Granular Payload",
-          "labelTa": "விதை கொள்ளளவு",
-          "value": "30 kg Seed Pellets"
-        },
-        {
-          "label": "Daily Acreage",
-          "labelTa": "தினசரி பரப்பு",
-          "value": "40 - 50 Acres / Day"
-        },
-        {
-          "label": "Flight Controller",
-          "labelTa": "கட்டுப்பாட்டகம்",
-          "value": "RTK Centimeter Precision Navigation"
-        }
-      ],
-      "createdAt": "2026-09-10T18:10:34.626Z"
-    },
-    {
-      "id": "eq-other-1",
-      "ownerId": "usr-farmer-1",
-      "name": "Kirloskar 7.5 HP Diesel Monoblock High-Discharge Irrigation Pump",
-      "nameTa": "கிர்லோஸ்கர் 7.5 HP டீசல் நீரேற்றி மோனோபிளாக் பம்ப்",
-      "category": "Water Pump",
-      "brand": "Kirloskar",
-      "model": "DM-7.5 High Flow",
-      "imageUrl": "https://images.unsplash.com/photo-1547036967-23d11aacaee0?auto=format&fit=crop&w=900&h=600&q=85",
-      "description": "Heavy duty portable 7.5 HP 4-stroke diesel engine coupled with high-discharge centrifugal water pump. Delivers 1,200 liters per minute from river canals, ponds, and wells. Mounted on rubber wheeled trolley for easy movement.",
-      "location": "Thanjavur, Tamil Nadu",
-      "lat": 10.787,
-      "lng": 79.1378,
-      "pricePerDay": 450,
-      "available": true,
-      "img": "https://images.unsplash.com/photo-1547036967-23d11aacaee0?auto=format&fit=crop&w=900&h=600&q=85",
-      "rating": 4.8,
-      "reviews": 50,
-      "hp": 7.5,
-      "fuelType": "Diesel",
-      "securityDeposit": 1000,
-      "operatorIncluded": false,
-      "specs": [
-        {
-          "label": "Discharge",
-          "labelTa": "நீர் வெளியேற்றம்",
-          "value": "1,200 Liters / Minute (72 m³/Hour)"
-        },
-        {
-          "label": "Engine Power",
-          "labelTa": "இயந்திர சக்தி",
-          "value": "7.5 HP Water-Cooled Diesel"
-        },
-        {
-          "label": "Delivery Head",
-          "labelTa": "தூக்கும் உயரம்",
-          "value": "Up to 24 Meters"
-        },
-        {
-          "label": "Fuel Consumption",
-          "labelTa": "டீசல் நுகர்வு",
-          "value": "0.9 Liters / Hour"
-        }
-      ],
-      "createdAt": "2026-09-10T18:10:34.626Z"
-    },
-    {
-      "id": "eq-other-2",
-      "ownerId": "usr-owner-1",
-      "name": "Texmo Submersible Solar Water Pump Set (5 HP, DC Powered)",
-      "nameTa": "டெக்ஸ்மோ 5 HP சோலார் நீர்மூழ்கி பம்ப் செட்",
-      "category": "Solar Irrigation",
-      "brand": "Texmo",
-      "model": "SP-5HP Solar",
-      "imageUrl": "https://images.unsplash.com/photo-1530507629858-e4977d30e9e0?auto=format&fit=crop&w=900&h=600&q=85",
-      "description": "Eco-friendly 5 HP stainless steel submersible borehole pump with mobile solar tracking PV array trolley. Runs 100% free on sunlight with zero electricity bill or diesel cost.",
-      "location": "Salem & Namakkal, Tamil Nadu",
-      "lat": 11.6643,
-      "lng": 78.146,
-      "pricePerDay": 800,
-      "available": true,
-      "img": "https://images.unsplash.com/photo-1530507629858-e4977d30e9e0?auto=format&fit=crop&w=900&h=600&q=85",
-      "rating": 4.9,
-      "reviews": 37,
-      "hp": 5,
-      "fuelType": "Solar / Electric",
-      "securityDeposit": 2000,
-      "operatorIncluded": false,
-      "specs": [
-        {
-          "label": "Power",
-          "labelTa": "சக்தி",
-          "value": "5 HP Brushless DC (BLDC) Motor"
-        },
-        {
-          "label": "Discharge",
-          "labelTa": "வெளியேற்றம்",
-          "value": "35,000 Liters / Day on Sunny Days"
-        },
-        {
-          "label": "Borewell Depth",
-          "labelTa": "ஆழ்துளை ஆழம்",
-          "value": "Suitable up to 350 Feet"
-        }
-      ],
-      "createdAt": "2026-09-10T18:10:34.626Z"
-    },
-    {
-      "id": "eq-other-3",
-      "ownerId": "usr-owner-2",
-      "name": "Shaktiman Round Straw Baler (Compact Hay & Paddy Straw Collector)",
-      "nameTa": "சக்திமான் வைக்கோல் உருண்டை கட்டும் பேலர் இயந்திரம்",
-      "category": "Baler & Tiller",
-      "brand": "Shaktiman",
-      "model": "SRB-60 Round Baler",
-      "imageUrl": "https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=900&h=600&q=85",
-      "description": "Picks up loose paddy straw and hay after combine harvest, compresses it tightly, and rolls it into dense, transportable 25-30 kg round bales tied with twine. Produces 45-60 bales per hour and prevents stubble burning.",
-      "location": "Thanjavur, Tamil Nadu",
-      "lat": 10.787,
-      "lng": 79.1378,
-      "pricePerDay": 1300,
-      "available": true,
-      "img": "https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=900&h=600&q=85",
-      "rating": 4.8,
-      "reviews": 42,
+      "reviews": 28,
       "hp": 40,
       "fuelType": "Diesel",
       "securityDeposit": 2500,
       "operatorIncluded": false,
       "specs": [
         {
-          "label": "Bale Size",
-          "labelTa": "வைக்கோல் கட்டு அளவு",
-          "value": "50 cm Diameter × 70 cm Width"
+          "label": "Rows",
+          "labelTa": "வரிசைகள்",
+          "value": "9 Rows Adjustable Spacing"
         },
         {
-          "label": "Bale Weight",
-          "labelTa": "கட்டின் எடை",
-          "value": "25 - 32 kg per Bale"
+          "label": "Metering Type",
+          "labelTa": "அளவீட்டு வகை",
+          "value": "Fluted Roller Metering"
         },
         {
-          "label": "Baling Rate",
-          "labelTa": "கட்டும் வேகம்",
-          "value": "45 - 60 Bales / Hour"
+          "label": "Depth Control",
+          "labelTa": "ஆழ கட்டுப்பாடு",
+          "value": "Spring Loaded Furrow Openers"
         },
         {
-          "label": "Tractor HP",
+          "label": "Tractor Required",
           "labelTa": "டிராக்டர் தேவை",
           "value": "35 - 50 HP"
         }
       ],
-      "createdAt": "2026-09-10T18:10:34.626Z"
+      "createdAt": "2026-09-18T17:29:05.423Z"
     },
     {
-      "id": "eq-other-4",
+      "id": "eq-seeding-3",
       "ownerId": "usr-owner-1",
-      "name": "Spectra Precision Laser Land Leveler with Dual Slope Transmitter",
-      "nameTa": "ஸ்பெக்ட்ரா லேசர் நில சமன் செய்யும் இயந்திரம்",
-      "category": "Land Leveler",
-      "brand": "Spectra Precision",
-      "model": "LL-500 Dual Slope",
-      "imageUrl": "https://images.unsplash.com/photo-1605000797499-95a51c5269ae?auto=format&fit=crop&w=900&h=600&q=85",
-      "description": "Rotating laser transmitter with 360-degree machine receiver that automatically commands the tractor hydraulic scraper blade. Levels irregular agricultural plots within ±2mm precision, reducing irrigation water requirements by 30-40%.",
+      "name": "Shaktiman Pneumatic Planter",
+      "nameTa": "சக்திமான் நியூமேடிக் பிளான்டர்",
+      "category": "Seeding",
+      "brand": "Shaktiman",
+      "model": "SVPP 4-Row Precision Planter",
+      "imageUrl": "/equipment/seeding/shaktiman-pneumatic-planter.jpg",
+      "description": "Shaktiman SVPP 4-row pneumatic precision planter utilizing vacuum suction technology for single-seed placement with exact plant-to-plant spacing in cotton, corn, and maize fields.",
+      "location": "Dindigul, Tamil Nadu",
+      "lat": 10.3673,
+      "lng": 77.9803,
+      "pricePerDay": 1800,
+      "available": true,
+      "img": "/equipment/seeding/shaktiman-pneumatic-planter.jpg",
+      "rating": 4.9,
+      "reviews": 22,
+      "hp": 50,
+      "fuelType": "Diesel",
+      "securityDeposit": 3000,
+      "operatorIncluded": false,
+      "specs": [
+        {
+          "label": "Rows",
+          "labelTa": "வரிசைகள்",
+          "value": "4 Rows (45 - 75 cm adjustable)"
+        },
+        {
+          "label": "Technology",
+          "labelTa": "தொழில்நுட்பம்",
+          "value": "Pneumatic Vacuum Metering"
+        },
+        {
+          "label": "Accuracy",
+          "labelTa": "துல்லியம்",
+          "value": "Single Seed Precision Sowing"
+        },
+        {
+          "label": "Supported Crops",
+          "labelTa": "பயிர்கள்",
+          "value": "Corn, Cotton, Soybean, Sunflower"
+        }
+      ],
+      "createdAt": "2026-09-18T17:29:05.423Z"
+    },
+    {
+      "id": "eq-drone-1",
+      "ownerId": "usr-owner-2",
+      "name": "DJI Agras T40 Agricultural Drone",
+      "nameTa": "டிஜேஐ அக்ராஸ் T40 விவசாய ட்ரோன்",
+      "category": "Sprayers & Drones",
+      "brand": "DJI",
+      "model": "Agras T40",
+      "imageUrl": "/equipment/sprayers-drones/dji-agras-t40.jpg",
+      "description": "DJI Agras T40 flagship agricultural drone featuring coaxial twin rotor design, 40-litre spraying payload, dual atomized centrifugal nozzles, and active phased-array radar for 40 acres/hour coverage.",
       "location": "Coimbatore, Tamil Nadu",
       "lat": 11.0168,
       "lng": 76.9558,
-      "pricePerDay": 1800,
+      "pricePerDay": 2800,
       "available": true,
-      "img": "https://images.unsplash.com/photo-1605000797499-95a51c5269ae?auto=format&fit=crop&w=900&h=600&q=85",
-      "rating": 5,
-      "reviews": 35,
-      "hp": 55,
-      "fuelType": "Diesel",
-      "securityDeposit": 3500,
+      "img": "/equipment/sprayers-drones/dji-agras-t40.jpg",
+      "rating": 4.9,
+      "reviews": 76,
+      "hp": 0,
+      "fuelType": "Battery / Hybrid",
+      "securityDeposit": 5000,
       "operatorIncluded": true,
       "specs": [
         {
-          "label": "Levelling Accuracy",
-          "labelTa": "சமன்படுத்தும் துல்லியம்",
-          "value": "± 2 mm per 100 Meters"
+          "label": "Payload Capacity",
+          "labelTa": "சுமை திறன்",
+          "value": "40 Litres Spray / 50 kg Spread"
         },
         {
-          "label": "Laser Transmitter",
-          "labelTa": "லேசர் வீச்சு",
-          "value": "Up to 500 Meters Radius"
+          "label": "Spray Flow Rate",
+          "labelTa": "தெளிக்கும் வேகம்",
+          "value": "Up to 12 L/min Dual Atomized"
         },
         {
-          "label": "Blade Width",
-          "labelTa": "ஸ்கிரேப்பர் அகலம்",
-          "value": "2.1 Meters (7 Feet) Heavy Box Scraper"
+          "label": "Rotor Type",
+          "labelTa": "ரோட்டார் வகை",
+          "value": "Coaxial Twin Rotor"
+        },
+        {
+          "label": "Radar",
+          "labelTa": "ரேடார்",
+          "value": "Active Phased Array + Binocular Vision"
         }
       ],
-      "createdAt": "2026-09-10T18:10:34.626Z"
+      "createdAt": "2026-09-18T17:29:05.423Z"
     },
     {
-      "id": "eq-other-5",
+      "id": "eq-drone-2",
+      "ownerId": "usr-owner-2",
+      "name": "Garuda Kisan Agricultural Drone",
+      "nameTa": "கருடா கிசான் விவசாய ட்ரோன்",
+      "category": "Sprayers & Drones",
+      "brand": "Garuda Aerospace",
+      "model": "Agri Kisan Drone V2",
+      "imageUrl": "/equipment/sprayers-drones/garuda-kisan-drone.jpg",
+      "description": "Garuda Kisan DGCA-certified indigenous agricultural drone engineered for uniform pesticide and micronutrient spraying with terrain-following sensors and high-efficiency nozzles.",
+      "location": "Erode, Tamil Nadu",
+      "lat": 11.341,
+      "lng": 77.7172,
+      "pricePerDay": 2200,
+      "available": true,
+      "img": "/equipment/sprayers-drones/garuda-kisan-drone.jpg",
+      "rating": 4.8,
+      "reviews": 43,
+      "hp": 0,
+      "fuelType": "Battery / Hybrid",
+      "securityDeposit": 4000,
+      "operatorIncluded": true,
+      "specs": [
+        {
+          "label": "Spray Tank",
+          "labelTa": "தெளிப்பு தொட்டி",
+          "value": "10 - 12 Litres"
+        },
+        {
+          "label": "Flight Time",
+          "labelTa": "பறக்கும் நேரம்",
+          "value": "Up to 25 mins per battery"
+        },
+        {
+          "label": "Coverage",
+          "labelTa": "பரப்பளவு",
+          "value": "6 - 8 acres per hour"
+        },
+        {
+          "label": "Certification",
+          "labelTa": "சான்றிதழ்",
+          "value": "DGCA Type Certified (Make in India)"
+        }
+      ],
+      "createdAt": "2026-09-18T17:29:05.423Z"
+    },
+    {
+      "id": "eq-sprayer-1",
       "ownerId": "usr-owner-1",
-      "name": "Jain Automatic Sand Media Filter & Venturi Fertigation Unit",
-      "nameTa": "ஜெயின் தானியங்கி மணல் வடிகட்டி & உர பாசன அமைப்பு",
-      "category": "Solar Irrigation",
-      "brand": "Jain Irrigation",
-      "model": "JF-3000 Automatic",
-      "imageUrl": "https://images.unsplash.com/photo-1589923188900-85dae523342b?auto=format&fit=crop&w=900&h=600&q=85",
-      "description": "High-flow dual media quartz gravel sand filter with stainless steel disc backup and venturi fertilizer suction injector. Removes algae, organic silt, and debris to safeguard drip emitters and micro sprinklers.",
+      "name": "John Deere Field Sprayer",
+      "nameTa": "ஜான் டீர் ஃபீல்ட் ஸ்ப்ரேயர்",
+      "category": "Sprayers & Drones",
+      "brand": "John Deere",
+      "model": "4630 Self-Propelled Sprayer",
+      "imageUrl": "/equipment/sprayers-drones/john-deere-field-sprayer.jpg",
+      "description": "John Deere 4630 self-propelled commercial field sprayer with 165 HP engine, 2,270-litre tank, wide 80-foot boom, and high underbody clearance for mature cotton, maize, and sugarcane spraying.",
       "location": "Madurai, Tamil Nadu",
       "lat": 9.9252,
       "lng": 78.1198,
-      "pricePerDay": 500,
+      "pricePerDay": 3200,
       "available": true,
-      "img": "https://images.unsplash.com/photo-1589923188900-85dae523342b?auto=format&fit=crop&w=900&h=600&q=85",
+      "img": "/equipment/sprayers-drones/john-deere-field-sprayer.jpg",
       "rating": 4.8,
-      "reviews": 24,
-      "hp": 0,
+      "reviews": 26,
+      "hp": 165,
+      "fuelType": "Diesel",
+      "securityDeposit": 5000,
+      "operatorIncluded": true,
+      "specs": [
+        {
+          "label": "Tank Capacity",
+          "labelTa": "தொட்டி கொள்ளளவு",
+          "value": "2,270 Litres (600 Gal)"
+        },
+        {
+          "label": "Boom Width",
+          "labelTa": "பூம் அகலம்",
+          "value": "80 - 90 Feet (24 - 27 m)"
+        },
+        {
+          "label": "Crop Clearance",
+          "labelTa": "பயிர் இடைவெளி",
+          "value": "1.27 m Underbody"
+        },
+        {
+          "label": "Engine Power",
+          "labelTa": "என்ஜின் திறன்",
+          "value": "165 HP John Deere PowerTech"
+        }
+      ],
+      "createdAt": "2026-09-18T17:29:05.423Z"
+    },
+    {
+      "id": "eq-pump-1",
+      "ownerId": "usr-owner-1",
+      "name": "Kirloskar Diesel Water Pump",
+      "nameTa": "கிர்லோஸ்கர் டீசல் நீர் பம்ப்",
+      "category": "Water Pump",
+      "brand": "Kirloskar",
+      "model": "5 HP Diesel Engine Pumpset",
+      "imageUrl": "/equipment/water-pumps/kirloskar-diesel-water-pump.jpg",
+      "description": "Kirloskar 5 HP portable diesel water pumpset with 3-inch delivery port and 55,000 L/h flow capacity, ideal for flood irrigation, canals, and rural farms without reliable electricity.",
+      "location": "Tiruchirappalli, Tamil Nadu",
+      "lat": 10.7905,
+      "lng": 78.7047,
+      "pricePerDay": 600,
+      "available": true,
+      "img": "/equipment/water-pumps/kirloskar-diesel-water-pump.jpg",
+      "rating": 4.8,
+      "reviews": 54,
+      "hp": 5,
+      "fuelType": "Diesel",
       "securityDeposit": 1000,
       "operatorIncluded": false,
       "specs": [
         {
-          "label": "Filtration Flow",
-          "labelTa": "வடிகட்டும் வேகம்",
-          "value": "40 m³ / Hour (approx 650 LPM)"
+          "label": "Power",
+          "labelTa": "திறன்",
+          "value": "5.0 HP Single Cylinder Diesel"
         },
         {
-          "label": "Media",
-          "labelTa": "வடிகட்டி மணல்",
-          "value": "Pure Silica Quartz Crushed Gravel"
+          "label": "Delivery Port",
+          "labelTa": "வெளியேறும் குழாய்",
+          "value": "3\" x 3\" (75 mm)"
         },
         {
-          "label": "Fertigation",
-          "labelTa": "உர உறிஞ்சி",
-          "value": "Venturi Injector with Flow Control Needle Valve"
+          "label": "Discharge Rate",
+          "labelTa": "நீர் வெளியேற்றம்",
+          "value": "55,000 Litres/hour"
+        },
+        {
+          "label": "Max Head",
+          "labelTa": "அதிகபட்ச உயரம்",
+          "value": "18 - 24 metres"
         }
       ],
-      "createdAt": "2026-09-10T18:10:34.626Z"
+      "createdAt": "2026-09-18T17:29:05.423Z"
     },
     {
-      "id": "eq-other-6",
+      "id": "eq-pump-2",
       "ownerId": "usr-owner-1",
-      "name": "VST Shakti MT 180D Mini Power Tiller (13 HP) with Rotary Weeder",
-      "nameTa": "விஎஸ்டி சக்தி MT 180D மினி பவர் டில்லர் & களையெடுப்பான் (13 HP)",
-      "category": "Baler & Tiller",
-      "brand": "VST Shakti",
-      "model": "MT 180D Mini",
-      "imageUrl": "https://images.unsplash.com/photo-1595113316349-9fa4eb24f884?auto=format&fit=crop&w=900&h=600&q=85",
-      "description": "Versatile 13 HP diesel walk-behind power tiller equipped with side rotary weeder blades and ridger attachment. Excellent for weeding between sugarcane, tapioca, and vegetable beds.",
+      "name": "Texmo Solar Water Pump",
+      "nameTa": "டெக்ஸ்மோ சோலார் நீர் பம்ப்",
+      "category": "Water Pump",
+      "brand": "Texmo",
+      "model": "Taro Solar Submersible Pumpset",
+      "imageUrl": "/equipment/water-pumps/texmo-solar-water-pump.jpg",
+      "description": "Texmo (Taro) 3 HP high-efficiency solar submersible pump system with MPPT controller, designed for sustainable, zero-electricity-cost deep borewell farm irrigation.",
       "location": "Coimbatore, Tamil Nadu",
       "lat": 11.0168,
       "lng": 76.9558,
-      "pricePerDay": 700,
+      "pricePerDay": 750,
       "available": true,
-      "img": "https://images.unsplash.com/photo-1595113316349-9fa4eb24f884?auto=format&fit=crop&w=900&h=600&q=85",
-      "rating": 4.8,
-      "reviews": 47,
-      "hp": 13,
-      "fuelType": "Diesel",
+      "img": "/equipment/water-pumps/texmo-solar-water-pump.jpg",
+      "rating": 4.9,
+      "reviews": 40,
+      "hp": 3,
+      "fuelType": "Solar / Electric",
       "securityDeposit": 1500,
       "operatorIncluded": false,
       "specs": [
         {
-          "label": "Engine",
-          "labelTa": "இயந்திரம்",
-          "value": "13 HP VST Horizontal 4-Stroke Diesel"
+          "label": "Power",
+          "labelTa": "திறன்",
+          "value": "3.0 HP High-Efficiency DC Solar"
         },
         {
-          "label": "Tilling Width",
-          "labelTa": "உழவு அகலம்",
-          "value": "60 - 80 cm Adjustable"
+          "label": "Head Range",
+          "labelTa": "தலைமை வரம்பு",
+          "value": "Up to 80 metres"
         },
         {
-          "label": "Gears",
-          "labelTa": "கியர்கள்",
-          "value": "6 Forward + 2 Reverse"
+          "label": "Discharge",
+          "labelTa": "வெளியேற்றம்",
+          "value": "25,000 - 35,000 L/h"
+        },
+        {
+          "label": "Pump Type",
+          "labelTa": "பம்ப் வகை",
+          "value": "Stainless Steel Borewell Submersible"
         }
       ],
-      "createdAt": "2026-09-10T18:10:34.626Z"
+      "createdAt": "2026-09-18T17:29:05.423Z"
+    },
+    {
+      "id": "eq-pump-3",
+      "ownerId": "usr-owner-1",
+      "name": "Kirloskar Electric Water Pump",
+      "nameTa": "கிர்லோஸ்கர் எலக்ட்ரிக் மோனோபிளாக் பம்ப்",
+      "category": "Water Pump",
+      "brand": "Kirloskar",
+      "model": "KSMB Monobloc Centrifugal Pump",
+      "imageUrl": "/equipment/water-pumps/kirloskar-electric-water-pump.jpg",
+      "description": "Kirloskar KSMB high-efficiency electric monobloc centrifugal pump with thermal overload protection, anti-corrosive coating, and dependable continuous flow for open well irrigation.",
+      "location": "Erode, Tamil Nadu",
+      "lat": 11.341,
+      "lng": 77.7172,
+      "pricePerDay": 450,
+      "available": true,
+      "img": "/equipment/water-pumps/kirloskar-electric-water-pump.jpg",
+      "rating": 4.7,
+      "reviews": 33,
+      "hp": 2,
+      "fuelType": "Solar / Electric",
+      "securityDeposit": 1000,
+      "operatorIncluded": false,
+      "specs": [
+        {
+          "label": "Power",
+          "labelTa": "திறன்",
+          "value": "2.0 HP (1.5 kW) Single Phase"
+        },
+        {
+          "label": "Delivery Port",
+          "labelTa": "வெளியேறும் குழாய்",
+          "value": "2\" x 2\" (50 mm)"
+        },
+        {
+          "label": "Discharge",
+          "labelTa": "வெளியேற்றம்",
+          "value": "30,000 Litres/hour"
+        },
+        {
+          "label": "Max Head",
+          "labelTa": "அதிகபட்ச உயரம்",
+          "value": "28 metres"
+        }
+      ],
+      "createdAt": "2026-09-18T17:29:05.423Z"
     }
   ],
   "bookings": [
     {
       "listingId": "eq-tractor-1",
-      "equipmentName": "John Deere 5310 4WD (55 HP) Tractor",
-      "equipmentImg": "https://images.unsplash.com/photo-1533062618053-d51e617307ec?auto=format&fit=crop&w=900&h=600&q=85",
+      "equipmentName": "Mahindra 575 DI Yuvo Tech+",
+      "equipmentImg": "/equipment/tractors/mahindra-575-di-yuvo-tech-plus.jpg",
+      "farmerId": "usr-farmer-1",
+      "farmerName": "Muthukumar S.",
+      "ownerId": "usr-owner-1",
+      "ownerName": "Selvam Murugan (Selvam Agro Fleet)",
+      "startDate": "2026-10-10",
+      "endDate": "2026-10-12",
+      "days": 2,
+      "dailyRate": 1800,
+      "totalAmount": 3600,
+      "securityDeposit": 3000,
+      "escrowStatus": "held",
+      "status": "active",
+      "id": "BK-9185",
+      "createdAt": "2026-10-03T17:56:57.273Z"
+    },
+    {
+      "listingId": "eq-tractor-1",
+      "equipmentName": "Mahindra 575 DI Yuvo Tech+",
+      "equipmentImg": "/equipment/tractors/mahindra-575-di-yuvo-tech-plus.jpg",
+      "farmerId": "usr-farmer-1",
+      "farmerName": "Muthukumar S.",
+      "ownerId": "usr-owner-1",
+      "ownerName": "Selvam Murugan (Selvam Agro Fleet)",
+      "startDate": "2026-10-10",
+      "endDate": "2026-10-12",
+      "days": 1,
+      "dailyRate": 1800,
+      "totalAmount": 1800,
+      "securityDeposit": 3000,
+      "escrowStatus": "held",
+      "status": "active",
+      "id": "BK-1087",
+      "createdAt": "2026-10-03T17:56:30.456Z"
+    },
+    {
+      "listingId": "eq-tractor-2",
+      "equipmentName": "John Deere 5310",
+      "equipmentImg": "/equipment/tractors/john-deere-5310.jpg",
       "farmerId": "usr-farmer-1",
       "farmerName": "Muthukumar S.",
       "ownerId": "usr-owner-1",
@@ -2036,8 +973,8 @@
       "createdAt": "2026-09-25T17:44:35.388Z"
     },
     {
-      "listingId": "eq-tractor-1",
-      "equipmentName": "John Deere 5310 4WD (55 HP) Tractor",
+      "listingId": "eq-tractor-2",
+      "equipmentName": "John Deere 5310",
       "farmerId": "usr-farmer-1",
       "farmerName": "Muthukumar S.",
       "ownerId": "usr-owner-1",
@@ -2051,11 +988,12 @@
       "escrowStatus": "held",
       "status": "active",
       "id": "BK-3974",
-      "createdAt": "2026-09-25T15:45:18.001Z"
+      "createdAt": "2026-09-25T15:45:18.001Z",
+      "equipmentImg": "/equipment/tractors/john-deere-5310.jpg"
     },
     {
-      "listingId": "eq-tractor-1",
-      "equipmentName": "John Deere 5310 4WD (55 HP) Tractor",
+      "listingId": "eq-tractor-2",
+      "equipmentName": "John Deere 5310",
       "farmerId": "usr-farmer-1",
       "farmerName": "Muthukumar S.",
       "ownerId": "usr-owner-1",
@@ -2069,11 +1007,12 @@
       "escrowStatus": "held",
       "status": "active",
       "id": "BK-6931",
-      "createdAt": "2026-09-25T11:19:33.264Z"
+      "createdAt": "2026-09-25T11:19:33.264Z",
+      "equipmentImg": "/equipment/tractors/john-deere-5310.jpg"
     },
     {
-      "listingId": "eq-tractor-1",
-      "equipmentName": "John Deere 5310 4WD (55 HP) Tractor",
+      "listingId": "eq-tractor-2",
+      "equipmentName": "John Deere 5310",
       "farmerId": "usr-farmer-1",
       "farmerName": "Muthukumar S.",
       "ownerId": "usr-owner-1",
@@ -2087,11 +1026,12 @@
       "escrowStatus": "held",
       "status": "active",
       "id": "BK-2721",
-      "createdAt": "2026-09-25T11:19:15.723Z"
+      "createdAt": "2026-09-25T11:19:15.723Z",
+      "equipmentImg": "/equipment/tractors/john-deere-5310.jpg"
     },
     {
-      "listingId": "eq-tractor-1",
-      "equipmentName": "John Deere 5310 4WD (55 HP) Tractor",
+      "listingId": "eq-tractor-2",
+      "equipmentName": "John Deere 5310",
       "farmerId": "usr-owner-1",
       "farmerName": "Selvam Murugan (Selvam Agro Fleet)",
       "ownerId": "usr-owner-1",
@@ -2105,11 +1045,12 @@
       "escrowStatus": "held",
       "status": "active",
       "id": "BK-8810",
-      "createdAt": "2026-09-23T16:58:44.766Z"
+      "createdAt": "2026-09-23T16:58:44.766Z",
+      "equipmentImg": "/equipment/tractors/john-deere-5310.jpg"
     },
     {
-      "listingId": "eq-tractor-1",
-      "equipmentName": "John Deere 5310 4WD (55 HP) Tractor",
+      "listingId": "eq-tractor-2",
+      "equipmentName": "John Deere 5310",
       "farmerId": "usr-farmer-1",
       "farmerName": "Muthukumar S.",
       "ownerId": "usr-owner-1",
@@ -2123,12 +1064,13 @@
       "escrowStatus": "held",
       "status": "active",
       "id": "BK-7984",
-      "createdAt": "2026-09-23T16:28:47.875Z"
+      "createdAt": "2026-09-23T16:28:47.875Z",
+      "equipmentImg": "/equipment/tractors/john-deere-5310.jpg"
     },
     {
       "id": "BK-9021",
       "listingId": "eq-drone-1",
-      "equipmentName": "DJI Agras T40 Agricultural Spraying Drone (40L)",
+      "equipmentName": "DJI Agras T40 Agricultural Drone",
       "farmerId": "usr-farmer-1",
       "farmerName": "Muthukumar S.",
       "ownerId": "usr-owner-1",
@@ -2141,12 +1083,13 @@
       "securityDeposit": 5000,
       "escrowStatus": "held",
       "status": "active",
-      "createdAt": "2026-09-20T10:00:00.000Z"
+      "createdAt": "2026-09-20T10:00:00.000Z",
+      "equipmentImg": "/equipment/sprayers-drones/dji-agras-t40.jpg"
     },
     {
       "id": "BK-8842",
       "listingId": "eq-harvester-1",
-      "equipmentName": "Preet 987 Self-Propelled Multi-Crop Combine Harvester",
+      "equipmentName": "Claas Crop Tiger 30",
       "farmerId": "usr-farmer-1",
       "farmerName": "Muthukumar S.",
       "ownerId": "usr-owner-2",
@@ -2159,12 +1102,13 @@
       "securityDeposit": 8000,
       "escrowStatus": "released",
       "status": "completed",
-      "createdAt": "2026-08-12T14:20:00.000Z"
+      "createdAt": "2026-08-12T14:20:00.000Z",
+      "equipmentImg": "/equipment/harvesters/claas-crop-tiger-30.jpg"
     },
     {
       "id": "BK-8510",
-      "listingId": "eq-tractor-1",
-      "equipmentName": "John Deere 5310 4WD (55 HP) Tractor",
+      "listingId": "eq-tractor-2",
+      "equipmentName": "John Deere 5310",
       "farmerId": "usr-farmer-2",
       "farmerName": "Rajesh Kumar Patil",
       "ownerId": "usr-owner-1",
@@ -2177,12 +1121,13 @@
       "securityDeposit": 3000,
       "escrowStatus": "held",
       "status": "active",
-      "createdAt": "2026-09-21T08:30:00.000Z"
+      "createdAt": "2026-09-21T08:30:00.000Z",
+      "equipmentImg": "/equipment/tractors/john-deere-5310.jpg"
     },
     {
       "id": "BK-8104",
-      "listingId": "eq-leveler-1",
-      "equipmentName": "Fieldking Dual-Mast Precision Laser Land Leveler",
+      "listingId": "eq-tillage-1",
+      "equipmentName": "Mahindra MB Plough",
       "farmerId": "usr-farmer-1",
       "farmerName": "Muthukumar S.",
       "ownerId": "usr-owner-2",
@@ -2195,10 +1140,147 @@
       "securityDeposit": 4000,
       "escrowStatus": "released",
       "status": "completed",
-      "createdAt": "2026-07-08T16:00:00.000Z"
+      "createdAt": "2026-07-08T16:00:00.000Z",
+      "equipmentImg": "/equipment/tillage/mahindra-mb-plough.jpg"
     }
   ],
   "notifications": [
+    {
+      "userId": "usr-owner-1",
+      "title": "Equipment Listing Removed",
+      "message": "Your listing \"Preet 987 Combine Harvester\" has been removed from the catalog.",
+      "type": "equipment_deleted",
+      "read": false,
+      "id": "notif-1791052121889-389",
+      "timestamp": "2026-10-03T18:28:41.889Z"
+    },
+    {
+      "userId": "usr-owner-1",
+      "title": "Equipment Listing Removed",
+      "message": "Your listing \"Swaraj 744 FE\" has been removed from the catalog.",
+      "type": "equipment_deleted",
+      "read": false,
+      "id": "notif-1791052121882-186",
+      "timestamp": "2026-10-03T18:28:41.882Z"
+    },
+    {
+      "userId": "usr-owner-1",
+      "title": "Equipment Listing Updated",
+      "message": "Your listing \"Preet 987 Combine Harvester\" has been updated successfully.",
+      "type": "equipment_updated",
+      "read": false,
+      "relatedId": "eq-49c25b3d",
+      "id": "notif-1791052121874-915",
+      "timestamp": "2026-10-03T18:28:41.874Z"
+    },
+    {
+      "userId": "usr-owner-1",
+      "title": "Equipment Listed Successfully",
+      "message": "Your Preet 987 Combine Harvester is now published and visible to farmers on the AgriRent marketplace.",
+      "type": "equipment_added",
+      "read": false,
+      "relatedId": "eq-49c25b3d",
+      "id": "notif-1791052121869-388",
+      "timestamp": "2026-10-03T18:28:41.869Z"
+    },
+    {
+      "userId": "usr-owner-1",
+      "title": "Equipment Listed Successfully",
+      "message": "Your Swaraj 744 FE is now published and visible to farmers on the AgriRent marketplace.",
+      "type": "equipment_added",
+      "read": false,
+      "relatedId": "eq-d43510ac",
+      "id": "notif-1791052121865-332",
+      "timestamp": "2026-10-03T18:28:41.865Z"
+    },
+    {
+      "userId": "usr-owner-1",
+      "title": "Equipment Listing Removed",
+      "message": "Your listing \"Preet 987 Combine Harvester\" has been removed from the catalog.",
+      "type": "equipment_deleted",
+      "read": false,
+      "id": "notif-1791052096803-378",
+      "timestamp": "2026-10-03T18:28:16.803Z"
+    },
+    {
+      "userId": "usr-owner-1",
+      "title": "Equipment Listing Removed",
+      "message": "Your listing \"Swaraj 744 FE\" has been removed from the catalog.",
+      "type": "equipment_deleted",
+      "read": false,
+      "id": "notif-1791052096799-930",
+      "timestamp": "2026-10-03T18:28:16.799Z"
+    },
+    {
+      "userId": "usr-owner-1",
+      "title": "Equipment Listing Updated",
+      "message": "Your listing \"Preet 987 Combine Harvester\" has been updated successfully.",
+      "type": "equipment_updated",
+      "read": false,
+      "relatedId": "eq-7ca0eea0",
+      "id": "notif-1791052096790-813",
+      "timestamp": "2026-10-03T18:28:16.790Z"
+    },
+    {
+      "userId": "usr-owner-1",
+      "title": "Equipment Listed Successfully",
+      "message": "Your Preet 987 Combine Harvester is now published and visible to farmers on the AgriRent marketplace.",
+      "type": "equipment_added",
+      "read": false,
+      "relatedId": "eq-7ca0eea0",
+      "id": "notif-1791052096784-560",
+      "timestamp": "2026-10-03T18:28:16.784Z"
+    },
+    {
+      "userId": "usr-owner-1",
+      "title": "Equipment Listed Successfully",
+      "message": "Your Swaraj 744 FE is now published and visible to farmers on the AgriRent marketplace.",
+      "type": "equipment_added",
+      "read": false,
+      "relatedId": "eq-7d55d3b9",
+      "id": "notif-1791052096779-505",
+      "timestamp": "2026-10-03T18:28:16.779Z"
+    },
+    {
+      "userId": "usr-owner-1",
+      "title": "New Booking Received: Mahindra 575 DI Yuvo Tech+",
+      "message": "Farmer Muthukumar S. booked Mahindra 575 DI Yuvo Tech+ from 2026-10-10 to 2026-10-12. ₹3,600 held in escrow.",
+      "type": "booking_received",
+      "read": false,
+      "relatedId": "BK-9185",
+      "id": "notif-1791050217276-183",
+      "timestamp": "2026-10-03T17:56:57.276Z"
+    },
+    {
+      "userId": "usr-farmer-1",
+      "title": "Booking Confirmed: Mahindra 575 DI Yuvo Tech+",
+      "message": "Your booking BK-9185 (2 days, ₹3,600) has been placed. Equipment will arrive on 2026-10-10.",
+      "type": "booking_confirmed",
+      "read": false,
+      "relatedId": "BK-9185",
+      "id": "notif-1791050217274-661",
+      "timestamp": "2026-10-03T17:56:57.274Z"
+    },
+    {
+      "userId": "usr-owner-1",
+      "title": "New Booking Received: Mahindra 575 DI Yuvo Tech+",
+      "message": "Farmer Muthukumar S. booked Mahindra 575 DI Yuvo Tech+ from 2026-10-10 to 2026-10-12. ₹1,800 held in escrow.",
+      "type": "booking_received",
+      "read": false,
+      "relatedId": "BK-1087",
+      "id": "notif-1791050190462-7",
+      "timestamp": "2026-10-03T17:56:30.462Z"
+    },
+    {
+      "userId": "usr-farmer-1",
+      "title": "Booking Confirmed: Mahindra 575 DI Yuvo Tech+",
+      "message": "Your booking BK-1087 (1 days, ₹1,800) has been placed. Equipment will arrive on 2026-10-10.",
+      "type": "booking_confirmed",
+      "read": false,
+      "relatedId": "BK-1087",
+      "id": "notif-1791050190461-235",
+      "timestamp": "2026-10-03T17:56:30.461Z"
+    },
     {
       "userId": "usr-owner-1",
       "title": "New Booking Received: John Deere 5310 4WD (55 HP) Tractor",

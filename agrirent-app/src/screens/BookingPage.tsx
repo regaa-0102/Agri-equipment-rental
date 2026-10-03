@@ -100,7 +100,7 @@ export default function BookingPage({ onNavigate, selectedEquipment }: Props) {
       const bookingRecord = createNewBooking({
         equipment: eq.name,
         cat: eq.cat,
-        img: eq.img,
+        img: eq.imageUrl || eq.img,
         location: `${village}, ${district}`,
         from: startDate,
         to: endDate,

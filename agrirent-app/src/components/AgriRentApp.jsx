@@ -44,6 +44,7 @@ import {
 import { categories, listings, popularCategories, productCategories } from "../data/catalog";
 import { tamilNaduDistricts } from "../lib/catalog";
 import { useLanguage } from "../context/LanguageContext";
+import { useTheme } from "../context/ThemeContext";
 import LanguageSelector from "./LanguageSelector";
 
 const iconMap = {
@@ -103,6 +104,7 @@ function Button({
 
 function Header({ navigate, user, setUser, wishlistCount }) {
   const { t } = useLanguage();
+  const { openSettings } = useTheme();
   const [open, setOpen] = useState(false);
   const [menu, setMenu] = useState(false);
   const logout = () => {
@@ -129,6 +131,14 @@ function Header({ navigate, user, setUser, wishlistCount }) {
         </nav>
         <div className="nav-actions">
           <LanguageSelector />
+          <button
+            className="icon-button"
+            aria-label="Settings & Theme"
+            title="Settings & Themes"
+            onClick={openSettings}
+          >
+            <Settings2 size={18} />
+          </button>
           <button
             className="icon-button"
             aria-label="Notifications"

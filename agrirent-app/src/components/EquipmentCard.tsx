@@ -1,7 +1,8 @@
-import { Star, MapPin } from 'lucide-react'
+import { useState } from 'react'
+import { Star, MapPin, ZoomIn } from 'lucide-react'
 import { CatalogItem, getCategoryFallback } from '../lib/catalog'
 import { useLanguage } from '../context/LanguageContext'
-
+import ImageZoomModal from './ImageZoomModal'
 interface Props {
   equipment: CatalogItem
   onNavigate: (screen: string) => void
@@ -10,6 +11,12 @@ interface Props {
 
 export default function EquipmentCard({ equipment, onNavigate, onSelect }: Props) {
   const { isTamil } = useLanguage()
+  const [zoomModalOpen, setZoomModalOpen] = useState(false)
+
+  const resolvedImage =
+    equipment.imageUrl ||
+    equipment.img ||
+    getCategoryFallback(equipment.category || equipment.cat)
 
   const handleCardClick = () => {
     if (typeof window !== 'undefined') {
@@ -51,13 +58,42 @@ export default function EquipmentCard({ equipment, onNavigate, onSelect }: Props
     >
       <div style={{ position: 'relative', height: 200, background: '#F3F4F6' }}>
         <img
-          src={equipment.imageUrl || equipment.img}
+          src={resolvedImage}
           alt={equipment.name}
           style={{ width: '100%', height: '100%', objectFit: 'cover' }}
           onError={(e) => {
             e.currentTarget.src = getCategoryFallback(equipment.category || equipment.cat)
           }}
         />
+        {/* Quick Zoom Button */}
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation()
+            setZoomModalOpen(true)
+          }}
+          title={isTamil ? 'படத்தை பெரிதாக்கிக் காண்க (Zoom)' : 'Zoom In Photo'}
+          style={{
+            position: 'absolute',
+            bottom: 10,
+            right: 10,
+            background: 'rgba(15, 23, 42, 0.78)',
+            backdropFilter: 'blur(4px)',
+            color: '#fff',
+            border: '1px solid rgba(255, 255, 255, 0.2)',
+            borderRadius: '50%',
+            width: 32,
+            height: 32,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            boxShadow: '0 2px 6px rgba(0,0,0,0.3)',
+            zIndex: 5,
+          }}
+        >
+          <ZoomIn size={16} />
+        </button>
         <div
           style={{
             position: 'absolute',
@@ -179,6 +215,16 @@ export default function EquipmentCard({ equipment, onNavigate, onSelect }: Props
           </button>
         </div>
       </div>
+
+      {/* Quick Zoom Modal */}
+      <ImageZoomModal
+        isOpen={zoomModalOpen}
+        onClose={() => setZoomModalOpen(false)}
+        imageSrc={resolvedImage}
+        equipmentName={equipment.name}
+        category={equipment.category || equipment.cat}
+        gallery={equipment.gallery && equipment.gallery.length > 0 ? equipment.gallery : [resolvedImage]}
+      />
     </div>
   )
 }

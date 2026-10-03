@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react'
-import { catalog, categories, categoryNames, tamilNaduDistricts, getFullCatalog, getAllBrands, searchCatalog } from '../lib/catalog'
+import { catalog, categories, categoryNames, tamilNaduDistricts, getFullCatalog, getAllBrands, searchCatalog, getDynamicCategories, syncCatalogWithServer } from '../lib/catalog'
 import { useLanguage } from '../context/LanguageContext'
 import LanguageSelector from '../components/LanguageSelector'
 import CategoryCard from '../components/CategoryCard'
@@ -10,7 +10,8 @@ import AgriWeatherCard from '../components/AgriWeatherCard'
 import AgriMatchCalculator from '../components/AgriMatchCalculator'
 import AgriChatbot from '../components/AgriChatbot'
 import ApiExplorerModal from '../components/ApiExplorerModal'
-import { Terminal, Search, Filter, X, RotateCcw, Check, Sparkles } from 'lucide-react'
+import { Terminal, Search, Filter, X, RotateCcw, Check, Sparkles, Settings, Palette } from 'lucide-react'
+import { useTheme } from '../context/ThemeContext'
 
 const P = '#2E7D32'
 const PL = '#66BB6A'
@@ -59,6 +60,7 @@ interface Props {
 
 export default function HomePage({ onNavigate }: Props) {
   const { t, isTamil } = useLanguage()
+  const { openSettings } = useTheme()
   const [openFaq, setOpenFaq] = useState<number | null>(null)
   const [activeCat, setActiveCat] = useState('All')
   const [searchLocation, setSearchLocation] = useState('All Locations')
@@ -72,12 +74,19 @@ export default function HomePage({ onNavigate }: Props) {
 
   useEffect(() => {
     setEquipmentList(getFullCatalog())
+    syncCatalogWithServer().then((list) => {
+      if (list && list.length > 0) {
+        setEquipmentList(list)
+      }
+    })
     const handleUpdate = () => {
       setEquipmentList(getFullCatalog())
     }
     window.addEventListener('agrirent_catalog_updated', handleUpdate)
     return () => window.removeEventListener('agrirent_catalog_updated', handleUpdate)
   }, [])
+
+  const dynamicCategories = useMemo(() => getDynamicCategories(equipmentList), [equipmentList])
 
   const allBrands = useMemo(() => getAllBrands(equipmentList), [equipmentList])
 
@@ -196,6 +205,30 @@ export default function HomePage({ onNavigate }: Props) {
           </nav>
 
           <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+            {/* Theme & Settings Trigger */}
+            <button
+              type="button"
+              onClick={openSettings}
+              title={isTamil ? 'அமைப்புகள் & தீம்கள்' : 'Settings & Themes'}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
+                padding: '8px 12px',
+                borderRadius: 8,
+                background: 'rgba(21, 128, 61, 0.08)',
+                border: '1px solid rgba(21, 128, 61, 0.2)',
+                color: '#15803D',
+                fontSize: 13,
+                fontWeight: 700,
+                cursor: 'pointer',
+              }}
+            >
+              <Palette size={15} />
+              <span className="hidden sm:inline">{isTamil ? 'தீம்கள்' : 'Themes'}</span>
+              <Settings size={14} />
+            </button>
+
             <LanguageSelector />
             <button onClick={() => onNavigate('login')} className="btn-outline" style={{ padding: '8px 16px', fontSize: 13 }}>
               {t('Log In')}
@@ -437,7 +470,7 @@ export default function HomePage({ onNavigate }: Props) {
               flexWrap: 'wrap',
             }}
           >
-            {categories.map((cat) => (
+            {dynamicCategories.map((cat) => (
               <CategoryCard
                 key={cat.name}
                 category={cat}

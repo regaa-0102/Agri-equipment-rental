@@ -13,7 +13,7 @@ export function getDatabasePool() {
       host: DB_HOST,
       port: Number(DB_PORT ?? 3306),
       user: DB_USER,
-      password: DB_PASSWORD,
+      password: DB_PASSWORD ?? "",
       database: DB_NAME,
       connectionLimit: 10,
       waitForConnections: true,

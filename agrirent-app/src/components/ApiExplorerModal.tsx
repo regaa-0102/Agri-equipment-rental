@@ -57,7 +57,7 @@ export default function ApiExplorerModal({ isOpen, onClose }: Props) {
 
   if (!isOpen) return null
 
-  const ep = ENDPOINTS[selectedIdx]
+  const ep = ENDPOINTS[selectedIdx] || ENDPOINTS[0]!
 
   const runRequest = async () => {
     setLoading(true)
@@ -69,11 +69,14 @@ export default function ApiExplorerModal({ isOpen, onClose }: Props) {
     if (token) headers['Authorization'] = `Bearer ${token}`
 
     try {
-      const res = await fetch(ep.url, {
+      const reqInit: RequestInit = {
         method: ep.method,
         headers,
-        body: ep.method === 'POST' ? ep.body : undefined,
-      })
+      }
+      if (ep.method === 'POST' && ep.body) {
+        reqInit.body = ep.body
+      }
+      const res = await fetch(ep.url, reqInit)
       setStatusCode(res.status)
       const data = await res.json()
       setResponse(data)
@@ -88,7 +91,7 @@ export default function ApiExplorerModal({ isOpen, onClose }: Props) {
   const copyCurl = () => {
     const token = getStoredJwt()
     const authHeader = token ? ` -H "Authorization: Bearer ${token}"` : ''
-    const bodyArg = ep.method === 'POST' ? ` -d '${ep.body.replace(/\n/g, '')}'` : ''
+    const bodyArg = ep.method === 'POST' && ep.body ? ` -d '${ep.body.replace(/\n/g, '')}'` : ''
     const curl = `curl -X ${ep.method} "http://localhost:5173${ep.url}" -H "Content-Type: application/json"${authHeader}${bodyArg}`
     navigator.clipboard.writeText(curl)
     setCopied(true)

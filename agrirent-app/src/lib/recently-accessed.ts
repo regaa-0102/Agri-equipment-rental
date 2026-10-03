@@ -6,7 +6,7 @@ const EVENT_KEY = 'agrirent_recently_viewed_change'
 export interface RecentlyViewedItem {
   id: string
   name: string
-  nameTa?: string
+  nameTa?: string | undefined
   cat: string
   img: string
   price: string

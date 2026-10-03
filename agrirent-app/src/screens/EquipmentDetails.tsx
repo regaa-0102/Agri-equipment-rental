@@ -1,9 +1,25 @@
 import { useState, useEffect } from 'react'
-import { Truck, Star, MapPin, ShieldCheck, Check, ArrowRight, Phone, Calendar, Clock } from 'lucide-react'
+import {
+  Truck,
+  Star,
+  MapPin,
+  ShieldCheck,
+  Check,
+  ArrowRight,
+  Phone,
+  Calendar,
+  Clock,
+  ZoomIn,
+  ZoomOut,
+  Maximize2,
+  ExternalLink,
+  RotateCcw,
+} from 'lucide-react'
 import { useLanguage } from '../context/LanguageContext'
-import { catalog, findCatalogItem, type CatalogItem, getCategoryFallback } from '../lib/catalog'
+import { catalog, findCatalogItem, type CatalogItem, getCategoryFallback, getGoogleImageSearchUrl } from '../lib/catalog'
 import { recordRecentlyViewed } from '../lib/recently-accessed'
 import TrackingPanel from '../components/TrackingPanel'
+import ImageZoomModal from '../components/ImageZoomModal'
 import { SEED_BOOKINGS } from '../lib/bookings'
 
 const P = '#2E7D32'
@@ -29,6 +45,8 @@ export default function EquipmentDetails({ onNavigate }: Props) {
   const [selectedImg, setSelectedImg] = useState<string>(() => item.imageUrl || item.img)
   const [activeTab, setActiveTab] = useState<'specs' | 'desc' | 'escrow'>('specs')
   const [showTracking, setShowTracking] = useState(false)
+  const [zoomModalOpen, setZoomModalOpen] = useState(false)
+  const [inlineZoom, setInlineZoom] = useState(1)
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -111,51 +129,259 @@ export default function EquipmentDetails({ onNavigate }: Props) {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: 32, marginBottom: 36 }}>
           {/* Photos Column */}
           <div>
-            <div style={{ height: 420, borderRadius: 20, overflow: 'hidden', background: '#F1F5F9', marginBottom: 12, border: '1px solid #E2E8F0', position: 'relative' }}>
+            <div
+              style={{
+                height: 420,
+                borderRadius: 20,
+                overflow: 'hidden',
+                background: '#0F172A',
+                marginBottom: 12,
+                border: '1px solid #E2E8F0',
+                position: 'relative',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
               <img
                 src={selectedImg}
                 alt={item.name}
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                onClick={() => setZoomModalOpen(true)}
+                title="Click to open Fullscreen Zoom Lightbox"
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                  transform: `scale(${inlineZoom})`,
+                  transition: 'transform 0.2s ease',
+                  cursor: inlineZoom > 1 ? 'pointer' : 'zoom-in',
+                }}
                 onError={(e) => {
                   e.currentTarget.src = getCategoryFallback(item.cat)
                 }}
               />
+
+              {/* Floating Zoom Controls Bar */}
+              <div
+                style={{
+                  position: 'absolute',
+                  top: 14,
+                  right: 14,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 4,
+                  padding: '4px 8px',
+                  borderRadius: 24,
+                  background: 'rgba(15, 23, 42, 0.82)',
+                  backdropFilter: 'blur(8px)',
+                  border: '1px solid rgba(255, 255, 255, 0.2)',
+                  color: '#fff',
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+                  zIndex: 10,
+                }}
+              >
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    setInlineZoom((prev) => Math.max(1, Number((prev - 0.25).toFixed(2))))
+                  }}
+                  disabled={inlineZoom <= 1}
+                  title="Zoom Out (-)"
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: '#fff',
+                    padding: 4,
+                    cursor: inlineZoom <= 1 ? 'not-allowed' : 'pointer',
+                    display: 'flex',
+                    opacity: inlineZoom <= 1 ? 0.35 : 1,
+                  }}
+                >
+                  <ZoomOut size={16} />
+                </button>
+
+                <span
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 800,
+                    color: '#4ADE80',
+                    minWidth: 40,
+                    textAlign: 'center',
+                    fontVariantNumeric: 'tabular-nums',
+                  }}
+                >
+                  {Math.round(inlineZoom * 100)}%
+                </span>
+
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    setInlineZoom((prev) => Math.min(2.5, Number((prev + 0.25).toFixed(2))))
+                  }}
+                  disabled={inlineZoom >= 2.5}
+                  title="Zoom In (+)"
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: '#fff',
+                    padding: 4,
+                    cursor: inlineZoom >= 2.5 ? 'not-allowed' : 'pointer',
+                    display: 'flex',
+                    opacity: inlineZoom >= 2.5 ? 0.35 : 1,
+                  }}
+                >
+                  <ZoomIn size={16} />
+                </button>
+
+                {inlineZoom > 1 && (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      setInlineZoom(1)
+                    }}
+                    title="Reset Zoom"
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      color: '#94A3B8',
+                      padding: 4,
+                      cursor: 'pointer',
+                      display: 'flex',
+                    }}
+                  >
+                    <RotateCcw size={14} />
+                  </button>
+                )}
+
+                <div style={{ width: 1, height: 16, background: 'rgba(255,255,255,0.2)', margin: '0 2px' }} />
+
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    setZoomModalOpen(true)
+                  }}
+                  title="Fullscreen Zoom Lightbox (up to 400% & Pan)"
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: '#38BDF8',
+                    padding: 4,
+                    cursor: 'pointer',
+                    display: 'flex',
+                  }}
+                >
+                  <Maximize2 size={15} />
+                </button>
+              </div>
+
+              {/* Sourcing Badge */}
               <div
                 style={{
                   position: 'absolute',
                   bottom: 14,
                   left: 14,
-                  background: 'rgba(0,0,0,0.7)',
+                  background: 'rgba(15, 23, 42, 0.8)',
                   color: '#fff',
                   borderRadius: 8,
-                  padding: '4px 10px',
+                  padding: '5px 12px',
                   fontSize: 12,
                   fontWeight: 600,
-                  backdropFilter: 'blur(4px)',
+                  backdropFilter: 'blur(6px)',
+                  border: '1px solid rgba(255,255,255,0.15)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6,
                 }}
               >
-                Verified Genuine Equipment Photo
+                <span style={{ color: '#4ADE80' }}>✓</span>
+                <span>Verified Google Model Photo</span>
               </div>
             </div>
 
             {/* Thumbnail Gallery */}
-            <div style={{ display: 'flex', gap: 10 }}>
-              {gallery.map((imgUrl, idx) => (
-                <div
-                  key={idx}
-                  onClick={() => setSelectedImg(imgUrl)}
-                  style={{
-                    width: 80,
-                    height: 60,
-                    borderRadius: 10,
-                    overflow: 'hidden',
-                    cursor: 'pointer',
-                    border: `2px solid ${selectedImg === imgUrl ? '#15803D' : '#CBD5E1'}`,
-                  }}
-                >
-                  <img src={imgUrl} alt={`Thumbnail ${idx}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                </div>
-              ))}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+              <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+                {gallery.map((imgUrl, idx) => (
+                  <div
+                    key={idx}
+                    onClick={() => {
+                      setSelectedImg(imgUrl)
+                      setInlineZoom(1)
+                    }}
+                    style={{
+                      width: 80,
+                      height: 60,
+                      borderRadius: 10,
+                      overflow: 'hidden',
+                      cursor: 'pointer',
+                      border: `2px solid ${selectedImg === imgUrl ? '#15803D' : '#CBD5E1'}`,
+                      transform: selectedImg === imgUrl ? 'scale(1.05)' : 'none',
+                      transition: 'all 0.15s ease',
+                    }}
+                  >
+                    <img src={imgUrl} alt={`Thumbnail ${idx}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Google Search & Fullscreen Zoom Bar */}
+            <div
+              style={{
+                display: 'flex',
+                gap: 10,
+                alignItems: 'center',
+                flexWrap: 'wrap',
+              }}
+            >
+              <button
+                type="button"
+                onClick={() => setZoomModalOpen(true)}
+                style={{
+                  flex: 1,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 6,
+                  padding: '9px 14px',
+                  borderRadius: 10,
+                  border: '1px solid #CBD5E1',
+                  background: '#FFFFFF',
+                  color: '#0F172A',
+                  fontSize: 12,
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                }}
+              >
+                <ZoomIn size={14} color="#15803D" />
+                <span>{isTamil ? 'பெரிதாக்கிக் காண்க (Zoom 400%)' : 'Interactive Zoom & Pan (400%)'}</span>
+              </button>
+
+              <a
+                href={getGoogleImageSearchUrl(item.name)}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  padding: '9px 14px',
+                  borderRadius: 10,
+                  border: '1px solid #CBD5E1',
+                  background: '#F8FAFC',
+                  color: '#334155',
+                  fontSize: 12,
+                  fontWeight: 600,
+                  textDecoration: 'none',
+                }}
+              >
+                <ExternalLink size={13} color="#2563EB" />
+                <span>{isTamil ? 'கூகிள் படங்கள்' : 'Search on Google Images'}</span>
+              </a>
             </div>
           </div>
 
@@ -341,6 +567,16 @@ export default function EquipmentDetails({ onNavigate }: Props) {
           </div>
         </div>
       </div>
+
+      {/* Fullscreen Image Zoom Lightbox */}
+      <ImageZoomModal
+        isOpen={zoomModalOpen}
+        onClose={() => setZoomModalOpen(false)}
+        imageSrc={selectedImg}
+        equipmentName={item.name}
+        category={item.cat}
+        gallery={gallery}
+      />
     </div>
   )
 }

@@ -10,9 +10,11 @@ interface Props {
 function parseJwt(token: string) {
   try {
     const parts = token.split('.')
-    if (parts.length !== 3) return null
-    const header = JSON.parse(atob(parts[0].replace(/-/g, '+').replace(/_/g, '/')))
-    const payload = JSON.parse(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')))
+    const p0 = parts[0]
+    const p1 = parts[1]
+    if (!p0 || !p1) return null
+    const header = JSON.parse(atob(p0.replace(/-/g, '+').replace(/_/g, '/')))
+    const payload = JSON.parse(atob(p1.replace(/-/g, '+').replace(/_/g, '/')))
     return { header, payload, rawSignature: parts[2] }
   } catch {
     return null

@@ -8,7 +8,7 @@ interface Message {
   sender: 'user' | 'bot'
   text: string
   time: string
-  recommendedEquipmentId?: string
+  recommendedEquipmentId?: string | undefined
 }
 
 interface Props {
@@ -73,7 +73,7 @@ export default function AgriChatbot({ onNavigate, onSelectEquipment }: Props) {
         sender: 'bot',
         text: isTamil
           ? 'ஜான் டீர் 5310 டிராக்டர் மற்றும் டிஜேஐ அக்ராஸ் T40 ட்ரோன் தற்போது முன்பதிவுக்கு தயாராக உள்ளன!'
-          : 'John Deere 5310 4WD and DJI Agras T40 Drone are currently available in your area for immediate booking!',
+          : 'John Deere 5310 and DJI Agras T40 Agricultural Drone are currently available in your area for immediate booking!',
         recommendedEquipmentId: 'eq-drone-1',
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       }

@@ -33,6 +33,12 @@ export interface StoredListing {
   lat?: number | undefined;
   lng?: number | undefined;
   pricePerDay: number;
+  pricePerHour?: number | undefined;
+  condition?: string | undefined;
+  year?: string | undefined;
+  minRentalDays?: number | undefined;
+  deliveryAvailable?: boolean | undefined;
+  deliveryCharge?: number | undefined;
   available: boolean;
   img: string;
   rating: number;
@@ -43,6 +49,7 @@ export interface StoredListing {
   operatorIncluded: boolean;
   specs: { label: string; labelTa: string; value: string }[];
   createdAt: string;
+  updatedAt?: string | undefined;
 }
 
 export interface StoredBooking {
@@ -199,12 +206,12 @@ function initializeDataStore(): DataStore {
     {
       id: "BK-9021",
       listingId: "eq-drone-1",
-      equipmentName: "DJI Agras T40 Agricultural Spraying Drone (40L)",
-      equipmentImg: "https://images.unsplash.com/photo-1508614589041-895b88991e3e?auto=format&fit=crop&w=900&h=600&q=85",
+      equipmentName: "DJI Agras T40 Agricultural Drone",
+      equipmentImg: "/equipment/sprayers-drones/dji-agras-t40.jpg",
       farmerId: "usr-farmer-1",
       farmerName: "Muthukumar S.",
-      ownerId: "usr-owner-1",
-      ownerName: "Selvam Murugan",
+      ownerId: "usr-owner-2",
+      ownerName: "Balvinder Singh",
       startDate: "2026-09-21",
       endDate: "2026-09-24",
       days: 3,
@@ -218,8 +225,8 @@ function initializeDataStore(): DataStore {
     {
       id: "BK-8842",
       listingId: "eq-harvester-1",
-      equipmentName: "Preet 987 Self-Propelled Multi-Crop Combine Harvester",
-      equipmentImg: "https://images.unsplash.com/photo-1635174815612-fd9636f70146?auto=format&fit=crop&w=900&h=600&q=85",
+      equipmentName: "Claas Crop Tiger 30",
+      equipmentImg: "/equipment/harvesters/claas-crop-tiger-30.jpg",
       farmerId: "usr-farmer-1",
       farmerName: "Muthukumar S.",
       ownerId: "usr-owner-2",
@@ -227,18 +234,18 @@ function initializeDataStore(): DataStore {
       startDate: "2026-08-15",
       endDate: "2026-08-18",
       days: 3,
-      dailyRate: 5200,
-      totalAmount: 15600,
-      securityDeposit: 8000,
+      dailyRate: 4800,
+      totalAmount: 14400,
+      securityDeposit: 7500,
       escrowStatus: "released",
       status: "completed",
       createdAt: "2026-08-12T14:20:00.000Z",
     },
     {
       id: "BK-8510",
-      listingId: "eq-tractor-1",
-      equipmentName: "John Deere 5310 4WD (55 HP) Tractor",
-      equipmentImg: "https://images.unsplash.com/photo-1533062618053-d51e617307ec?auto=format&fit=crop&w=900&h=600&q=85",
+      listingId: "eq-tractor-2",
+      equipmentName: "John Deere 5310",
+      equipmentImg: "/equipment/tractors/john-deere-5310.jpg",
       farmerId: "usr-farmer-2",
       farmerName: "Rajesh Kumar Patil",
       ownerId: "usr-owner-1",
@@ -246,28 +253,28 @@ function initializeDataStore(): DataStore {
       startDate: "2026-09-22",
       endDate: "2026-09-26",
       days: 4,
-      dailyRate: 1800,
-      totalAmount: 7200,
-      securityDeposit: 3000,
+      dailyRate: 2200,
+      totalAmount: 8800,
+      securityDeposit: 3500,
       escrowStatus: "held",
       status: "active",
       createdAt: "2026-09-21T08:30:00.000Z",
     },
     {
       id: "BK-8104",
-      listingId: "eq-leveler-1",
-      equipmentName: "Fieldking Dual-Mast Precision Laser Land Leveler",
-      equipmentImg: "https://images.unsplash.com/photo-1605000797499-95a51c5269ae?auto=format&fit=crop&w=900&h=600&q=85",
+      listingId: "eq-tillage-1",
+      equipmentName: "Mahindra MB Plough",
+      equipmentImg: "/equipment/tillage/mahindra-mb-plough.jpg",
       farmerId: "usr-farmer-1",
       farmerName: "Muthukumar S.",
-      ownerId: "usr-owner-2",
-      ownerName: "Balvinder Singh",
+      ownerId: "usr-owner-1",
+      ownerName: "Selvam Murugan",
       startDate: "2026-07-10",
       endDate: "2026-07-12",
       days: 2,
-      dailyRate: 2400,
-      totalAmount: 4800,
-      securityDeposit: 4000,
+      dailyRate: 850,
+      totalAmount: 1700,
+      securityDeposit: 1500,
       escrowStatus: "released",
       status: "completed",
       createdAt: "2026-07-08T16:00:00.000Z",
@@ -312,11 +319,18 @@ function loadStore(): DataStore {
           }
         }
 
-        // If listings have pollinations image or missing images, refresh from catalog
-        const hasOutdatedImages = parsed.listings.some((l) => !l.img || l.img.includes("pollinations.ai"));
-        if (hasOutdatedImages || parsed.listings.length < catalog.length) {
-          const fresh = initializeDataStore();
-          parsed.listings = fresh.listings;
+        // Ensure all 18 seed catalog items exist without overwriting owner-created listings
+        const existingListingMap = new Map(parsed.listings.map((l) => [l.id, l]));
+        const fresh = initializeDataStore();
+
+        for (const seedListing of fresh.listings) {
+          const current = existingListingMap.get(seedListing.id);
+          if (!current) {
+            parsed.listings.push(seedListing);
+          } else if (!current.img || !current.img.startsWith("/equipment/")) {
+            current.img = seedListing.img;
+            current.imageUrl = seedListing.imageUrl;
+          }
         }
 
         // Ensure notifications table exists
@@ -451,13 +465,37 @@ export const storage = {
     return newListing;
   },
 
-  deleteListing(id: string): boolean {
+  updateListing(id: string, updates: Partial<StoredListing>): StoredListing | null {
     const store = loadStore();
+    const listing = store.listings.find((l) => l.id === id);
+    if (!listing) return null;
+    Object.assign(listing, updates, { updatedAt: new Date().toISOString() });
+    saveStore();
+    return listing;
+  },
+
+  hasActiveBookings(listingId: string): boolean {
+    const store = loadStore();
+    return store.bookings.some(
+      (b) =>
+        b.listingId === listingId &&
+        (b.status === "active" || b.status === "approved" || b.status === "pending")
+    );
+  },
+
+  deleteListing(id: string): { success: boolean; error?: string } {
+    const store = loadStore();
+    if (this.hasActiveBookings(id)) {
+      return {
+        success: false,
+        error: "This equipment has an active booking and cannot be removed until the booking is completed.",
+      };
+    }
     const index = store.listings.findIndex((l) => l.id === id);
-    if (index === -1) return false;
+    if (index === -1) return { success: false, error: "Listing not found" };
     store.listings.splice(index, 1);
     saveStore();
-    return true;
+    return { success: true };
   },
 
   getBookings(filter?: { farmerId?: string; ownerId?: string }): StoredBooking[] {

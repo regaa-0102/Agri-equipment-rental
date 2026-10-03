@@ -263,9 +263,9 @@ export default function AdminDashboard({ onNavigate }: Props) {
                   </thead>
                   <tbody>
                     {(bookings.length ? bookings : [
-                      { id: 'BK-9021', equipmentName: 'DJI Agras T40 Drone (40L)', farmerName: 'Muthukumar S.', totalAmount: 8400, securityDeposit: 5000, escrowStatus: 'held', status: 'active' },
-                      { id: 'BK-8510', equipmentName: 'John Deere 5310 4WD Tractor', farmerName: 'Rajesh Kumar Patil', totalAmount: 7200, securityDeposit: 3000, escrowStatus: 'held', status: 'active' },
-                      { id: 'BK-8842', equipmentName: 'Preet 987 Combine Harvester', farmerName: 'Muthukumar S.', totalAmount: 15600, securityDeposit: 8000, escrowStatus: 'released', status: 'completed' },
+                      { id: 'BK-9021', equipmentName: 'DJI Agras T40 Agricultural Drone', farmerName: 'Muthukumar S.', totalAmount: 8400, securityDeposit: 5000, escrowStatus: 'held', status: 'active' },
+                      { id: 'BK-8510', equipmentName: 'John Deere 5310', farmerName: 'Rajesh Kumar Patil', totalAmount: 8800, securityDeposit: 3500, escrowStatus: 'held', status: 'active' },
+                      { id: 'BK-8842', equipmentName: 'Claas Crop Tiger 30', farmerName: 'Muthukumar S.', totalAmount: 14400, securityDeposit: 7500, escrowStatus: 'released', status: 'completed' },
                     ]).map((b: any) => (
                       <tr key={b.id} style={{ borderBottom: '1px solid #E2E8F0' }}>
                         <td style={{ padding: '12px 16px', fontWeight: 800, color: '#0F172A' }}>{b.id}</td>
