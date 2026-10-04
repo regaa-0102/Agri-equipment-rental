@@ -15,6 +15,7 @@ import { LanguageProvider } from "../context/LanguageContext";
 import { ThemeProvider } from "../context/ThemeContext";
 import SettingsModal from "../components/SettingsModal";
 import AgriRentApp from "../components/AgriRentApp";
+import { Toaster } from "../components/ui/sonner";
 
 function NotFoundComponent() {
   return <AgriRentApp />;
@@ -115,6 +116,7 @@ function RootComponent() {
           {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
           <Outlet />
           <SettingsModal />
+          <Toaster richColors position="top-right" />
         </LanguageProvider>
       </ThemeProvider>
     </QueryClientProvider>

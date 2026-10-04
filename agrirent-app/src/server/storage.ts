@@ -83,6 +83,18 @@ export interface StoredNotification {
   relatedId?: string | undefined;
 }
 
+export interface StoredContactMessage {
+  id: string;
+  fullName: string;
+  email: string;
+  phone: string;
+  subject: string;
+  category: string;
+  message: string;
+  createdAt: string;
+  status: "new" | "reviewed";
+}
+
 export function hashPassword(password: string): string {
   return createHash("sha256").update(password).digest("hex");
 }
@@ -168,6 +180,7 @@ interface DataStore {
   listings: StoredListing[];
   bookings: StoredBooking[];
   notifications: StoredNotification[];
+  contactMessages?: StoredContactMessage[];
 }
 
 let memoryStore: DataStore | null = null;
@@ -297,6 +310,7 @@ function initializeDataStore(): DataStore {
     listings: seedListings,
     bookings: seedBookings,
     notifications: seedNotifs,
+    contactMessages: [],
   };
 }
 
@@ -345,6 +359,10 @@ function loadStore(): DataStore {
             timestamp: n.timestamp,
             relatedId: n.relatedId,
           }));
+        }
+
+        if (!parsed.contactMessages) {
+          parsed.contactMessages = [];
         }
 
         memoryStore = parsed;
@@ -600,5 +618,25 @@ export const storage = {
       escrowHeld,
       disputes: store.bookings.filter((b) => b.escrowStatus === "disputed").length,
     };
+  },
+
+  // Contact Messages Operations
+  getContactMessages(): StoredContactMessage[] {
+    const store = loadStore();
+    return store.contactMessages || [];
+  },
+
+  createContactMessage(msg: Omit<StoredContactMessage, "id" | "createdAt" | "status">): StoredContactMessage {
+    const store = loadStore();
+    if (!store.contactMessages) store.contactMessages = [];
+    const newMsg: StoredContactMessage = {
+      ...msg,
+      id: `contact-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+      createdAt: new Date().toISOString(),
+      status: "new",
+    };
+    store.contactMessages.unshift(newMsg);
+    saveStore();
+    return newMsg;
   },
 };

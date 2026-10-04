@@ -1294,7 +1294,7 @@ function Footer({ navigate }) {
         <div>
           <strong>Company</strong>
           <button>About AgriRent</button>
-          <button>Contact support</button>
+          <button onClick={() => navigate("/contact")}>{t("support")}</button>
           <button>Safety & trust</button>
         </div>
         <div>

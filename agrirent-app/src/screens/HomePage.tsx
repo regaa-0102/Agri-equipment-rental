@@ -188,6 +188,15 @@ export default function HomePage({ onNavigate }: Props) {
               <a
                 key={item}
                 href={i === 1 ? '#equipment-catalog' : '#'}
+                onClick={(e) => {
+                  if (item === 'Contact') {
+                    e.preventDefault()
+                    onNavigate('contact')
+                  } else if (item === 'Home') {
+                    e.preventDefault()
+                    onNavigate('home')
+                  }
+                }}
                 style={{
                   padding: '8px 16px',
                   borderRadius: 8,
@@ -197,6 +206,7 @@ export default function HomePage({ onNavigate }: Props) {
                   textDecoration: 'none',
                   background: i === 0 ? PM : 'transparent',
                   transition: 'all 0.2s',
+                  cursor: 'pointer',
                 }}
               >
                 {t(item)}
@@ -1093,7 +1103,7 @@ export default function HomePage({ onNavigate }: Props) {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 <span style={{ color: '#9CA3AF', fontSize: 13 }}>{t('About Us')}</span>
                 <span style={{ color: '#9CA3AF', fontSize: 13 }}>{t('Safety')}</span>
-                <span style={{ color: '#9CA3AF', fontSize: 13 }}>{t('Contact')}</span>
+                <a onClick={() => onNavigate('contact')} style={{ color: '#9CA3AF', fontSize: 13, textDecoration: 'none', cursor: 'pointer' }}>{t('Contact Us')}</a>
               </div>
             </div>
           </div>

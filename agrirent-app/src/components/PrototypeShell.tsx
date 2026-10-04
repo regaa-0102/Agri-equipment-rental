@@ -27,6 +27,7 @@ export const SCREENS = [
   { id: 'owner-bookings', path: '/owner-bookings', label: '16. Owner Booking Requests' },
   { id: 'analytics', path: '/analytics', label: '17. Fleet Analytics' },
   { id: 'revenue', path: '/revenue', label: '18. Revenue & Settlements' },
+  { id: 'contact', path: '/contact', label: '19. Contact Us' },
 ]
 
 export function screenPath(screen: string) {

@@ -45,6 +45,7 @@ export default function Sidebar({ activeItem, onNavigate, role }: Props) {
     { icon: '🔔', label: 'Notifications', screen: 'notifications', badge: unreadNotifs > 0 ? unreadNotifs : undefined },
     { icon: '👤', label: 'Profile', screen: 'profile' },
     { icon: '❓', label: 'Help & Support', screen: 'help' },
+    { icon: '📞', label: 'Contact Us', screen: 'contact' },
   ]
 
   const ownerItems: SidebarItem[] = [
@@ -56,6 +57,7 @@ export default function Sidebar({ activeItem, onNavigate, role }: Props) {
     { icon: '💰', label: 'Revenue', screen: 'revenue' },
     { icon: '🔔', label: 'Notifications', screen: 'notifications', badge: unreadNotifs > 0 ? unreadNotifs : undefined },
     { icon: '👤', label: 'Profile', screen: 'profile' },
+    { icon: '📞', label: 'Contact Us', screen: 'contact' },
   ]
 
   const adminItems: SidebarItem[] = [
@@ -67,6 +69,7 @@ export default function Sidebar({ activeItem, onNavigate, role }: Props) {
     { icon: '💰', label: 'Revenue', screen: 'revenue' },
     { icon: '⚠️', label: 'Disputes', screen: 'admin-dashboard', badge: 3 },
     { icon: '⚙', label: 'Settings', screen: 'profile' },
+    { icon: '📞', label: 'Contact Us', screen: 'contact' },
   ]
 
   const items = role === 'farmer' ? farmerItems : role === 'owner' ? ownerItems : adminItems
@@ -120,7 +123,8 @@ export default function Sidebar({ activeItem, onNavigate, role }: Props) {
               activeItem === item.label ||
               activeItem === item.screen ||
               (item.screen === 'profile' && activeItem.toLowerCase().includes('profile')) ||
-              (item.screen === 'notifications' && activeItem.toLowerCase().includes('notif'))
+              (item.screen === 'notifications' && activeItem.toLowerCase().includes('notif')) ||
+              (item.screen === 'contact' && activeItem.toLowerCase().includes('contact'))
 
             return (
               <div

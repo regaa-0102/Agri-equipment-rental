@@ -14,6 +14,7 @@ import { Route as AddEquipmentRouteImport } from './routes/add-equipment'
 import { Route as AdminDashboardRouteImport } from './routes/admin-dashboard'
 import { Route as AnalyticsRouteImport } from './routes/analytics'
 import { Route as BookingRouteImport } from './routes/booking'
+import { Route as ContactRouteImport } from './routes/contact'
 import { Route as EquipmentDetailsRouteImport } from './routes/equipment-details'
 import { Route as FarmerDashboardRouteImport } from './routes/farmer-dashboard'
 import { Route as HelpRouteImport } from './routes/help'
@@ -51,6 +52,11 @@ const AnalyticsRoute = AnalyticsRouteImport.update({
 const BookingRoute = BookingRouteImport.update({
   id: '/booking',
   path: '/booking',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EquipmentDetailsRoute = EquipmentDetailsRouteImport.update({
@@ -125,6 +131,7 @@ export interface FileRoutesByFullPath {
   '/admin-dashboard': typeof AdminDashboardRoute
   '/analytics': typeof AnalyticsRoute
   '/booking': typeof BookingRoute
+  '/contact': typeof ContactRoute
   '/equipment-details': typeof EquipmentDetailsRoute
   '/farmer-dashboard': typeof FarmerDashboardRoute
   '/help': typeof HelpRoute
@@ -145,6 +152,7 @@ export interface FileRoutesByTo {
   '/admin-dashboard': typeof AdminDashboardRoute
   '/analytics': typeof AnalyticsRoute
   '/booking': typeof BookingRoute
+  '/contact': typeof ContactRoute
   '/equipment-details': typeof EquipmentDetailsRoute
   '/farmer-dashboard': typeof FarmerDashboardRoute
   '/help': typeof HelpRoute
@@ -166,6 +174,7 @@ export interface FileRoutesById {
   '/admin-dashboard': typeof AdminDashboardRoute
   '/analytics': typeof AnalyticsRoute
   '/booking': typeof BookingRoute
+  '/contact': typeof ContactRoute
   '/equipment-details': typeof EquipmentDetailsRoute
   '/farmer-dashboard': typeof FarmerDashboardRoute
   '/help': typeof HelpRoute
@@ -188,6 +197,7 @@ export interface FileRouteTypes {
     | '/admin-dashboard'
     | '/analytics'
     | '/booking'
+    | '/contact'
     | '/equipment-details'
     | '/farmer-dashboard'
     | '/help'
@@ -208,6 +218,7 @@ export interface FileRouteTypes {
     | '/admin-dashboard'
     | '/analytics'
     | '/booking'
+    | '/contact'
     | '/equipment-details'
     | '/farmer-dashboard'
     | '/help'
@@ -228,6 +239,7 @@ export interface FileRouteTypes {
     | '/admin-dashboard'
     | '/analytics'
     | '/booking'
+    | '/contact'
     | '/equipment-details'
     | '/farmer-dashboard'
     | '/help'
@@ -249,6 +261,7 @@ export interface RootRouteChildren {
   AdminDashboardRoute: typeof AdminDashboardRoute
   AnalyticsRoute: typeof AnalyticsRoute
   BookingRoute: typeof BookingRoute
+  ContactRoute: typeof ContactRoute
   EquipmentDetailsRoute: typeof EquipmentDetailsRoute
   FarmerDashboardRoute: typeof FarmerDashboardRoute
   HelpRoute: typeof HelpRoute
@@ -299,6 +312,13 @@ declare module '@tanstack/react-router' {
       path: '/booking'
       fullPath: '/booking'
       preLoaderRoute: typeof BookingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/equipment-details': {
@@ -401,6 +421,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminDashboardRoute: AdminDashboardRoute,
   AnalyticsRoute: AnalyticsRoute,
   BookingRoute: BookingRoute,
+  ContactRoute: ContactRoute,
   EquipmentDetailsRoute: EquipmentDetailsRoute,
   FarmerDashboardRoute: FarmerDashboardRoute,
   HelpRoute: HelpRoute,

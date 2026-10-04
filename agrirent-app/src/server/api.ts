@@ -789,6 +789,74 @@ export async function handleApiRequest(request: Request): Promise<Response | nul
       return json(result);
     }
 
+    // 13. Contact Us Form API
+    if (request.method === "POST" && pathname === "/api/contact") {
+      const body = await readBody<{
+        fullName?: string;
+        email?: string;
+        phone?: string;
+        subject?: string;
+        category?: string;
+        message?: string;
+      }>(request);
+
+      const fullName = body?.fullName?.trim();
+      const email = body?.email?.trim();
+      const phone = body?.phone?.trim();
+      const subject = body?.subject?.trim();
+      const category = body?.category?.trim();
+      const message = body?.message?.trim();
+
+      if (!fullName) {
+        return json({ error: "Full Name is required" }, 400);
+      }
+      if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
+        return json({ error: "A valid email address is required" }, 400);
+      }
+      const rawPhone = (phone || "").replace(/\D/g, "");
+      if (!phone || rawPhone.length < 10) {
+        return json({ error: "A valid phone number with at least 10 digits is required" }, 400);
+      }
+      if (!subject) {
+        return json({ error: "Subject is required" }, 400);
+      }
+      if (!category) {
+        return json({ error: "Support Category is required" }, 400);
+      }
+      if (!message || message.length < 15) {
+        return json({ error: "Message must be at least 15 characters long" }, 400);
+      }
+
+      const created = storage.createContactMessage({
+        fullName,
+        email,
+        phone,
+        subject,
+        category,
+        message,
+      });
+
+      // Create admin notification
+      storage.createNotification({
+        userId: "usr-admin-1",
+        title: `Contact Inquiry: ${created.category}`,
+        message: `${created.fullName} (${created.phone}) sent inquiry: "${created.subject}"`,
+        type: "contact_received",
+        read: false,
+      });
+
+      return json({
+        success: true,
+        message: "Thank you for contacting AgriRent. Our founder and support team will respond shortly.",
+        contact: created,
+      }, 201);
+    }
+
+    if (request.method === "GET" && pathname === "/api/contact") {
+      const messages = storage.getContactMessages();
+      return json({ count: messages.length, messages });
+    }
+
     return json({ error: `API route not found: ${request.method} ${pathname}` }, 404);
   } catch (error) {
     console.error("API Router Error:", error);

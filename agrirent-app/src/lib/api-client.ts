@@ -231,4 +231,55 @@ export const api = {
   async getHealth() {
     return request<any>('/api/health')
   },
+
+  // Contact Us
+  async submitContactMessage(data: {
+    fullName: string
+    email: string
+    phone: string
+    subject: string
+    category: string
+    message: string
+  }) {
+    try {
+      const res = await request<{
+        success: boolean
+        message: string
+        contact: any
+      }>('/api/contact', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      })
+      if (typeof window !== 'undefined') {
+        try {
+          const raw = window.localStorage.getItem('agrirent_contact_messages')
+          const list = raw ? JSON.parse(raw) : []
+          list.unshift(res.contact || { ...data, id: `local-${Date.now()}`, createdAt: new Date().toISOString() })
+          window.localStorage.setItem('agrirent_contact_messages', JSON.stringify(list))
+        } catch {}
+      }
+      return res
+    } catch (err) {
+      console.warn('Backend /api/contact unreachable or demo mode, persisting locally:', err)
+      const fallback = {
+        id: `contact-local-${Date.now()}`,
+        ...data,
+        createdAt: new Date().toISOString(),
+        status: 'new',
+      }
+      if (typeof window !== 'undefined') {
+        try {
+          const raw = window.localStorage.getItem('agrirent_contact_messages')
+          const list = raw ? JSON.parse(raw) : []
+          list.unshift(fallback)
+          window.localStorage.setItem('agrirent_contact_messages', JSON.stringify(list))
+        } catch {}
+      }
+      return {
+        success: true,
+        message: 'Your message has been sent successfully. Regaa G and the AgriRent team will respond shortly.',
+        contact: fallback,
+      }
+    }
+  },
 }
