@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { Terminal, X, Play, Copy, Check, ExternalLink } from 'lucide-react'
-import { getStoredJwt } from '../lib/api-client'
 
 interface Props {
   isOpen: boolean
@@ -28,11 +27,11 @@ const ENDPOINTS = [
     description: 'Calculates recommended tractor HP, machine hours, fuel consumption, and labor cost savings.',
   },
   {
-    name: 'JWT Authentication (Farmer Login)',
+    name: 'Secure Account Login',
     method: 'POST',
     url: '/api/auth/login',
-    body: JSON.stringify({ email: 'muthu.farmer@gmail.com', password: 'Farmer@123' }, null, 2),
-    description: 'Authenticates user and returns RFC 7519 HMAC-SHA256 JWT token.',
+    body: JSON.stringify({ email: 'registered-user@example.com', password: '<your-password>', role: 'farmer' }, null, 2),
+    description: 'Authenticates an existing account and issues a secure HttpOnly session cookie.',
   },
   {
     name: 'Admin Telemetry & Escrow Metrics',
@@ -41,10 +40,10 @@ const ENDPOINTS = [
     description: 'Returns platform GMV, commission revenue, active rentals, and escrow held.',
   },
   {
-    name: 'Seed Users Directory (5 Verified Accounts)',
+    name: 'Persistent Store Diagnostics',
     method: 'GET',
-    url: '/api/auth/seed-users',
-    description: 'Returns the 5 pre-seeded test accounts for fast 1-click evaluation.',
+    url: '/api/db-status',
+    description: 'Returns connection status and record counts for the file-backed JSON store.',
   },
 ]
 
@@ -64,14 +63,13 @@ export default function ApiExplorerModal({ isOpen, onClose }: Props) {
     setResponse(null)
     setStatusCode(null)
 
-    const token = getStoredJwt()
     const headers: Record<string, string> = { 'Content-Type': 'application/json' }
-    if (token) headers['Authorization'] = `Bearer ${token}`
 
     try {
       const reqInit: RequestInit = {
         method: ep.method,
         headers,
+        credentials: 'same-origin',
       }
       if (ep.method === 'POST' && ep.body) {
         reqInit.body = ep.body
@@ -89,10 +87,8 @@ export default function ApiExplorerModal({ isOpen, onClose }: Props) {
   }
 
   const copyCurl = () => {
-    const token = getStoredJwt()
-    const authHeader = token ? ` -H "Authorization: Bearer ${token}"` : ''
     const bodyArg = ep.method === 'POST' && ep.body ? ` -d '${ep.body.replace(/\n/g, '')}'` : ''
-    const curl = `curl -X ${ep.method} "http://localhost:5173${ep.url}" -H "Content-Type: application/json"${authHeader}${bodyArg}`
+    const curl = `curl -X ${ep.method} "http://localhost:5173${ep.url}" -H "Content-Type: application/json"${bodyArg}`
     navigator.clipboard.writeText(curl)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)

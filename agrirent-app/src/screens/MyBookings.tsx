@@ -1,15 +1,57 @@
-import { useState, useEffect } from 'react'
-import { CalendarDays, ChevronDown, CircleX, Clock, Navigation, Plus, Search, Truck } from 'lucide-react'
+import { useState, useEffect, type FormEvent } from 'react'
+import { CalendarDays, ChevronDown, CircleX, Clock, Navigation, Plus, Search, Star, Truck } from 'lucide-react'
 import Sidebar from '../components/Sidebar'
 import BookingStatus from '../components/BookingStatus'
 import ExtendRental from '../components/ExtendRental'
 import CancelBooking from '../components/CancelBooking'
 import TrackingPanel from '../components/TrackingPanel'
 import { useLanguage } from '../context/LanguageContext'
-import { BookingItem, getStoredBookings, onBookingsChange } from '../lib/bookings'
+import { BookingItem } from '../lib/bookings'
+import { api } from '../lib/api-client'
+import { findCatalogItem } from '../lib/catalog'
 
 const P = '#2E7D32'
 const PM = '#E8F5E9'
+
+interface ApiBooking {
+  id: string
+  listingId: string
+  equipmentName: string
+  equipmentImg?: string
+  startDate: string
+  endDate: string
+  days: number
+  dailyRate: number
+  totalAmount: number
+  status: string
+  ownerName: string
+}
+
+function toBookingItem(booking: ApiBooking): BookingItem {
+  const listing = findCatalogItem(booking.listingId)
+  const status: BookingItem['status'] =
+    booking.status === 'completed' ? 'completed' :
+    booking.status === 'cancelled' ? 'cancelled' :
+    booking.status === 'pending' ? 'pending' : 'active'
+
+  return {
+    id: booking.id,
+    equipmentId: booking.listingId,
+    equipment: booking.equipmentName,
+    cat: listing?.cat || 'Equipment',
+    img: booking.equipmentImg || listing?.img || '',
+    location: listing?.location || '—',
+    from: booking.startDate,
+    to: booking.endDate,
+    days: booking.days,
+    dailyRate: booking.dailyRate,
+    amount: `₹${booking.totalAmount.toLocaleString()}`,
+    totalNumeric: booking.totalAmount,
+    status,
+    owner: booking.ownerName,
+    trackingStage: status === 'completed' ? 6 : status === 'active' ? 5 : 0,
+  }
+}
 
 interface Props {
   onNavigate: (screen: string) => void
@@ -17,7 +59,9 @@ interface Props {
 
 export default function MyBookings({ onNavigate }: Props) {
   const { t, isTamil } = useLanguage()
-  const [bookingsList, setBookingsList] = useState<BookingItem[]>(() => getStoredBookings())
+  const [bookingsList, setBookingsList] = useState<BookingItem[]>([])
+  const [loading, setLoading] = useState(true)
+  const [loadError, setLoadError] = useState('')
   const [tab, setTab] = useState<'all' | 'active' | 'completed' | 'cancelled'>('all')
   const [searchQuery, setSearchQuery] = useState<string>('')
 
@@ -25,12 +69,54 @@ export default function MyBookings({ onNavigate }: Props) {
   const [extendingBooking, setExtendingBooking] = useState<BookingItem | null>(null)
   const [cancellingBooking, setCancellingBooking] = useState<BookingItem | null>(null)
   const [trackingBooking, setTrackingBooking] = useState<BookingItem | null>(null)
+  const [reviewingBooking, setReviewingBooking] = useState<BookingItem | null>(null)
+  const [reviewRating, setReviewRating] = useState(5)
+  const [reviewText, setReviewText] = useState('')
+  const [reviewError, setReviewError] = useState('')
+  const [reviewSubmitting, setReviewSubmitting] = useState(false)
+  const [reviewNotice, setReviewNotice] = useState('')
 
   useEffect(() => {
-    return onBookingsChange((updated) => {
-      setBookingsList(updated)
-    })
+    void loadBookings()
   }, [])
+
+  async function loadBookings() {
+    setLoading(true)
+    setLoadError('')
+    try {
+      const response = await api.getBookings()
+      setBookingsList((response.bookings as ApiBooking[]).map(toBookingItem))
+    } catch (error) {
+      setLoadError(error instanceof Error ? error.message : 'Could not load bookings.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  async function submitReview(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    if (!reviewingBooking?.equipmentId) {
+      setReviewError(isTamil ? 'கருவி விவரம் கிடைக்கவில்லை.' : 'The equipment reference is unavailable.')
+      return
+    }
+    setReviewError('')
+    setReviewSubmitting(true)
+    try {
+      await api.createReview({
+        equipmentId: reviewingBooking.equipmentId,
+        bookingId: reviewingBooking.id,
+        rating: reviewRating,
+        reviewText: reviewText.trim(),
+      })
+      setReviewingBooking(null)
+      setReviewText('')
+      setReviewNotice(isTamil ? 'உங்கள் மதிப்புரை சேமிக்கப்பட்டது.' : 'Your review has been saved.')
+    } catch (error) {
+      setReviewError(error instanceof Error ? error.message : 'Could not submit review.')
+    } finally {
+      setReviewSubmitting(false)
+    }
+  }
 
   const filtered = bookingsList.filter((b) => {
     const matchesTab = tab === 'all' || b.status === tab
@@ -109,6 +195,20 @@ export default function MyBookings({ onNavigate }: Props) {
         </div>
 
         <div style={{ padding: '24px 28px', flex: 1, minWidth: 0 }}>
+          {loadError && (
+            <div role="alert" style={{ padding: 14, marginBottom: 16, borderRadius: 10, color: '#B91C1C', background: '#FEF2F2' }}>
+              {loadError}
+              <button type="button" onClick={() => void loadBookings()} style={{ marginLeft: 12, color: '#991B1B', textDecoration: 'underline', border: 0, background: 'none', cursor: 'pointer' }}>
+                {isTamil ? 'மீண்டும் முயற்சிக்கவும்' : 'Retry'}
+              </button>
+            </div>
+          )}
+          {reviewNotice && (
+            <div role="status" style={{ padding: 14, marginBottom: 16, borderRadius: 10, color: '#166534', background: '#F0FDF4' }}>
+              {reviewNotice}
+              <button type="button" onClick={() => setReviewNotice('')} style={{ marginLeft: 12, color: '#166534', border: 0, background: 'none', cursor: 'pointer' }}>×</button>
+            </div>
+          )}
           {/* Stats row */}
           <div
             style={{
@@ -390,6 +490,21 @@ export default function MyBookings({ onNavigate }: Props) {
                               <span>{isTamil ? 'நீட்டிக்கவும்' : 'Extend'}</span>
                             </button>
                           )}
+                          {b.status === 'completed' && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setReviewingBooking(b)
+                                setReviewRating(5)
+                                setReviewText('')
+                                setReviewError('')
+                              }}
+                              title={isTamil ? 'மதிப்புரை எழுதவும்' : 'Review this rental'}
+                              style={{ padding: '6px 8px', background: '#FFFBEB', color: '#92400E', border: '1px solid #FDE68A', borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 4, whiteSpace: 'nowrap' }}
+                            >
+                              <Star size={14} />{isTamil ? 'மதிப்புரை' : 'Review'}
+                            </button>
+                          )}
 
                           {/* Cancel Booking Button - Only available for active / pending bookings */}
                           {b.status === 'active' && (
@@ -422,7 +537,12 @@ export default function MyBookings({ onNavigate }: Props) {
               </table>
             </div>
 
-            {filtered.length === 0 && (
+            {loading && (
+              <div role="status" style={{ textAlign: 'center', padding: '32px 20px', color: '#6B7280' }}>
+                {isTamil ? 'முன்பதிவுகள் ஏற்றப்படுகின்றன...' : 'Loading your bookings…'}
+              </div>
+            )}
+            {!loading && filtered.length === 0 && (
               <div style={{ textAlign: 'center', padding: '56px 20px', color: '#6B7280' }}>
                 <div style={{ fontSize: 44, marginBottom: 12 }}>📋</div>
                 <div style={{ fontWeight: 700, fontSize: 16, color: '#111827', marginBottom: 4 }}>
@@ -443,8 +563,8 @@ export default function MyBookings({ onNavigate }: Props) {
           booking={extendingBooking}
           isOpen={Boolean(extendingBooking)}
           onClose={() => setExtendingBooking(null)}
-          onSuccess={(updated) => {
-            setBookingsList(getStoredBookings())
+          onSuccess={() => {
+            void loadBookings()
             setExtendingBooking(null)
           }}
         />
@@ -456,8 +576,8 @@ export default function MyBookings({ onNavigate }: Props) {
           booking={cancellingBooking}
           isOpen={Boolean(cancellingBooking)}
           onClose={() => setCancellingBooking(null)}
-          onSuccess={(updated) => {
-            setBookingsList(getStoredBookings())
+          onSuccess={() => {
+            void loadBookings()
             setCancellingBooking(null)
           }}
         />
@@ -470,6 +590,27 @@ export default function MyBookings({ onNavigate }: Props) {
           isOpen={Boolean(trackingBooking)}
           onClose={() => setTrackingBooking(null)}
         />
+      )}
+      {reviewingBooking && (
+        <div role="presentation" onClick={() => setReviewingBooking(null)} style={{ position: 'fixed', inset: 0, zIndex: 10000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16, background: 'rgba(17,24,39,.6)' }}>
+          <form onSubmit={(event) => void submitReview(event)} role="dialog" aria-modal="true" aria-labelledby="booking-review-title" onClick={(event) => event.stopPropagation()} style={{ width: '100%', maxWidth: 480, background: '#fff', borderRadius: 16, padding: 24 }}>
+            <h2 id="booking-review-title" style={{ margin: '0 0 8px', fontSize: 20 }}>{isTamil ? 'வாடகை மதிப்புரை' : 'Review your rental'}</h2>
+            <p style={{ margin: '0 0 16px', color: '#64748B' }}>{reviewingBooking.equipment}</p>
+            <div role="radiogroup" aria-label={isTamil ? 'நட்சத்திர மதிப்பீடு' : 'Star rating'} style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
+              {[1, 2, 3, 4, 5].map((stars) => (
+                <button key={stars} type="button" role="radio" aria-checked={reviewRating === stars} aria-label={`${stars} ${stars === 1 ? 'star' : 'stars'}`} onClick={() => setReviewRating(stars)} style={{ padding: 4, background: 'none', border: 0, cursor: 'pointer', color: stars <= reviewRating ? '#F59E0B' : '#CBD5E1' }}>
+                  <Star size={28} fill={stars <= reviewRating ? 'currentColor' : 'none'} />
+                </button>
+              ))}
+            </div>
+            <textarea value={reviewText} onChange={(event) => setReviewText(event.target.value)} maxLength={2000} rows={4} placeholder={isTamil ? 'உங்கள் அனுபவத்தைப் பகிரவும்' : 'Share your experience (optional)'} style={{ width: '100%', boxSizing: 'border-box', border: '1px solid #CBD5E1', borderRadius: 10, padding: 12, resize: 'vertical' }} />
+            {reviewError && <p role="alert" style={{ color: '#B91C1C', margin: '10px 0 0' }}>{reviewError}</p>}
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 16 }}>
+              <button type="button" onClick={() => setReviewingBooking(null)} style={{ padding: '9px 14px', border: '1px solid #CBD5E1', borderRadius: 8, background: '#fff', cursor: 'pointer' }}>{isTamil ? 'மூடு' : 'Cancel'}</button>
+              <button type="submit" disabled={reviewSubmitting} style={{ padding: '9px 14px', border: 0, borderRadius: 8, background: P, color: '#fff', fontWeight: 700, cursor: reviewSubmitting ? 'wait' : 'pointer' }}>{reviewSubmitting ? (isTamil ? 'சேமிக்கிறது...' : 'Submitting…') : (isTamil ? 'மதிப்புரையை சமர்ப்பிக்கவும்' : 'Submit review')}</button>
+            </div>
+          </form>
+        </div>
       )}
     </div>
   )

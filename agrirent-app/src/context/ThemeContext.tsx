@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState, useMemo } from 'react'
 
-export type AppTheme = 'light' | 'dark' | 'forest' | 'harvest' | 'earth'
+export type AppTheme = 'light' | 'dark' | 'forest' | 'harvest' | 'earth' | 'ocean' | 'lavender' | 'sage'
 
 export interface ThemeInfo {
   id: AppTheme
@@ -75,6 +75,42 @@ export const THEME_OPTIONS: ThemeInfo[] = [
     accentPreview: '#EA580C',
     textPreview: '#FFEDD5',
     icon: '🏺',
+  },
+  {
+    id: 'ocean',
+    name: 'Monsoon Ocean',
+    nameTa: 'பருவமழைக் கடல்',
+    description: 'Cool deep-blue surfaces with clear sky-blue highlights.',
+    descriptionTa: 'அடர் நீல பின்னணியும் வான்நீல சிறப்பம்சங்களும்.',
+    bgPreview: '#081A2B',
+    cardPreview: '#102B42',
+    accentPreview: '#38BDF8',
+    textPreview: '#E0F2FE',
+    icon: '🌊',
+  },
+  {
+    id: 'lavender',
+    name: 'Lavender Dusk',
+    nameTa: 'லாவெண்டர் மாலை',
+    description: 'Soft violet accents against a calm twilight palette.',
+    descriptionTa: 'அமைதியான மாலைத் தோற்றத்தில் மென்மையான ஊதா நிறம்.',
+    bgPreview: '#181326',
+    cardPreview: '#27203A',
+    accentPreview: '#C4B5FD',
+    textPreview: '#F5F3FF',
+    icon: '🌆',
+  },
+  {
+    id: 'sage',
+    name: 'Sage Field',
+    nameTa: 'முனிவர் பசுமை வயல்',
+    description: 'Muted sage greens and warm neutral surfaces for a gentle workspace.',
+    descriptionTa: 'மென்மையான பசுமையும் வெப்பமான இயற்கை நிறங்களும்.',
+    bgPreview: '#101B18',
+    cardPreview: '#1E2D26',
+    accentPreview: '#A3C9A8',
+    textPreview: '#E8F3E9',
+    icon: '🍃',
   },
 ]
 

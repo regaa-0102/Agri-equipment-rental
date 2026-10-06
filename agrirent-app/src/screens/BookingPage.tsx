@@ -1,11 +1,9 @@
 import { useState, useEffect } from 'react'
 import { CalendarDays, CheckCircle2, ShieldCheck, MapPin, ArrowRight, AlertCircle, X, ShieldAlert, Check } from 'lucide-react'
 import { useLanguage } from '../context/LanguageContext'
-import { createNewBooking } from '../lib/bookings'
 import { catalog, findCatalogItem, CatalogItem, getCategoryFallback } from '../lib/catalog'
 import { api, getStoredUser } from '../lib/api-client'
 import { checkBookingVerification, BookingVerificationCheck } from '../lib/verification'
-import { addNotification } from '../lib/notifications'
 
 const P = '#2E7D32'
 const PM = '#E8F5E9'
@@ -65,6 +63,7 @@ export default function BookingPage({ onNavigate, selectedEquipment }: Props) {
   const [showConfirmModal, setShowConfirmModal] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [bookingSuccess, setBookingSuccess] = useState(false)
+  const [bookingError, setBookingError] = useState<string | null>(null)
 
   // Dynamic days calculation
   const startMs = new Date(startDate).getTime()
@@ -93,66 +92,22 @@ export default function BookingPage({ onNavigate, selectedEquipment }: Props) {
   // Final Confirmed Booking Action
   const handleFinalConfirm = async () => {
     if (isSubmitting) return
+    if (!currentUser || currentUser.role !== 'farmer') {
+      onNavigate('login')
+      return
+    }
     setIsSubmitting(true)
+    setBookingError(null)
 
     try {
-      // 1. Add to centralized booking store
-      const bookingRecord = createNewBooking({
-        equipment: eq.name,
-        cat: eq.cat,
-        img: eq.imageUrl || eq.img,
-        location: `${village}, ${district}`,
-        from: startDate,
-        to: endDate,
-        dailyRate: pricePerDay,
-        amount: `₹${total.toLocaleString('en-IN')}`,
-        totalNumeric: total,
-        owner: eq.owner || 'Verified Equipment Partner',
-        ownerPhone: eq.ownerPhone || '+91 98421 54321',
-        lastLocation: eq.location,
-        distance: eq.distance || '2.5 km away',
-      })
-
-      // 2. Dispatch notifications
-      // A) To the Farmer
-      addNotification({
-        userId: currentUser?.id || 'usr-farmer-1',
-        title: isTamil ? `முன்பதிவு உறுதியானது: ${eq.name}` : `Booking Confirmed: ${eq.name}`,
-        message: isTamil
-          ? `உங்கள் ${eq.name} முன்பதிவு (${days} நாட்கள், ₹${total.toLocaleString('en-IN')}) வெற்றிகரமாக பதிவானது. உரிய தேதியில் அனுப்பி வைக்கப்படும்.`
-          : `Your booking for ${eq.name} (${days} days, ₹${total.toLocaleString('en-IN')}) has been confirmed. Escrow held securely.`,
-        type: 'booking_confirmed',
-        relatedId: bookingRecord.id,
-      })
-
-      // B) To the Equipment Owner
-      const ownerId = eq.ownerId || 'usr-owner-1'
-      addNotification({
-        userId: ownerId,
-        title: isTamil ? `புதிய முன்பதிவு கோரிக்கை: ${eq.name}` : `New Equipment Booking: ${eq.name}`,
-        message: isTamil
-          ? `விவசாயி ${currentUser?.name || 'Muthukumar S.'} உங்கள் ${eq.name} கருவியை ${startDate} முதல் ${endDate} வரை முன்பதிவு செய்துள்ளார்.`
-          : `Farmer ${currentUser?.name || 'Muthukumar S.'} has booked your ${eq.name} for ${days} days (${startDate} to ${endDate}). ₹${total.toLocaleString('en-IN')} escrow reserved.`,
-        type: 'booking_received',
-        relatedId: bookingRecord.id,
-      })
-
-      // 3. Sync to backend API if available
-      try {
-        await api.createBooking({
-          listingId: eq.id,
-          startDate,
-          endDate,
-          days,
-        })
-      } catch (err) {
-        console.warn('Backend booking sync notice (continuing with local confirmation):', err)
-      }
+      await api.createBooking({ listingId: eq.id, startDate, endDate, days })
 
       setBookingSuccess(true)
       setTimeout(() => {
         onNavigate('payment-success')
       }, 700)
+    } catch (error) {
+      setBookingError(error instanceof Error ? error.message : 'Booking could not be saved.')
     } finally {
       setIsSubmitting(false)
     }
@@ -717,6 +672,11 @@ export default function BookingPage({ onNavigate, selectedEquipment }: Props) {
 
             {/* Modal Body */}
             <div style={{ padding: '24px', maxHeight: '75vh', overflowY: 'auto' }}>
+              {bookingError && (
+                <div role="alert" style={{ color: '#991B1B', background: '#FEF2F2', border: '1px solid #FCA5A5', borderRadius: 10, padding: 12, marginBottom: 16 }}>
+                  {bookingError}
+                </div>
+              )}
               {/* Equipment Item Row */}
               <div
                 style={{

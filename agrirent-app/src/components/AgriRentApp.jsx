@@ -45,6 +45,7 @@ import { categories, listings, popularCategories, productCategories } from "../d
 import { tamilNaduDistricts } from "../lib/catalog";
 import { useLanguage } from "../context/LanguageContext";
 import { useTheme } from "../context/ThemeContext";
+import { api, getStoredUser } from "../lib/api-client";
 import LanguageSelector from "./LanguageSelector";
 
 const iconMap = {
@@ -107,10 +108,14 @@ function Header({ navigate, user, setUser, wishlistCount }) {
   const { openSettings } = useTheme();
   const [open, setOpen] = useState(false);
   const [menu, setMenu] = useState(false);
-  const logout = () => {
-    localStorage.removeItem("agri-user");
-    setUser(null);
-    navigate("/");
+  const logout = async () => {
+    try {
+      await api.logout();
+      setUser(null);
+      navigate("/");
+    } catch (error) {
+      console.error("Could not end the authenticated session", error);
+    }
   };
   return (
     <header className="topbar">
@@ -686,6 +691,9 @@ function Detail({ id, navigate, wishlist, setWishlist }) {
 }
 
 function Booking({ itemId, navigate, user, setUser }) {
+  useEffect(() => {
+    if (!user) navigate("/login");
+  }, [navigate, user]);
   const item = listings.find((x) => x.id === itemId) || listings[0];
   const [start, setStart] = useState("");
   const [end, setEnd] = useState("");
@@ -695,6 +703,7 @@ function Booking({ itemId, navigate, user, setUser }) {
     start && end ? Math.max(1, Math.ceil((new Date(end) - new Date(start)) / 86400000)) : 1;
   const subtotal = item.price * days * quantity;
   const total = subtotal + 99;
+  if (!user) return null;
   const confirm = () => {
     if (!user) {
       navigate("/login");
@@ -893,10 +902,14 @@ function Payment({ bookingId, navigate }) {
 
 function Dashboard({ navigate, user, setUser }) {
   const [tab, setTab] = useState("overview");
+  useEffect(() => {
+    if (!user) navigate("/login");
+  }, [navigate, user]);
+  if (!user) return null;
   const bookings = read("agri-bookings", []);
   const payments = read("agri-payments", []);
-  const isOwner = user?.role === "Owner";
-  const isAdmin = user?.role === "Admin";
+  const isOwner = user?.role?.toLowerCase() === "owner";
+  const isAdmin = user?.role?.toLowerCase() === "admin";
   const stats = isOwner
     ? [
         ["Total listings", "12", Package],
@@ -921,10 +934,14 @@ function Dashboard({ navigate, user, setUser }) {
           ],
           ["Total spending", "₹42,860", Wallet],
         ];
-  const logout = () => {
-    localStorage.removeItem("agri-user");
-    setUser(null);
-    navigate("/");
+  const logout = async () => {
+    try {
+      await api.logout();
+      setUser(null);
+      navigate("/");
+    } catch (error) {
+      console.error("Could not end the authenticated session", error);
+    }
   };
   return (
     <main className="dashboard-wrap">
@@ -940,8 +957,8 @@ function Dashboard({ navigate, user, setUser }) {
         <div className="account-label">
           <span className="avatar">{user?.name?.[0] || "A"}</span>
           <span>
-            <strong>{user?.name || "Demo Farmer"}</strong>
-            <small>{user?.role || "Farmer"} account</small>
+            <strong>{user.name}</strong>
+            <small>{user.role} account</small>
           </span>
         </div>
         <nav>
@@ -976,7 +993,7 @@ function Dashboard({ navigate, user, setUser }) {
             </span>
             <h1>
               {tab === "overview"
-                ? `Good morning, ${user?.name?.split(" ")[0] || "Farmer"}.`
+                ? `Good morning, ${user.name.split(" ")[0]}.`
                 : tab[0].toUpperCase() + tab.slice(1)}
             </h1>
           </div>
@@ -1157,23 +1174,45 @@ function Auth({ navigate, setUser, register = false }) {
   const [role, setRole] = useState("Farmer");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
-  const submit = (e) => {
+  const [loading, setLoading] = useState(false);
+  const submit = async (e) => {
     e.preventDefault();
-    if (!email || (!register && !email.includes("@"))) {
+    if (!email || !email.includes("@") || !password) {
       setError(t("validEmail"));
       return;
     }
-    const account = {
-      name:
-        name ||
-        (role === "Admin" ? "Admin User" : role === "Owner" ? "Arjun Meena" : "Priya Sharma"),
-      email,
-      role,
-    };
-    write("agri-user", account);
-    setUser(account);
-    navigate(role === "Owner" ? "/owner/dashboard" : role === "Admin" ? "/admin/dashboard" : "/farmer/dashboard");
+    if (register && (!name.trim() || !phone.trim() || password !== confirmPassword)) {
+      setError(password !== confirmPassword ? "Passwords do not match." : "Full name and phone are required.");
+      return;
+    }
+    setLoading(true);
+    setError("");
+    try {
+      const result = register
+        ? await api.register({
+            name: name.trim(),
+            email: email.trim(),
+            phone: phone.trim(),
+            password,
+            confirmPassword,
+            role: role === "Owner" ? "owner" : "farmer",
+          })
+        : await api.login(email.trim(), password, role.toLowerCase());
+      const account = {
+        ...result.user,
+        role: result.user.role[0].toUpperCase() + result.user.role.slice(1),
+      };
+      setUser(account);
+      navigate(role === "Owner" ? "/owner/dashboard" : role === "Admin" ? "/admin/dashboard" : "/farmer/dashboard");
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : "Authentication failed.");
+    } finally {
+      setLoading(false);
+    }
   };
   return (
     <main className="auth-page">
@@ -1219,6 +1258,12 @@ function Auth({ navigate, setUser, register = false }) {
               />
             </label>
           )}
+          {register && (
+            <label>
+              Phone
+              <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} autoComplete="tel" required />
+            </label>
+          )}
           <label>
             {t("email")}
             <input
@@ -1230,12 +1275,30 @@ function Auth({ navigate, setUser, register = false }) {
           </label>
           <label>
             {t("password")}
-            <input type="password" placeholder="••••••••" />
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              autoComplete={register ? "new-password" : "current-password"}
+              required
+            />
           </label>
+          {register && (
+            <label>
+              Confirm password
+              <input
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                autoComplete="new-password"
+                required
+              />
+            </label>
+          )}
           <div className="role-select">
             <span>{t("role")}</span>
             <div>
-              {["Farmer", "Owner", "Admin"].map((option) => (
+              {(register ? ["Farmer", "Owner"] : ["Farmer", "Owner", "Admin"]).map((option) => (
                 <button
                   type="button"
                   key={option}
@@ -1248,7 +1311,7 @@ function Auth({ navigate, setUser, register = false }) {
             </div>
           </div>
           {error && <p className="form-error">{error}</p>}
-          <Button type="submit" icon={ArrowRight}>
+          <Button type="submit" icon={ArrowRight} disabled={loading}>
             {register ? t("createAccount") : t("signIn")}
           </Button>
         </form>
@@ -1258,9 +1321,6 @@ function Auth({ navigate, setUser, register = false }) {
             {register ? t("signIn") : t("register")}
           </button>
         </p>
-        <small className="demo-hint">
-          {t("demo")}
-        </small>
       </div>
     </main>
   );
@@ -1306,7 +1366,7 @@ function Footer({ navigate }) {
         </div>
       </div>
       <div className="footer-bottom">
-        <span>© 2026 AgriRent. Frontend demo project.</span>
+        <span>© 2026 AgriRent. All rights reserved.</span>
         <span>
           Built for India's farming community <Sprout size={14} />
         </span>
@@ -1319,10 +1379,16 @@ export default function AgriRentApp() {
   const [path, setPath] = useState(() =>
     typeof window === "undefined" ? "/" : window.location.pathname,
   );
-  const [user, setUser] = useState(() => read("agri-user", null));
+  const [user, setUser] = useState(() => getStoredUser());
   const [search, setSearch] = useState("");
   const [wishlist, setWishlist] = useState(() => read("agri-wishlist", []));
   useEffect(() => write("agri-wishlist", wishlist), [wishlist]);
+  useEffect(() => {
+    const syncUser = () => setUser(getStoredUser());
+    window.addEventListener("agrirent_auth_change", syncUser);
+    syncUser();
+    return () => window.removeEventListener("agrirent_auth_change", syncUser);
+  }, []);
   useEffect(() => {
     const onPop = () => setPath(window.location.pathname);
     window.addEventListener("popstate", onPop);

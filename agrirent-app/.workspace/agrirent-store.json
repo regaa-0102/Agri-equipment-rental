@@ -1,87 +1,18 @@
 {
   "users": [
     {
-      "id": "usr-admin-1",
-      "name": "Dr. Ramesh V. (Admin)",
-      "email": "admin@agrirent.in",
-      "passwordHash": "e86f78a8a3caf0b60d8e74e5942aa6d86dc150cd3c03338aef25b7d2d7e3acc7",
-      "role": "admin",
-      "phone": "+91 98401 23456",
-      "location": "Chennai / Pan-India HQ",
-      "avatar": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&auto=format&fit=crop&q=80",
-      "status": "active",
-      "provider": "local",
-      "createdAt": "2026-01-10T10:00:00.000Z",
-      "verificationStatus": "VERIFIED"
-    },
-    {
-      "id": "usr-farmer-1",
-      "name": "Muthukumar S.",
-      "email": "muthu.farmer@gmail.com",
-      "passwordHash": "30846418ea6e88191fb6725ec8119b345e0b9c710e99fedf2dbf732461c36510",
+      "name": "Test Farmer",
+      "email": "testfarmer2026@example.com",
+      "passwordHash": "scrypt$zMJtEC8d1kAbhw741NPEiA==$An39ww1cb+L4XgfykvOzGkTwNAhKsUCSCCr2PoNzMy/gFmO2KrgSPl0+EZ92xjJVLdcHx38DPOjGkXYCNKQpiQ==",
       "role": "farmer",
-      "phone": "+91 94432 10987",
-      "location": "Thanjavur, Tamil Nadu (Cauvery Delta)",
-      "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80",
+      "phone": "9000000001",
+      "location": "Tamil Nadu",
+      "avatar": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80",
       "status": "active",
       "provider": "local",
-      "createdAt": "2026-02-14T09:30:00.000Z",
-      "verificationStatus": "VERIFIED"
-    },
-    {
-      "id": "usr-farmer-2",
-      "name": "Rajesh Kumar Patil",
-      "email": "rajesh.kumar@gmail.com",
-      "passwordHash": "30846418ea6e88191fb6725ec8119b345e0b9c710e99fedf2dbf732461c36510",
-      "role": "farmer",
-      "phone": "+91 97654 32109",
-      "location": "Pune, Maharashtra",
-      "avatar": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80",
-      "status": "active",
-      "provider": "local",
-      "createdAt": "2026-03-01T11:15:00.000Z",
-      "verificationStatus": "NOT_VERIFIED"
-    },
-    {
-      "id": "usr-owner-1",
-      "name": "Selvam Murugan (Selvam Agro Fleet)",
-      "email": "selvam.agro@gmail.com",
-      "passwordHash": "553feacf899a72916b2b50e4c95f587a06d6d1b8b4e6b433beb5fea315d0acb0",
-      "role": "owner",
-      "phone": "+91 98421 54321",
-      "location": "Coimbatore & Pollachi, Tamil Nadu",
-      "avatar": "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150&auto=format&fit=crop&q=80",
-      "status": "active",
-      "provider": "local",
-      "createdAt": "2026-01-20T08:00:00.000Z",
-      "verificationStatus": "VERIFIED"
-    },
-    {
-      "id": "usr-owner-2",
-      "name": "Balvinder Singh (Kisan Drone & Harvester Services)",
-      "email": "balvinder.harvesters@gmail.com",
-      "passwordHash": "553feacf899a72916b2b50e4c95f587a06d6d1b8b4e6b433beb5fea315d0acb0",
-      "role": "owner",
-      "phone": "+91 98140 87654",
-      "location": "Ludhiana, Punjab & Madurai, Tamil Nadu",
-      "avatar": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150&auto=format&fit=crop&q=80",
-      "status": "active",
-      "provider": "local",
-      "createdAt": "2026-01-25T14:45:00.000Z",
-      "verificationStatus": "VERIFIED"
-    },
-    {
-      "name": "Arun Kumar",
-      "email": "tamil.farmer@gmail.com",
-      "passwordHash": "ea9e8b46c430a3cd79f2f0161ea5a44bd55284e5f7a6f72915c1cb770e776a97",
-      "role": "farmer",
-      "phone": "+91 98450 12345",
-      "location": "Coimbatore, Tamil Nadu",
-      "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
-      "status": "active",
-      "provider": "google",
-      "id": "42c9e2c7-2f0f-4c04-ac9e-23df75dc4f27",
-      "createdAt": "2026-09-23T16:23:01.776Z"
+      "verificationStatus": "NOT_VERIFIED",
+      "id": "4a73ef39-991d-485a-b3a2-2fed302e4076",
+      "createdAt": "2026-10-06T16:43:17.452Z"
     }
   ],
   "listings": [
@@ -129,7 +60,11 @@
           "value": "60 Litres"
         }
       ],
-      "createdAt": "2026-09-18T17:29:05.421Z"
+      "createdAt": "2026-09-18T17:29:05.421Z",
+      "availabilityType": "both",
+      "purchasePrice": 850000,
+      "vendorId": "vnd-1",
+      "vendorName": "Sri Murugan Mahindra Tractors & Implements"
     },
     {
       "id": "eq-tractor-2",
@@ -175,7 +110,11 @@
           "value": "Oil Immersed Disc Brakes"
         }
       ],
-      "createdAt": "2026-09-18T17:29:05.423Z"
+      "createdAt": "2026-09-18T17:29:05.423Z",
+      "availabilityType": "both",
+      "purchasePrice": 1120000,
+      "vendorId": "vnd-3",
+      "vendorName": "Deere PowerTech Agricultural Center"
     },
     {
       "id": "eq-tractor-3",
@@ -221,7 +160,11 @@
           "value": "Double Clutch Independent PTO"
         }
       ],
-      "createdAt": "2026-09-18T17:29:05.423Z"
+      "createdAt": "2026-09-18T17:29:05.423Z",
+      "availabilityType": "both",
+      "purchasePrice": 680000,
+      "vendorId": "vnd-1",
+      "vendorName": "Sri Murugan Mahindra Tractors & Implements"
     },
     {
       "id": "eq-harvester-1",
@@ -267,7 +210,11 @@
           "value": "Terra Trac Rubber Track"
         }
       ],
-      "createdAt": "2026-09-18T17:29:05.423Z"
+      "createdAt": "2026-09-18T17:29:05.423Z",
+      "availabilityType": "both",
+      "purchasePrice": 2450000,
+      "vendorId": "vnd-4",
+      "vendorName": "Kisan Harvester & Drone SuperStore"
     },
     {
       "id": "eq-harvester-2",
@@ -313,7 +260,11 @@
           "value": "High-Clearance Crawler Track"
         }
       ],
-      "createdAt": "2026-09-18T17:29:05.423Z"
+      "createdAt": "2026-09-18T17:29:05.423Z",
+      "availabilityType": "both",
+      "purchasePrice": 2200000,
+      "vendorId": "vnd-4",
+      "vendorName": "Kisan Harvester & Drone SuperStore"
     },
     {
       "id": "eq-harvester-3",
@@ -359,7 +310,11 @@
           "value": "Rotary Separator with 5 Walkers"
         }
       ],
-      "createdAt": "2026-09-18T17:29:05.423Z"
+      "createdAt": "2026-09-18T17:29:05.423Z",
+      "availabilityType": "both",
+      "purchasePrice": 2100000,
+      "vendorId": "vnd-2",
+      "vendorName": "Cauvery Delta Agro Machinery & Implements Dealer"
     },
     {
       "id": "eq-tillage-1",
@@ -405,7 +360,11 @@
           "value": "High Boron Hardened Steel"
         }
       ],
-      "createdAt": "2026-09-18T17:29:05.423Z"
+      "createdAt": "2026-09-18T17:29:05.423Z",
+      "availabilityType": "both",
+      "purchasePrice": 75000,
+      "vendorId": "vnd-1",
+      "vendorName": "Sri Murugan Mahindra Tractors & Implements"
     },
     {
       "id": "eq-tillage-2",
@@ -451,7 +410,11 @@
           "value": "45 - 60 HP"
         }
       ],
-      "createdAt": "2026-09-18T17:29:05.423Z"
+      "createdAt": "2026-09-18T17:29:05.423Z",
+      "availabilityType": "both",
+      "purchasePrice": 135000,
+      "vendorId": "vnd-5",
+      "vendorName": "Kongu Agro Implements & Spares Hub"
     },
     {
       "id": "eq-tillage-3",
@@ -497,7 +460,11 @@
           "value": "40 - 55 HP"
         }
       ],
-      "createdAt": "2026-09-18T17:29:05.423Z"
+      "createdAt": "2026-09-18T17:29:05.423Z",
+      "availabilityType": "both",
+      "purchasePrice": 88000,
+      "vendorId": "vnd-2",
+      "vendorName": "Cauvery Delta Agro Machinery & Implements Dealer"
     },
     {
       "id": "eq-seeding-1",
@@ -543,7 +510,11 @@
           "value": "80 kg Capacity"
         }
       ],
-      "createdAt": "2026-09-18T17:29:05.423Z"
+      "createdAt": "2026-09-18T17:29:05.423Z",
+      "availabilityType": "both",
+      "purchasePrice": 62000,
+      "vendorId": "vnd-1",
+      "vendorName": "Sri Murugan Mahindra Tractors & Implements"
     },
     {
       "id": "eq-seeding-2",
@@ -589,7 +560,11 @@
           "value": "35 - 50 HP"
         }
       ],
-      "createdAt": "2026-09-18T17:29:05.423Z"
+      "createdAt": "2026-09-18T17:29:05.423Z",
+      "availabilityType": "both",
+      "purchasePrice": 195000,
+      "vendorId": "vnd-5",
+      "vendorName": "Kongu Agro Implements & Spares Hub"
     },
     {
       "id": "eq-seeding-3",
@@ -635,7 +610,11 @@
           "value": "Corn, Cotton, Soybean, Sunflower"
         }
       ],
-      "createdAt": "2026-09-18T17:29:05.423Z"
+      "createdAt": "2026-09-18T17:29:05.423Z",
+      "availabilityType": "both",
+      "purchasePrice": 84000,
+      "vendorId": "vnd-2",
+      "vendorName": "Cauvery Delta Agro Machinery & Implements Dealer"
     },
     {
       "id": "eq-drone-1",
@@ -681,7 +660,11 @@
           "value": "Active Phased Array + Binocular Vision"
         }
       ],
-      "createdAt": "2026-09-18T17:29:05.423Z"
+      "createdAt": "2026-09-18T17:29:05.423Z",
+      "availabilityType": "both",
+      "purchasePrice": 980000,
+      "vendorId": "vnd-4",
+      "vendorName": "Kisan Harvester & Drone SuperStore"
     },
     {
       "id": "eq-drone-2",
@@ -727,7 +710,11 @@
           "value": "DGCA Type Certified (Make in India)"
         }
       ],
-      "createdAt": "2026-09-18T17:29:05.423Z"
+      "createdAt": "2026-09-18T17:29:05.423Z",
+      "availabilityType": "both",
+      "purchasePrice": 550000,
+      "vendorId": "vnd-4",
+      "vendorName": "Kisan Harvester & Drone SuperStore"
     },
     {
       "id": "eq-sprayer-1",
@@ -773,7 +760,11 @@
           "value": "165 HP John Deere PowerTech"
         }
       ],
-      "createdAt": "2026-09-18T17:29:05.423Z"
+      "createdAt": "2026-09-18T17:29:05.423Z",
+      "availabilityType": "both",
+      "purchasePrice": 1120000,
+      "vendorId": "vnd-1",
+      "vendorName": "Sri Murugan Mahindra Tractors & Implements"
     },
     {
       "id": "eq-pump-1",
@@ -819,7 +810,11 @@
           "value": "18 - 24 metres"
         }
       ],
-      "createdAt": "2026-09-18T17:29:05.423Z"
+      "createdAt": "2026-09-18T17:29:05.423Z",
+      "availabilityType": "both",
+      "purchasePrice": 42000,
+      "vendorId": "vnd-2",
+      "vendorName": "Cauvery Delta Agro Machinery & Implements Dealer"
     },
     {
       "id": "eq-pump-2",
@@ -865,7 +860,11 @@
           "value": "Stainless Steel Borewell Submersible"
         }
       ],
-      "createdAt": "2026-09-18T17:29:05.423Z"
+      "createdAt": "2026-09-18T17:29:05.423Z",
+      "availabilityType": "both",
+      "purchasePrice": 175000,
+      "vendorId": "vnd-5",
+      "vendorName": "Kongu Agro Implements & Spares Hub"
     },
     {
       "id": "eq-pump-3",
@@ -911,10 +910,33 @@
           "value": "28 metres"
         }
       ],
-      "createdAt": "2026-09-18T17:29:05.423Z"
+      "createdAt": "2026-09-18T17:29:05.423Z",
+      "availabilityType": "both",
+      "purchasePrice": 58000,
+      "vendorId": "vnd-1",
+      "vendorName": "Sri Murugan Mahindra Tractors & Implements"
     }
   ],
   "bookings": [
+    {
+      "listingId": "eq-tractor-1",
+      "equipmentName": "Mahindra 575 DI Yuvo Tech+",
+      "equipmentImg": "/equipment/tractors/mahindra-575-di-yuvo-tech-plus.jpg",
+      "farmerId": "4a73ef39-991d-485a-b3a2-2fed302e4076",
+      "farmerName": "Test Farmer",
+      "ownerId": "usr-owner-1",
+      "ownerName": "Verified Fleet Owner",
+      "startDate": "2026-09-26",
+      "endDate": "2026-09-29",
+      "days": 3,
+      "dailyRate": 1800,
+      "totalAmount": 5400,
+      "securityDeposit": 3000,
+      "escrowStatus": "held",
+      "status": "active",
+      "id": "BK-7428",
+      "createdAt": "2026-10-06T16:43:59.432Z"
+    },
     {
       "listingId": "eq-tractor-1",
       "equipmentName": "Mahindra 575 DI Yuvo Tech+",
@@ -1145,6 +1167,16 @@
     }
   ],
   "notifications": [
+    {
+      "userId": "4a73ef39-991d-485a-b3a2-2fed302e4076",
+      "title": "Booking Confirmed: Mahindra 575 DI Yuvo Tech+",
+      "message": "Your booking BK-7428 (3 days, ₹5,400) has been placed. Equipment will arrive on 2026-09-26.",
+      "type": "booking_confirmed",
+      "read": false,
+      "relatedId": "BK-7428",
+      "id": "notif-1791305039446-891",
+      "timestamp": "2026-10-06T16:43:59.446Z"
+    },
     {
       "userId": "usr-owner-1",
       "title": "Equipment Listing Removed",
@@ -1438,5 +1470,306 @@
       "timestamp": "2026-09-23T10:00:00.000Z"
     }
   ],
-  "contactMessages": []
+  "contactMessages": [],
+  "reviews": [
+    {
+      "id": "rev-101",
+      "equipmentId": "eq-tractor-1",
+      "userId": "usr-farmer-1",
+      "userName": "Muthukumar S.",
+      "bookingId": "BK-2712",
+      "rating": 5,
+      "reviewText": "Very good tractor for field work. Engine torque and fuel mileage during puddling was top notch. Owner was helpful and equipment was maintained well.",
+      "createdAt": "2026-07-23T14:30:00.000Z"
+    },
+    {
+      "id": "rev-102",
+      "equipmentId": "eq-tractor-1",
+      "userId": "usr-farmer-2",
+      "userName": "Rajesh Kumar Patil",
+      "bookingId": "BK-seed-t1",
+      "rating": 5,
+      "reviewText": "High precision hydraulics made rotavator operation effortless. On-time doorstep delivery by owner.",
+      "createdAt": "2026-08-10T09:15:00.000Z"
+    },
+    {
+      "id": "rev-103",
+      "equipmentId": "eq-tractor-1",
+      "userId": "usr-farmer-1",
+      "userName": "Muthukumar S.",
+      "bookingId": "BK-seed-t2",
+      "rating": 4,
+      "reviewText": "Good machine condition and operator was skilled. Minor delay in transport arrival but overall great experience.",
+      "createdAt": "2026-08-18T16:45:00.000Z"
+    },
+    {
+      "id": "rev-104",
+      "equipmentId": "eq-tractor-2",
+      "userId": "usr-farmer-2",
+      "userName": "Rajesh Kumar Patil",
+      "bookingId": "BK-8510",
+      "rating": 5,
+      "reviewText": "John Deere 5310 is unbeatable in heavy clay soils. Smooth dual-clutch transmission and zero breakdown.",
+      "createdAt": "2026-09-27T11:00:00.000Z"
+    },
+    {
+      "id": "rev-105",
+      "equipmentId": "eq-harvester-1",
+      "userId": "usr-farmer-1",
+      "userName": "Muthukumar S.",
+      "bookingId": "BK-8842",
+      "rating": 5,
+      "reviewText": "Rubber tracks worked wonders in wet paddy land without sinking. Grain loss was less than 1%. Highly recommended!",
+      "createdAt": "2026-08-19T17:20:00.000Z"
+    },
+    {
+      "id": "rev-106",
+      "equipmentId": "eq-tillage-2",
+      "userId": "usr-farmer-1",
+      "userName": "Muthukumar S.",
+      "bookingId": "BK-2756",
+      "rating": 5,
+      "reviewText": "Shaktiman rotavator pulverized black soil into fine tilth in a single pass. Boron steel blades are sharp and strong.",
+      "createdAt": "2026-08-31T10:10:00.000Z"
+    },
+    {
+      "id": "rev-107",
+      "equipmentId": "eq-drone-1",
+      "userId": "usr-farmer-2",
+      "userName": "Rajesh Kumar Patil",
+      "bookingId": "BK-seed-d1",
+      "rating": 5,
+      "reviewText": "Sprayed 10 acres of cotton crop in under an hour. Saved 90% water and prevented direct chemical contact. Amazing tech!",
+      "createdAt": "2026-09-12T15:30:00.000Z"
+    }
+  ],
+  "vendors": [
+    {
+      "id": "vnd-1",
+      "name": "Sri Murugan Mahindra Tractors & Implements",
+      "dealerType": "Authorized Mahindra Dealer & Service Hub",
+      "rating": 4.8,
+      "reviewsCount": 142,
+      "phone": "+91 98421 88900",
+      "email": "murugan.dealers@agrirent.in",
+      "address": "142 Pollachi Main Road, Eachanari, Coimbatore, Tamil Nadu 641021",
+      "city": "Coimbatore",
+      "lat": 10.938,
+      "lng": 76.974,
+      "brands": [
+        "Mahindra",
+        "Shaktiman",
+        "Texmo"
+      ],
+      "inventory": [
+        {
+          "id": "eq-tractor-1",
+          "name": "Mahindra 575 DI Yuvo Tech+",
+          "price": 850000,
+          "category": "Tractor",
+          "inStock": true
+        },
+        {
+          "id": "eq-tractor-3",
+          "name": "Sonalika DI 745 III",
+          "price": 680000,
+          "category": "Tractor",
+          "inStock": true
+        },
+        {
+          "id": "eq-tillage-1",
+          "name": "Mahindra MB Plough",
+          "price": 75000,
+          "category": "Ploughing & Tilling",
+          "inStock": true
+        },
+        {
+          "id": "eq-seeding-1",
+          "name": "Mahindra Seed Drill",
+          "price": 62000,
+          "category": "Seeding",
+          "inStock": true
+        },
+        {
+          "id": "eq-pump-3",
+          "name": "Texmo 7.5HP Submersible Pump",
+          "price": 58000,
+          "category": "Water Pump",
+          "inStock": true
+        }
+      ]
+    },
+    {
+      "id": "vnd-2",
+      "name": "Cauvery Delta Agro Machinery & Implements Dealer",
+      "dealerType": "Certified Multi-Brand Farm Equipment Dealer",
+      "rating": 4.7,
+      "reviewsCount": 98,
+      "phone": "+91 94432 77123",
+      "email": "cauvery.machinery@agrirent.in",
+      "address": "88 Cauvery River Road, Near Old Bus Stand, Thanjavur, Tamil Nadu 613001",
+      "city": "Thanjavur",
+      "lat": 10.787,
+      "lng": 79.1378,
+      "brands": [
+        "Preet",
+        "Fieldking",
+        "Kirloskar",
+        "Landforce"
+      ],
+      "inventory": [
+        {
+          "id": "eq-harvester-3",
+          "name": "Preet 987 Combine Harvester",
+          "price": 2100000,
+          "category": "Harvester",
+          "inStock": true
+        },
+        {
+          "id": "eq-tillage-3",
+          "name": "Fieldking Heavy Duty Disc Harrow",
+          "price": 88000,
+          "category": "Ploughing & Tilling",
+          "inStock": true
+        },
+        {
+          "id": "eq-seeding-3",
+          "name": "Landforce Zero Till Drill",
+          "price": 84000,
+          "category": "Seeding",
+          "inStock": true
+        },
+        {
+          "id": "eq-pump-1",
+          "name": "Kirloskar Diesel Water Pump",
+          "price": 42000,
+          "category": "Water Pump",
+          "inStock": true
+        }
+      ]
+    },
+    {
+      "id": "vnd-3",
+      "name": "Deere PowerTech Agricultural Center",
+      "dealerType": "Authorized John Deere Dealership",
+      "rating": 4.9,
+      "reviewsCount": 185,
+      "phone": "+91 98425 66789",
+      "email": "salem.deere@agrirent.in",
+      "address": "24 Bangalore National Highway, Omalur Bypass, Salem, Tamil Nadu 636005",
+      "city": "Salem",
+      "lat": 11.6643,
+      "lng": 78.146,
+      "brands": [
+        "John Deere"
+      ],
+      "inventory": [
+        {
+          "id": "eq-tractor-2",
+          "name": "John Deere 5310 PowerTech",
+          "price": 1120000,
+          "category": "Tractor",
+          "inStock": true
+        }
+      ]
+    },
+    {
+      "id": "vnd-4",
+      "name": "Kisan Harvester & Drone SuperStore",
+      "dealerType": "Claas, Kubota & DGCA Drone Authorized Partner",
+      "rating": 4.8,
+      "reviewsCount": 124,
+      "phone": "+91 98140 22345",
+      "email": "kisan.tech@agrirent.in",
+      "address": "56 Ring Road Junction, Mattuthavani, Madurai, Tamil Nadu 625020",
+      "city": "Madurai",
+      "lat": 9.9252,
+      "lng": 78.1198,
+      "brands": [
+        "Claas",
+        "Kubota",
+        "DJI",
+        "Garuda Aerospace"
+      ],
+      "inventory": [
+        {
+          "id": "eq-harvester-1",
+          "name": "Claas Crop Tiger 30",
+          "price": 2450000,
+          "category": "Harvester",
+          "inStock": true
+        },
+        {
+          "id": "eq-harvester-2",
+          "name": "Kubota DC-68G Combine Harvester",
+          "price": 2200000,
+          "category": "Harvester",
+          "inStock": true
+        },
+        {
+          "id": "eq-drone-1",
+          "name": "DJI Agras T40 Agricultural Drone",
+          "price": 980000,
+          "category": "Sprayers & Drones",
+          "inStock": true
+        },
+        {
+          "id": "eq-drone-2",
+          "name": "Garuda Kisan Drone",
+          "price": 550000,
+          "category": "Sprayers & Drones",
+          "inStock": true
+        }
+      ]
+    },
+    {
+      "id": "vnd-5",
+      "name": "Kongu Agro Implements & Spares Hub",
+      "dealerType": "Agricultural Equipment & Machinery Dealer",
+      "rating": 4.6,
+      "reviewsCount": 82,
+      "phone": "+91 98423 44556",
+      "email": "kongu.agro@agrirent.in",
+      "address": "102 Karur Bypass Road, Tiruchirappalli, Tamil Nadu 620002",
+      "city": "Tiruchirappalli",
+      "lat": 10.7905,
+      "lng": 78.7047,
+      "brands": [
+        "Shaktiman",
+        "Aspee",
+        "Crompton",
+        "National"
+      ],
+      "inventory": [
+        {
+          "id": "eq-tillage-2",
+          "name": "Shaktiman Rotary Tiller",
+          "price": 135000,
+          "category": "Ploughing & Tilling",
+          "inStock": true
+        },
+        {
+          "id": "eq-seeding-2",
+          "name": "National Pneumatic Planter",
+          "price": 195000,
+          "category": "Seeding",
+          "inStock": true
+        },
+        {
+          "id": "eq-drone-3",
+          "name": "Aspee Tractor Mounted Boom Sprayer",
+          "price": 145000,
+          "category": "Sprayers & Drones",
+          "inStock": true
+        },
+        {
+          "id": "eq-pump-2",
+          "name": "Crompton 5HP Solar Water Pump",
+          "price": 175000,
+          "category": "Water Pump",
+          "inStock": true
+        }
+      ]
+    }
+  ]
 }

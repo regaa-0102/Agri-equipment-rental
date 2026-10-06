@@ -1,16 +1,17 @@
 import { useState, type ReactNode } from 'react'
+import { useEffect } from 'react'
 import { useNavigate, useRouterState } from '@tanstack/react-router'
 import LanguageSelector from './LanguageSelector'
-import AgriRentApp from './AgriRentApp'
 import { useLanguage } from '../context/LanguageContext'
 import ApiExplorerModal from './ApiExplorerModal'
 import JwtInspectorModal from './JwtInspectorModal'
 import { Tractor, Settings, ZoomIn, ZoomOut, Palette } from 'lucide-react'
 import { useTheme } from '../context/ThemeContext'
+import { getStoredUser, isAuthInitialized } from '../lib/api-client'
 
 export const SCREENS = [
   { id: 'home', path: '/', label: '1. Home / Equipment Catalog' },
-  { id: 'login', path: '/login', label: '2. Login Page (5 Test Accounts)' },
+  { id: 'login', path: '/login', label: '2. Login Page' },
   { id: 'register', path: '/register', label: '3. Registration Page' },
   { id: 'farmer-dashboard', path: '/farmer-dashboard', label: '4. Farmer Dashboard' },
   { id: 'equipment-details', path: '/equipment-details', label: '5. Equipment Details' },
@@ -19,7 +20,7 @@ export const SCREENS = [
   { id: 'my-bookings', path: '/my-bookings', label: '8. My Bookings' },
   { id: 'owner-dashboard', path: '/owner-dashboard', label: '9. Owner Dashboard' },
   { id: 'add-equipment', path: '/add-equipment', label: '10. Add Equipment' },
-  { id: 'admin-dashboard', path: '/admin-dashboard', label: '11. Admin Dashboard (Mandatory)' },
+  { id: 'admin-dashboard', path: '/admin-dashboard', label: '11. Admin Dashboard' },
   { id: 'notifications', path: '/notifications', label: '12. Notifications Center' },
   { id: 'profile', path: '/profile', label: '13. Profile & Identity Verification' },
   { id: 'payments', path: '/payments', label: '14. Payments & Escrow Ledger' },
@@ -46,9 +47,51 @@ export function usePrototypeNavigate() {
 
 export default function PrototypeShell({ children }: { children: ReactNode }) {
   const navigate = useNavigate()
+  const pathname = useRouterState({ select: (state) => state.location.pathname })
   const { theme, siteZoom, zoomIn, zoomOut, openSettings } = useTheme()
   const [apiModalOpen, setApiModalOpen] = useState(false)
   const [jwtModalOpen, setJwtModalOpen] = useState(false)
+  const [authState, setAuthState] = useState(() => ({
+    ready: isAuthInitialized(),
+    user: getStoredUser(),
+  }))
+
+  const requiredRole =
+    pathname === '/admin-dashboard'
+      ? 'admin'
+      : ['/owner-dashboard', '/owner-bookings', '/add-equipment', '/analytics', '/revenue'].includes(pathname)
+      ? 'owner'
+      : ['/farmer-dashboard', '/booking', '/my-bookings', '/payment-success', '/payments'].includes(pathname)
+      ? 'farmer'
+      : null
+  const requiresAuthentication =
+    requiredRole !== null || ['/notifications', '/profile', '/help'].includes(pathname)
+
+  useEffect(() => {
+    const refreshAuthState = () => {
+      setAuthState({ ready: isAuthInitialized(), user: getStoredUser() })
+    }
+    window.addEventListener('agrirent_auth_change', refreshAuthState)
+    refreshAuthState()
+    return () => window.removeEventListener('agrirent_auth_change', refreshAuthState)
+  }, [])
+
+  useEffect(() => {
+    if (
+      requiresAuthentication &&
+      authState.ready &&
+      (!authState.user || (requiredRole !== null && authState.user.role !== requiredRole))
+    ) {
+      navigate({ to: '/login' })
+    }
+  }, [authState, navigate, pathname, requiredRole, requiresAuthentication])
+
+  if (
+    requiresAuthentication &&
+    (!authState.ready || !authState.user || (requiredRole !== null && authState.user.role !== requiredRole))
+  ) {
+    return null
+  }
 
   const handleScreenChange = (path: string) => {
     navigate({ to: path as string })

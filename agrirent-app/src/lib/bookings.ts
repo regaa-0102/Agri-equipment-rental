@@ -1,5 +1,6 @@
 export interface BookingItem {
   id: string
+  equipmentId?: string | undefined
   equipment: string
   cat: string
   category?: string | undefined

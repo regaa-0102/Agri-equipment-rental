@@ -1,6 +1,6 @@
-import { createHmac } from "node:crypto";
+import { createHmac, randomBytes } from "node:crypto";
 
-const JWT_SECRET = process.env['JWT_SECRET'] || "agrirent-secure-jwt-secret-key-2026";
+const JWT_SECRET = process.env["JWT_SECRET"] || randomBytes(32);
 
 export interface JwtPayload {
   userId: string;
@@ -8,6 +8,9 @@ export interface JwtPayload {
   email: string;
   role: "farmer" | "owner" | "admin";
   provider?: "local" | "google";
+  purpose?: "google-pending";
+  googleId?: string;
+  avatar?: string;
   iat?: number;
   exp?: number;
 }

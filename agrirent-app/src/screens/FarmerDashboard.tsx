@@ -2,8 +2,9 @@ import { useState, useEffect } from 'react'
 import Sidebar from '../components/Sidebar'
 import { getFullCatalog, categoryNames, getCategoryFallback, searchCatalog } from '../lib/catalog'
 import { useLanguage } from '../context/LanguageContext'
-import { BookingItem, getStoredBookings, onBookingsChange } from '../lib/bookings'
-import { getStoredUser } from '../lib/api-client'
+import { BookingItem } from '../lib/bookings'
+import { api, getStoredUser } from '../lib/api-client'
+import { findCatalogItem } from '../lib/catalog'
 import BookingStatus from '../components/BookingStatus'
 import TrackingPanel from '../components/TrackingPanel'
 import NearbyEquipment from '../components/NearbyEquipment'
@@ -25,7 +26,8 @@ export default function FarmerDashboard({ onNavigate }: Props) {
   const [category, setCategory] = useState('All')
   const [location, setLocation] = useState('All Locations')
   const [searchQuery, setSearchQuery] = useState('')
-  const [bookingsList, setBookingsList] = useState<BookingItem[]>(() => getStoredBookings())
+  const [bookingsList, setBookingsList] = useState<BookingItem[]>([])
+  const [bookingsError, setBookingsError] = useState('')
   const [trackingBooking, setTrackingBooking] = useState<BookingItem | null>(null)
   const [user, setUser] = useState<any>(null)
   const [allCatalog, setAllCatalog] = useState(() => getFullCatalog())
@@ -43,8 +45,33 @@ export default function FarmerDashboard({ onNavigate }: Props) {
   }, [])
 
   useEffect(() => {
-    return onBookingsChange((updated) => {
-      setBookingsList(updated)
+    void api.getBookings().then(({ bookings }) => {
+      setBookingsList(bookings.map((booking) => {
+        const listing = findCatalogItem(booking.listingId)
+        const status: BookingItem['status'] =
+          booking.status === 'completed' ? 'completed' :
+          booking.status === 'cancelled' ? 'cancelled' :
+          booking.status === 'pending' ? 'pending' : 'active'
+        return {
+          id: booking.id,
+          equipmentId: booking.listingId,
+          equipment: booking.equipmentName,
+          cat: listing?.cat || 'Equipment',
+          img: booking.equipmentImg || listing?.img || '',
+          location: listing?.location || '—',
+          from: booking.startDate,
+          to: booking.endDate,
+          days: booking.days,
+          dailyRate: booking.dailyRate,
+          amount: `₹${booking.totalAmount.toLocaleString()}`,
+          totalNumeric: booking.totalAmount,
+          status,
+          owner: booking.ownerName,
+          trackingStage: status === 'completed' ? 6 : status === 'active' ? 5 : 0,
+        }
+      }))
+    }).catch((error: unknown) => {
+      setBookingsError(error instanceof Error ? error.message : 'Could not load bookings.')
     })
   }, [])
 
@@ -56,12 +83,13 @@ export default function FarmerDashboard({ onNavigate }: Props) {
   const activeRentalsCount = bookingsList.filter((b) => b.status === 'active').length
   const completedRentalsCount = bookingsList.filter((b) => b.status === 'completed').length
 
-  const displayName = user?.name || 'Muthukumar S.'
-  const displayLocation = user?.location || 'Thanjavur, Tamil Nadu (Cauvery Delta)'
+  if (!user) return null
+  const displayName = user.name
+  const displayLocation = user.location || ''
 
   return (
     <div style={{ display: 'flex', minHeight: 'calc(100vh - 44px)', width: '100%', minWidth: 0, background: '#F8FAFC' }}>
-      <Sidebar activeItem="Dashboard" onNavigate={onNavigate} role="farmer" />
+      <Sidebar activeItem="Dashboard" onNavigate={onNavigate} role={user.role} />
 
       {/* Main content */}
       <div style={{ flex: 1, minWidth: 0, overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
@@ -124,9 +152,9 @@ export default function FarmerDashboard({ onNavigate }: Props) {
           {/* Stats cards */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16, marginBottom: 28 }}>
             {[
-              { label: isTamil ? 'மொத்த முன்பதிவுகள்' : 'Total Bookings', value: String(bookingsList.length || 4), icon: '📋', delta: '+2 this month', color: '#EFF6FF', tc: '#1D4ED8' },
-              { label: isTamil ? 'செயலில் உள்ள வாடகைகள்' : 'Active Rentals', value: String(activeRentalsCount || 2), icon: '🚜', delta: 'Currently in field', color: PM, tc: P },
-              { label: isTamil ? 'நிறைவடைந்தவை' : 'Completed Returns', value: String(completedRentalsCount || 2), icon: '✅', delta: 'Deposit refunded', color: '#F0FDF4', tc: '#16A34A' },
+              { label: isTamil ? 'மொத்த முன்பதிவுகள்' : 'Total Bookings', value: String(bookingsList.length), icon: '📋', delta: '+2 this month', color: '#EFF6FF', tc: '#1D4ED8' },
+              { label: isTamil ? 'செயலில் உள்ள வாடகைகள்' : 'Active Rentals', value: String(activeRentalsCount), icon: '🚜', delta: 'Currently in field', color: PM, tc: P },
+              { label: isTamil ? 'நிறைவடைந்தவை' : 'Completed Returns', value: String(completedRentalsCount), icon: '✅', delta: 'Deposit refunded', color: '#F0FDF4', tc: '#16A34A' },
               { label: isTamil ? 'சேமிக்கப்பட்ட தொகை' : 'Savings vs Buying', value: '₹2.8 Lakhs', icon: '💳', delta: 'Zero maintenance cost', color: '#FEF3C7', tc: '#B45309' },
             ].map((stat) => (
               <div key={stat.label} className="card-shadow" style={{ background: '#fff', borderRadius: 16, padding: '18px 20px', border: '1px solid #E2E8F0' }}>
@@ -141,6 +169,8 @@ export default function FarmerDashboard({ onNavigate }: Props) {
             ))}
           </div>
 
+          <NearbyEquipment onNavigate={onNavigate} />
+
           {/* Live Micrometeorology & Spray Index */}
           <AgriWeatherCard />
 
@@ -151,6 +181,7 @@ export default function FarmerDashboard({ onNavigate }: Props) {
           <RecentlyViewedSection onNavigate={onNavigate} />
 
           {/* Active Bookings Tracking */}
+          {bookingsError && <div role="alert" style={{ marginBottom: 16, color: '#B91C1C' }}>{bookingsError}</div>}
           {bookingsList.length > 0 && (
             <div style={{ marginBottom: 32 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>

@@ -1,6 +1,3 @@
-const TOKEN_KEY = 'agrirent_jwt_token'
-const USER_KEY = 'agrirent_user_session'
-
 export interface UserSession {
   id: string
   name: string
@@ -9,52 +6,38 @@ export interface UserSession {
   phone?: string
   location?: string
   avatar?: string
+  theme?: string
   provider?: 'local' | 'google'
+  verificationStatus?: 'NOT_VERIFIED' | 'PENDING' | 'VERIFIED' | 'REJECTED'
 }
 
-export function getStoredJwt(): string | null {
-  if (typeof window === 'undefined') return null
-  return window.localStorage.getItem(TOKEN_KEY)
-}
-
-export function setStoredJwt(token: string): void {
-  if (typeof window === 'undefined') return
-  window.localStorage.setItem(TOKEN_KEY, token)
-}
+let currentUser: UserSession | null = null
+let authInitialized = false
+let authRestorePromise: Promise<UserSession | null> | null = null
 
 export function getStoredUser(): UserSession | null {
-  if (typeof window === 'undefined') return null
-  try {
-    const raw = window.localStorage.getItem(USER_KEY)
-    return raw ? JSON.parse(raw) : null
-  } catch {
-    return null
+  return currentUser
+}
+
+export function isAuthInitialized(): boolean {
+  return authInitialized
+}
+
+export function setAuthenticatedUser(user: UserSession | null): void {
+  currentUser = user
+  authInitialized = true
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('agrirent_auth_change', { detail: user }))
   }
-}
-
-export function setStoredUser(user: UserSession): void {
-  if (typeof window === 'undefined') return
-  window.localStorage.setItem(USER_KEY, JSON.stringify(user))
-  window.dispatchEvent(new CustomEvent('agrirent_auth_change', { detail: user }))
-}
-
-export function clearAuth(): void {
-  if (typeof window === 'undefined') return
-  window.localStorage.removeItem(TOKEN_KEY)
-  window.localStorage.removeItem(USER_KEY)
-  window.dispatchEvent(new CustomEvent('agrirent_auth_change', { detail: null }))
 }
 
 async function request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-  const token = getStoredJwt()
   const headers = new Headers(options.headers || {})
   headers.set('Content-Type', 'application/json')
-  if (token) {
-    headers.set('Authorization', `Bearer ${token}`)
-  }
 
   const response = await fetch(endpoint, {
     ...options,
+    credentials: 'same-origin',
     headers,
   })
 
@@ -64,6 +47,12 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
       const body = await response.json()
       if (body.error) errorMsg = body.error
     } catch {}
+    if (
+      response.status === 401 &&
+      !['/api/auth/login', '/api/auth/register', '/api/auth/logout'].includes(endpoint)
+    ) {
+      setAuthenticatedUser(null)
+    }
     throw new Error(errorMsg)
   }
 
@@ -72,38 +61,70 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
 
 export const api = {
   // Auth
-  async login(email: string, password: string) {
-    const res = await request<{ token: string; user: UserSession }>('/api/auth/login', {
+  async login(email: string, password: string, role: 'farmer' | 'owner' | 'admin', remember = true) {
+    const res = await request<{ user: UserSession }>('/api/auth/login', {
       method: 'POST',
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ email, password, role, remember }),
     })
-    setStoredJwt(res.token)
-    setStoredUser(res.user)
+    setAuthenticatedUser(res.user)
     return res
   },
 
-  async register(data: { name: string; email: string; password: string; role: 'farmer' | 'owner'; phone?: string; location?: string }) {
-    const res = await request<{ token: string; user: UserSession }>('/api/auth/register', {
+  async completeGoogleLogin(role: 'farmer' | 'owner') {
+    const res = await request<{ user: UserSession }>('/api/auth/google/complete', {
+      method: 'POST',
+      body: JSON.stringify({ role }),
+    })
+    setAuthenticatedUser(res.user)
+    return res
+  },
+
+  async register(data: {
+    name: string
+    email: string
+    password: string
+    confirmPassword: string
+    role: 'farmer' | 'owner'
+    phone: string
+    location?: string
+  }) {
+    const res = await request<{ user: UserSession }>('/api/auth/register', {
       method: 'POST',
       body: JSON.stringify(data),
     })
-    setStoredJwt(res.token)
-    setStoredUser(res.user)
+    setAuthenticatedUser(res.user)
     return res
   },
 
-  async oauthGoogle(data?: { email?: string; name?: string; role?: 'farmer' | 'owner' }) {
-    const res = await request<{ token: string; oauthProvider: string; user: UserSession }>('/api/auth/oauth', {
-      method: 'POST',
-      body: JSON.stringify(data || {}),
+  async logout() {
+    await request<{ success: boolean }>('/api/auth/logout', { method: 'POST' })
+    setAuthenticatedUser(null)
+  },
+
+  async restoreSession(): Promise<UserSession | null> {
+    if (authInitialized) return currentUser
+    if (authRestorePromise) return authRestorePromise
+    authRestorePromise = this.getMe()
+      .then(({ user }) => {
+        setAuthenticatedUser(user)
+        return user
+      })
+      .catch((error: unknown) => {
+        setAuthenticatedUser(null)
+        if (error instanceof Error && error.message.startsWith('HTTP Error 401')) return null
+        throw error
+      })
+      .finally(() => {
+        authRestorePromise = null
+      })
+    return authRestorePromise
+  },
+
+  async updateTheme(theme: string) {
+    return request<{ success: boolean; theme: string }>('/api/users/theme', {
+      method: 'PATCH',
+      body: JSON.stringify({ theme }),
     })
-    setStoredJwt(res.token)
-    setStoredUser(res.user)
-    return res
-  },
-
-  async getSeedUsers() {
-    return request<{ seedUsers: Array<UserSession & { defaultPassword: string }> }>('/api/auth/seed-users')
   },
 
   async getMe() {
@@ -111,18 +132,64 @@ export const api = {
   },
 
   // Listings
-  async getListings(filters?: { search?: string; category?: string; minPrice?: number; maxPrice?: number }) {
+  async getListings(filters?: {
+    search?: string
+    category?: string
+    minPrice?: number
+    maxPrice?: number
+    minRating?: number
+    availability?: 'rent' | 'buy' | 'both'
+    sortBy?: 'rating' | 'reviews' | 'price_asc' | 'price_desc'
+  }) {
     const params = new URLSearchParams()
     if (filters?.search) params.set('search', filters.search)
     if (filters?.category) params.set('category', filters.category)
     if (filters?.minPrice) params.set('minPrice', String(filters.minPrice))
     if (filters?.maxPrice) params.set('maxPrice', String(filters.maxPrice))
+    if (filters?.minRating) params.set('minRating', String(filters.minRating))
+    if (filters?.availability) params.set('availability', filters.availability)
+    if (filters?.sortBy) params.set('sortBy', filters.sortBy)
     const query = params.toString() ? `?${params.toString()}` : ''
     return request<{ count: number; listings: any[] }>(`/api/listings${query}`)
   },
 
   async getListingById(id: string) {
-    return request<{ listing: any }>(`/api/listings/${id}`)
+    return request<{ listing: any; ratingSummary?: any; reviews?: any[]; vendor?: any }>(`/api/listings/${id}`)
+  },
+
+  // Reviews
+  async getReviews(equipmentId?: string) {
+    const query = equipmentId ? `?equipmentId=${encodeURIComponent(equipmentId)}` : ''
+    return request<{ reviews: any[]; summary: any }>(`/api/reviews${query}`)
+  },
+
+  async createReview(data: { equipmentId: string; bookingId: string; rating: number; reviewText?: string }) {
+    return request<{ success: boolean; review: any; summary: any }>('/api/reviews', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    })
+  },
+
+  // Vendors
+  async getVendors(filters?: {
+    lat?: number
+    lng?: number
+    city?: string
+    search?: string
+    sortBy?: 'distance' | 'rating'
+  }) {
+    const params = new URLSearchParams()
+    if (filters?.lat !== undefined) params.set('lat', String(filters.lat))
+    if (filters?.lng !== undefined) params.set('lng', String(filters.lng))
+    if (filters?.city) params.set('city', filters.city)
+    if (filters?.search) params.set('search', filters.search)
+    if (filters?.sortBy) params.set('sortBy', filters.sortBy)
+    const query = params.toString() ? `?${params.toString()}` : ''
+    return request<{ count: number; vendors: any[] }>(`/api/vendors${query}`)
+  },
+
+  async getVendorById(id: string) {
+    return request<{ vendor: any }>(`/api/vendors/${id}`)
   },
 
   async createListing(data: any) {
@@ -188,6 +255,13 @@ export const api = {
     return request<{ booking: any }>(`/api/bookings/${id}/status`, {
       method: 'PATCH',
       body: JSON.stringify({ status, escrowStatus }),
+    })
+  },
+
+  async extendBooking(id: string, endDate: string) {
+    return request<{ booking: any }>(`/api/bookings/${id}/extend`, {
+      method: 'PATCH',
+      body: JSON.stringify({ endDate }),
     })
   },
 

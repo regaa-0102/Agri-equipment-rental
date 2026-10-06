@@ -99,7 +99,6 @@ const QUICK_TOPICS = [
 export default function ContactPage({ onNavigate }: Props) {
   const { t, isTamil } = useLanguage()
   const currentUser = getStoredUser()
-  const role = currentUser?.role || 'farmer'
 
   const formSectionRef = useRef<HTMLDivElement | null>(null)
   const messageInputRef = useRef<HTMLTextAreaElement | null>(null)
@@ -253,7 +252,7 @@ export default function ContactPage({ onNavigate }: Props) {
         background: '#F8FAFC',
       }}
     >
-      <Sidebar activeItem="Contact Us" onNavigate={onNavigate} role={role} />
+      {currentUser && <Sidebar activeItem="Contact Us" onNavigate={onNavigate} role={currentUser.role} />}
 
       {/* Main Content Area */}
       <div style={{ flex: 1, minWidth: 0, overflowY: 'auto' }}>

@@ -14,7 +14,8 @@ interface Props {
 export default function AnalyticsPage({ onNavigate }: Props) {
   const { t, isTamil } = useLanguage()
   const currentUser = getStoredUser()
-  const role = currentUser?.role || 'owner'
+  if (!currentUser) return null
+  const role = currentUser.role
 
   return (
     <div style={{ display: 'flex', minHeight: 'calc(100vh - 44px)', width: '100%', minWidth: 0, background: '#F9FAFB' }}>

@@ -69,6 +69,8 @@ export default function HomePage({ onNavigate }: Props) {
   const [selectedBrand, setSelectedBrand] = useState('All')
   const [maxPrice, setMaxPrice] = useState<number>(0)
   const [availableOnly, setAvailableOnly] = useState(false)
+  const [minRating, setMinRating] = useState(0)
+  const [sortByRating, setSortByRating] = useState(false)
   const [apiModalOpen, setApiModalOpen] = useState(false)
   const [equipmentList, setEquipmentList] = useState(() => getFullCatalog())
 
@@ -96,9 +98,11 @@ export default function HomePage({ onNavigate }: Props) {
       brand: selectedBrand,
       maxPrice: maxPrice > 0 ? maxPrice : undefined,
       availableOnly,
+      minRating: minRating || undefined,
+      sortBy: sortByRating ? 'rating' : undefined,
       location: searchLocation !== 'All Locations' ? searchLocation : undefined,
     })
-  }, [equipmentList, searchQuery, activeCat, selectedBrand, maxPrice, availableOnly, searchLocation])
+  }, [equipmentList, searchQuery, activeCat, selectedBrand, maxPrice, availableOnly, minRating, sortByRating, searchLocation])
 
   const hasActiveFilters = Boolean(
     searchQuery.trim() ||
@@ -106,6 +110,8 @@ export default function HomePage({ onNavigate }: Props) {
     selectedBrand !== 'All' ||
     maxPrice > 0 ||
     availableOnly ||
+    minRating > 0 ||
+    sortByRating ||
     searchLocation !== 'All Locations'
   )
 
@@ -115,6 +121,8 @@ export default function HomePage({ onNavigate }: Props) {
     setSelectedBrand('All')
     setMaxPrice(0)
     setAvailableOnly(false)
+    setMinRating(0)
+    setSortByRating(false)
     setSearchLocation('All Locations')
   }
 
@@ -714,6 +722,20 @@ export default function HomePage({ onNavigate }: Props) {
                   {isTamil ? 'வடிகட்டிகளை நீக்கு' : 'Reset'}
                 </button>
               )}
+            </div>
+
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, alignItems: 'center' }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 600, color: '#475569' }}>
+                {isTamil ? 'குறைந்தபட்ச மதிப்பீடு' : 'Rating'}
+                <select value={minRating} onChange={(event) => setMinRating(Number(event.target.value))} style={{ padding: '8px 10px', borderRadius: 9, border: '1px solid #CBD5E1', background: '#fff' }}>
+                  <option value={0}>{isTamil ? 'அனைத்து மதிப்பீடுகள்' : 'All ratings'}</option>
+                  <option value={5}>{isTamil ? '5 நட்சத்திரம்' : '5 stars'}</option>
+                  <option value={4}>{isTamil ? '4+ நட்சத்திரம்' : '4+ stars'}</option>
+                </select>
+              </label>
+              <button type="button" onClick={() => setSortByRating(!sortByRating)} aria-pressed={sortByRating} style={{ padding: '8px 12px', borderRadius: 9, border: `1px solid ${sortByRating ? P : '#CBD5E1'}`, background: sortByRating ? PM : '#fff', color: sortByRating ? P : '#475569', fontWeight: 700, cursor: 'pointer' }}>
+                {isTamil ? 'அதிக மதிப்பீடு முதலில்' : 'Highest rated first'}
+              </button>
             </div>
 
             {/* Results count indicator */}

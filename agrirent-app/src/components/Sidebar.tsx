@@ -24,7 +24,7 @@ export default function Sidebar({ activeItem, onNavigate, role }: Props) {
   const { t } = useLanguage()
   const { openSettings } = useTheme()
   const [currentUser, setCurrentUser] = useState<UserSession | null>(() => getStoredUser())
-  const userId = currentUser?.id || (role === 'farmer' ? 'usr-farmer-1' : 'usr-owner-1')
+  const userId = currentUser?.id || ''
 
   const [unreadNotifs, setUnreadNotifs] = useState(() => getUnreadCount(userId))
 
@@ -35,6 +35,8 @@ export default function Sidebar({ activeItem, onNavigate, role }: Props) {
     })
     return () => unsubscribe()
   }, [userId])
+
+  if (!currentUser) return null
 
   const farmerItems: SidebarItem[] = [
     { icon: '🏠', label: 'Dashboard', screen: 'farmer-dashboard' },
@@ -76,12 +78,8 @@ export default function Sidebar({ activeItem, onNavigate, role }: Props) {
   const roleLabel = role === 'farmer' ? t('🌾 Farmer') : role === 'owner' ? t('🔧 Equipment Owner') : t('⚙️ Administrator')
   const dashboardScreen = role === 'farmer' ? 'farmer-dashboard' : role === 'owner' ? 'owner-dashboard' : 'admin-dashboard'
 
-  const displayName =
-    currentUser?.name ||
-    (role === 'farmer' ? 'Muthukumar S.' : role === 'owner' ? 'Selvam Murugan' : 'Dr. Anandhan')
-  const displayEmail =
-    currentUser?.email ||
-    (role === 'farmer' ? 'muthukumar@agrirent.in' : role === 'owner' ? 'selvam@agrirent.in' : 'admin@agrirent.in')
+  const displayName = currentUser.name
+  const displayEmail = currentUser.email
   const initials = displayName
     .split(' ')
     .map((w) => w[0])

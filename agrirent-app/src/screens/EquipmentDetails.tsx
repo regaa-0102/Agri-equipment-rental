@@ -17,6 +17,7 @@ import {
 } from 'lucide-react'
 import { useLanguage } from '../context/LanguageContext'
 import { catalog, findCatalogItem, type CatalogItem, getCategoryFallback, getGoogleImageSearchUrl } from '../lib/catalog'
+import { api } from '../lib/api-client'
 import { recordRecentlyViewed } from '../lib/recently-accessed'
 import TrackingPanel from '../components/TrackingPanel'
 import ImageZoomModal from '../components/ImageZoomModal'
@@ -43,7 +44,10 @@ export default function EquipmentDetails({ onNavigate }: Props) {
     return (catalog[0] as CatalogItem)
   })
   const [selectedImg, setSelectedImg] = useState<string>(() => item.imageUrl || item.img)
-  const [activeTab, setActiveTab] = useState<'specs' | 'desc' | 'escrow'>('specs')
+  const [activeTab, setActiveTab] = useState<'specs' | 'desc' | 'escrow' | 'reviews'>('specs')
+  const [ratingSummary, setRatingSummary] = useState<{ averageRating: number; totalReviews: number; distribution: Record<string, number> } | null>(null)
+  const [reviews, setReviews] = useState<Array<{ id: string; userName: string; rating: number; reviewText: string; createdAt: string }>>([])
+  const [reviewsError, setReviewsError] = useState('')
   const [showTracking, setShowTracking] = useState(false)
   const [zoomModalOpen, setZoomModalOpen] = useState(false)
   const [inlineZoom, setInlineZoom] = useState(1)
@@ -64,6 +68,19 @@ export default function EquipmentDetails({ onNavigate }: Props) {
     }
     recordRecentlyViewed(catalog[0] as CatalogItem)
   }, [])
+
+  useEffect(() => {
+    let active = true
+    setReviewsError('')
+    void api.getListingById(item.id).then((response) => {
+      if (!active) return
+      setRatingSummary(response.ratingSummary)
+      setReviews(response.reviews || [])
+    }).catch((error: unknown) => {
+      if (active) setReviewsError(error instanceof Error ? error.message : 'Could not load equipment reviews.')
+    })
+    return () => { active = false }
+  }, [item.id])
 
   const handleBookNow = () => {
     if (typeof window !== 'undefined') {
@@ -410,9 +427,9 @@ export default function EquipmentDetails({ onNavigate }: Props) {
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 4, background: '#FEF3C7', padding: '3px 8px', borderRadius: 6 }}>
                 <Star size={14} fill="#F59E0B" color="#F59E0B" />
-                <span style={{ fontWeight: 800, fontSize: 13, color: '#B45309' }}>{item.rating}</span>
+                <span style={{ fontWeight: 800, fontSize: 13, color: '#B45309' }}>{ratingSummary?.averageRating ?? item.rating}</span>
               </div>
-              <span style={{ fontSize: 13, color: '#64748B' }}>({item.reviews} verified farmer reviews)</span>
+              <span style={{ fontSize: 13, color: '#64748B' }}>({ratingSummary?.totalReviews ?? item.reviews} verified farmer reviews)</span>
               <span style={{ fontSize: 13, color: '#16A34A', fontWeight: 700 }}>• Verified Fleet Listing</span>
             </div>
 
@@ -428,6 +445,15 @@ export default function EquipmentDetails({ onNavigate }: Props) {
                   <span style={{ fontSize: 14, fontWeight: 800, color: '#B45309' }}>₹{(item.securityDeposit || 2500).toLocaleString()} (Refundable)</span>
                 </div>
               </div>
+
+              {item.purchasePrice && item.availabilityType !== 'rent' && (
+                <div style={{ marginBottom: 16, padding: '11px 13px', borderRadius: 10, background: '#F0FDF4', color: '#166534', fontSize: 13 }}>
+                  <strong>{isTamil ? 'வாங்கும் விலை' : 'Purchase price'}: ₹{item.purchasePrice.toLocaleString('en-IN')}</strong>
+                  <span style={{ display: 'block', marginTop: 3, color: '#64748B', fontSize: 11 }}>
+                    {isTamil ? 'வாங்குவதற்கான விவரங்களுக்கு உரிமையாளரைத் தொடர்பு கொள்ளவும்.' : 'Contact the equipment provider to arrange a purchase.'}
+                  </span>
+                </div>
+              )}
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 16, fontSize: 12, color: '#475569' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -494,10 +520,11 @@ export default function EquipmentDetails({ onNavigate }: Props) {
               { id: 'specs', label: isTamil ? 'தொழில்நுட்ப விவரங்கள்' : 'Technical Specifications' },
               { id: 'desc', label: isTamil ? 'கருவி விளக்கம்' : 'Full Machine Overview' },
               { id: 'escrow', label: isTamil ? 'அக்ரிசேஃப்™ எஸ்க்ரோ பாதுகாப்பு' : 'AgriSafe™ Escrow & Inspection' },
+              { id: 'reviews', label: isTamil ? 'மதிப்புரைகள்' : 'Reviews' },
             ].map((tItem) => (
               <button
                 key={tItem.id}
-                onClick={() => setActiveTab(tItem.id as any)}
+                onClick={() => setActiveTab(tItem.id as 'specs' | 'desc' | 'escrow' | 'reviews')}
                 style={{
                   padding: '16px 20px',
                   background: 'transparent',
@@ -562,6 +589,41 @@ export default function EquipmentDetails({ onNavigate }: Props) {
                     ? 'நீங்கள் செலுத்தும் பாதுகாப்பு வைப்புத்தொகை அக்ரிரென்ட் எஸ்க்ரோ கணக்கில் பாதுகாப்பாக வைக்கப்படுகிறது. வாடகை முடிந்து உபகரணத்தை பரிசோதித்த 24 மணி நேரத்திற்குள் முழு வைப்புத்தொகையும் உங்கள் கணக்கிற்கு திரும்ப வழங்கப்படும்.'
                     : 'Your security deposit is held in a digital escrow trust during the rental period. Before release, a pre-delivery and post-return digital inspection log (hour meter, fuel level, and attachment health) is recorded. Zero unexpected deduction guarantee.'}
                 </p>
+              </div>
+            )}
+
+            {activeTab === 'reviews' && (
+              <div style={{ display: 'grid', gridTemplateColumns: 'minmax(220px, 0.8fr) minmax(0, 2fr)', gap: 28 }}>
+                <section aria-label={isTamil ? 'மதிப்பீட்டு விநியோகம்' : 'Rating distribution'}>
+                  <div style={{ fontSize: 34, fontWeight: 800, color: '#0F172A' }}>{ratingSummary?.averageRating ?? item.rating} <span style={{ color: '#F59E0B' }}>★</span></div>
+                  <div style={{ color: '#64748B', fontSize: 13, marginBottom: 16 }}>{ratingSummary?.totalReviews ?? item.reviews} {isTamil ? 'மதிப்பீடுகள்' : 'ratings'}</div>
+                  {[5, 4, 3, 2, 1].map((stars) => {
+                    const count = ratingSummary?.distribution[String(stars)] ?? 0
+                    const total = ratingSummary?.totalReviews ?? 0
+                    const percent = total > 0 ? Math.min(100, (count / total) * 100) : 0
+                    return (
+                      <div key={stars} style={{ display: 'grid', gridTemplateColumns: '28px 1fr 28px', alignItems: 'center', gap: 8, margin: '8px 0', fontSize: 12, color: '#475569' }}>
+                        <span>{stars}★</span>
+                        <div style={{ height: 8, borderRadius: 99, background: '#E2E8F0', overflow: 'hidden' }}><div style={{ height: '100%', width: `${percent}%`, background: '#F59E0B' }} /></div>
+                        <span>{count}</span>
+                      </div>
+                    )
+                  })}
+                </section>
+                <section>
+                  {reviewsError && <p role="alert" style={{ color: '#B91C1C' }}>{reviewsError}</p>}
+                  {reviews.length === 0 && !reviewsError && <p style={{ color: '#64748B' }}>{isTamil ? 'இன்னும் எழுதப்பட்ட மதிப்புரைகள் இல்லை.' : 'No written reviews yet.'}</p>}
+                  {reviews.map((review) => (
+                    <article key={review.id} style={{ padding: '14px 0', borderBottom: '1px solid #E2E8F0' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}>
+                        <strong style={{ color: '#0F172A' }}>{review.userName}</strong>
+                        <span style={{ color: '#B45309', whiteSpace: 'nowrap' }}>{'★'.repeat(Math.max(0, Math.min(5, review.rating)))}{'☆'.repeat(Math.max(0, 5 - review.rating))}</span>
+                      </div>
+                      <time dateTime={review.createdAt} style={{ display: 'block', color: '#94A3B8', fontSize: 12, marginTop: 3 }}>{new Date(review.createdAt).toLocaleDateString(isTamil ? 'ta-IN' : 'en-IN')}</time>
+                      <p style={{ color: '#475569', lineHeight: 1.6, margin: '8px 0 0' }}>{review.reviewText}</p>
+                    </article>
+                  ))}
+                </section>
               </div>
             )}
           </div>

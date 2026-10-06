@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { AlertTriangle, Check, CircleX, X } from 'lucide-react'
 import { useLanguage } from '../context/LanguageContext'
-import { BookingItem, cancelBookingRental } from '../lib/bookings'
+import { BookingItem } from '../lib/bookings'
+import { api } from '../lib/api-client'
 
 interface Props {
   booking: BookingItem
@@ -17,20 +18,21 @@ export default function CancelBooking({ booking, isOpen, onClose, onSuccess }: P
 
   if (!isOpen) return null
 
-  const handleConfirmCancel = () => {
-    const res = cancelBookingRental(booking.id)
-    if (res.success && res.booking) {
+  const handleConfirmCancel = async () => {
+    setErrorMsg('')
+    try {
+      await api.updateBookingStatus(booking.id, 'cancelled', 'refunded')
       setSuccessMsg(
         isTamil
           ? `முன்பதிவு ${booking.id} வெற்றிகரமாக ரத்து செய்யப்பட்டது.`
           : `Booking ${booking.id} has been successfully cancelled.`
       )
       setTimeout(() => {
-        if (onSuccess && res.booking) onSuccess(res.booking)
+        if (onSuccess) onSuccess({ ...booking, status: 'cancelled' })
         onClose()
       }, 1400)
-    } else {
-      setErrorMsg(res.error || (isTamil ? 'ரத்து செய்ய முடியவில்லை' : 'Failed to cancel booking'))
+    } catch (error) {
+      setErrorMsg(error instanceof Error ? error.message : (isTamil ? 'ரத்து செய்ய முடியவில்லை' : 'Failed to cancel booking'))
     }
   }
 

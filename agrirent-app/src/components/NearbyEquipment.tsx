@@ -1,622 +1,410 @@
-import { useState, useMemo } from 'react'
-import { MapPin, Navigation, Star, ArrowRight, ShieldCheck, Filter, ArrowUpDown, Compass, CheckCircle2 } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
+import { ArrowRight, LoaderCircle, MapPin, Navigation, Search, SlidersHorizontal, Star } from 'lucide-react'
 import { useLanguage } from '../context/LanguageContext'
-import { getFullCatalog, CatalogItem, calculateDistanceKm, getCategoryFallback } from '../lib/catalog'
+import { api } from '../lib/api-client'
+import {
+  calculateDistanceKm,
+  categoryNames,
+  CatalogItem,
+  getCategoryFallback,
+  getFullCatalog,
+  tamilNaduDistrictCoordinates,
+  tamilNaduDistricts,
+} from '../lib/catalog'
+import NearbyEquipmentMap, { type NearbyMapItem } from './NearbyEquipmentMap'
 
-interface Props {
-  onNavigate: (screen: string) => void
-  onSelectEquipment?: (item: CatalogItem) => void
-}
+type Purpose = 'all' | 'rent' | 'buy' | 'both'
+type SortOption = 'nearest' | 'rating' | 'rent-price' | 'buy-price'
+type Coordinates = { lat: number; lng: number }
 
-interface RegionalHub {
+interface ListingApiRecord {
   id: string
   name: string
-  nameTa: string
+  nameTa?: string | undefined
+  category?: string | undefined
+  brand?: string | undefined
+  model?: string | undefined
+  description?: string | undefined
+  imageUrl?: string | undefined
+  img?: string | undefined
+  location?: string | undefined
+  lat?: number | undefined
+  lng?: number | undefined
+  pricePerDay?: number | undefined
+  rating?: number | undefined
+  reviews?: number | undefined
+  available?: boolean | undefined
+  availabilityType?: 'rent' | 'buy' | 'both' | undefined
+  purchasePrice?: number | undefined
+  vendorId?: string | undefined
+  vendorName?: string | undefined
+  ownerId?: string | undefined
+  ownerName?: string | undefined
+  ownerPhone?: string | undefined
+  securityDeposit?: number | undefined
+  specs?: CatalogItem['specs'] | undefined
+}
+
+interface VendorApiRecord {
+  id: string
+  name: string
+  address: string
+  city: string
   lat: number
   lng: number
 }
 
-const REGIONAL_HUBS: RegionalHub[] = [
-  { id: 'coimbatore', name: 'Coimbatore & Pollachi', nameTa: 'கோயம்புத்தூர் & பொள்ளாச்சி', lat: 10.998, lng: 76.96 },
-  { id: 'madurai', name: 'Madurai & Usilampatti', nameTa: 'மதுரை & உசிலம்பட்டி', lat: 9.9252, lng: 78.1198 },
-  { id: 'thanjavur', name: 'Thanjavur & Delta Region', nameTa: 'தஞ்சாவூர் & டெல்டா மண்டலம்', lat: 10.787, lng: 79.1378 },
-  { id: 'salem', name: 'Salem & Omalur', nameTa: 'சேலம் & ஓமலூர்', lat: 11.6643, lng: 78.146 },
-  { id: 'trichy', name: 'Tiruchirappalli', nameTa: 'திருச்சிராப்பள்ளி', lat: 10.7905, lng: 78.7047 },
-  { id: 'ludhiana', name: 'Ludhiana, Punjab', nameTa: 'லூதியானா, பஞ்சாப்', lat: 30.901, lng: 75.8573 },
-]
+function normalizeDistrict(location: string): string {
+  const normalized = location
+    .split(',')
+    .map((part) => part.trim())
+    .find((part) => part && part.toLowerCase() !== 'tamil nadu')
+  if (!normalized) return ''
+  const alias = normalized.toLowerCase() === 'villupuram' ? 'Viluppuram' : normalized
+  return tamilNaduDistricts.find((district) => district.toLowerCase() === alias.toLowerCase()) || ''
+}
 
-export default function NearbyEquipment({ onNavigate, onSelectEquipment }: Props) {
+function mapServerListing(
+  record: ListingApiRecord,
+  vendors: Map<string, VendorApiRecord>,
+  catalog: CatalogItem[],
+): CatalogItem {
+  const base = catalog.find((item) => item.id === record.id)
+  const vendor = record.vendorId ? vendors.get(record.vendorId) : undefined
+  const image = record.imageUrl || record.img || base?.imageUrl || base?.img || ''
+  const dailyRate = Number(record.pricePerDay ?? base?.dailyRate ?? 0)
+  const location = record.location || base?.location || vendor?.address || vendor?.city || 'Tamil Nadu'
+  const lat = typeof record.lat === 'number' ? record.lat : vendor?.lat ?? base?.lat
+  const lng = typeof record.lng === 'number' ? record.lng : vendor?.lng ?? base?.lng
+  const category = record.category || base?.category || base?.cat || 'Equipment'
+
+  return {
+    id: record.id,
+    name: record.name || base?.name || 'Agricultural equipment',
+    nameTa: record.nameTa || base?.nameTa || record.name,
+    category,
+    cat: category,
+    brand: record.brand || base?.brand || '',
+    model: record.model || base?.model || record.name,
+    description: record.description || base?.description || '',
+    descriptionTa: base?.descriptionTa || record.description || '',
+    imageUrl: image,
+    img: image,
+    gallery: base?.gallery || [image],
+    price: dailyRate ? `₹${dailyRate.toLocaleString('en-IN')}/day` : 'Price unavailable',
+    dailyRate,
+    unit: '/day',
+    location,
+    lat,
+    lng,
+    rating: Number(record.rating ?? base?.rating ?? 0),
+    reviews: Number(record.reviews ?? base?.reviews ?? 0),
+    avail: record.available !== false,
+    availabilityType: record.availabilityType || base?.availabilityType || 'rent',
+    purchasePrice: record.purchasePrice ?? base?.purchasePrice,
+    vendorId: record.vendorId || base?.vendorId,
+    vendorName: record.vendorName || vendor?.name || base?.vendorName,
+    owner: record.ownerName || base?.owner || vendor?.name || 'Equipment provider',
+    ownerId: record.ownerId || base?.ownerId || '',
+    ownerPhone: record.ownerPhone || base?.ownerPhone || '',
+    specs: record.specs || base?.specs || [],
+    features: base?.features || [],
+    securityDeposit: record.securityDeposit ?? base?.securityDeposit,
+  }
+}
+
+function money(value: number): string {
+  return `₹${value.toLocaleString('en-IN')}`
+}
+
+function formatDistance(distanceKm: number): string {
+  return distanceKm < 1
+    ? `${Math.round(distanceKm * 1000)} m away`
+    : `${distanceKm.toFixed(1)} km away`
+}
+
+interface Props {
+  onNavigate: (screen: string) => void
+}
+
+export default function NearbyEquipment({ onNavigate }: Props) {
   const { isTamil } = useLanguage()
+  const [equipment, setEquipment] = useState<CatalogItem[]>([])
+  const [loading, setLoading] = useState(true)
+  const [loadError, setLoadError] = useState('')
+  const [vendorError, setVendorError] = useState('')
+  const [district, setDistrict] = useState('')
+  const [category, setCategory] = useState('All')
+  const [purpose, setPurpose] = useState<Purpose>('all')
+  const [availableOnly, setAvailableOnly] = useState(false)
+  const [minimumRating, setMinimumRating] = useState(0)
+  const [sortBy, setSortBy] = useState<SortOption>('nearest')
+  const [equipmentQuery, setEquipmentQuery] = useState('')
+  const [searchQuery, setSearchQuery] = useState('')
+  const [currentLocation, setCurrentLocation] = useState<Coordinates | null>(null)
+  const [locating, setLocating] = useState(false)
+  const [locationMessage, setLocationMessage] = useState('')
+  const [selectedId, setSelectedId] = useState<string | null>(null)
 
-  // Location State (Privacy-first: only on request, no continuous background tracking)
-  const [currentCoord, setCurrentCoord] = useState<{ lat: number; lng: number }>({
-    lat: REGIONAL_HUBS[0]?.lat ?? 10.998,
-    lng: REGIONAL_HUBS[0]?.lng ?? 76.96,
-  })
-  const [selectedHubId, setSelectedHubId] = useState<string>('coimbatore')
-  const [isLocating, setIsLocating] = useState(false)
-  const [locationStatus, setLocationStatus] = useState<{
-    type: 'default' | 'gps' | 'denied'
-    message: string
-  }>({
-    type: 'default',
-    message: isTamil
-      ? 'இயல்புநிலை பண்ணை இருப்பிடம்: கோயம்புத்தூர் / பொள்ளாச்சி மண்டலம்'
-      : 'Default Location: Coimbatore & Pollachi Hub',
-  })
+  useEffect(() => {
+    let mounted = true
+    const load = async () => {
+      setLoading(true)
+      setLoadError('')
+      let vendorRecords: VendorApiRecord[] = []
+      try {
+        const vendorResponse = await api.getVendors()
+        vendorRecords = vendorResponse.vendors
+      } catch (error: unknown) {
+        console.error('Failed to load vendors for nearby equipment', error)
+        if (mounted) setVendorError(isTamil
+          ? 'விற்பனையாளர் விவரங்களை ஏற்ற முடியவில்லை.'
+          : 'Vendor details could not be loaded; listing information is still shown.')
+      }
 
-  // Filter & Sort State
-  const [selectedCategory, setSelectedCategory] = useState<string>('All')
-  const [sortBy, setSortBy] = useState<'nearest' | 'price_asc' | 'price_desc' | 'available'>('nearest')
+      try {
+        const listingResponse = await api.getListings()
+        if (!mounted) return
+        const vendorMap = new Map(vendorRecords.map((vendor) => [vendor.id, vendor]))
+        const referenceCatalog = getFullCatalog()
+        const rows = listingResponse.listings as ListingApiRecord[]
+        setEquipment(rows.map((record) => mapServerListing(record, vendorMap, referenceCatalog)))
+      } catch (error: unknown) {
+        console.error('Failed to load equipment for nearby search', error)
+        if (mounted) {
+          setLoadError(isTamil
+            ? 'உபகரணங்களை ஏற்ற முடியவில்லை. இணைய இணைப்பைச் சரிபார்த்து மீண்டும் முயற்சிக்கவும்.'
+            : 'Could not load equipment. Check your connection and try again.')
+        }
+      } finally {
+        if (mounted) setLoading(false)
+      }
+    }
+    void load()
+    return () => {
+      mounted = false
+    }
+  }, [isTamil])
 
-  const categories = [
-    { id: 'All', labelEn: 'All Equipment', labelTa: 'அனைத்தும்' },
-    { id: 'Tractor', labelEn: 'Tractors', labelTa: 'டிராக்டர்கள்' },
-    { id: 'Harvester', labelEn: 'Harvesters', labelTa: 'அறுவடை இயந்திரங்கள்' },
-    { id: 'Rotavator', labelEn: 'Ploughing / Tillage', labelTa: 'உழவு கருவிகள்' },
-    { id: 'Seeder', labelEn: 'Seeding', labelTa: 'விதைப்பு' },
-    { id: 'Water Sprayer', labelEn: 'Sprayers & Drones', labelTa: 'தெளிப்பான்கள் & ட்ரோன்கள்' },
-    { id: 'Water Pump', labelEn: 'Water Pumps', labelTa: 'நீரேற்றி' },
-  ]
+  const districtCenter = (district ? tamilNaduDistrictCoordinates[district] : undefined) || { lat: 10.7, lng: 78.5 }
+  const origin = currentLocation || (district ? districtCenter : null)
 
-  // Geolocation Handler with Graceful Fallback
-  const handleRequestLiveLocation = () => {
-    if (typeof window === 'undefined' || !navigator.geolocation) {
-      setLocationStatus({
-        type: 'denied',
-        message: isTamil
-          ? 'உங்கள் உலாவியில் புவிஇருப்பிடம் வசதி இல்லை. கீழே உள்ள மண்டலத்தை தேர்ந்தெடுக்கவும்.'
-          : 'Geolocation not supported by this browser. Using selected regional hub.',
+  const results = useMemo<NearbyMapItem[]>(() => {
+    const query = searchQuery.trim().toLowerCase()
+    return equipment
+      .map((item) => {
+        const itemDistrict = normalizeDistrict(item.location)
+        const hasCoordinates = typeof item.lat === 'number' && typeof item.lng === 'number'
+        const distanceKm = currentLocation && hasCoordinates
+          ? calculateDistanceKm(currentLocation.lat, currentLocation.lng, item.lat!, item.lng!)
+          : null
+        return { item, district: itemDistrict || item.location, distanceKm }
       })
+      .filter(({ item, district: itemDistrict }) => {
+        if (district && itemDistrict.toLowerCase() !== district.toLowerCase()) return false
+        if (category !== 'All' && item.category.toLowerCase() !== category.toLowerCase()) return false
+        if (query && !`${item.name} ${item.brand} ${item.model} ${item.vendorName || item.owner}`.toLowerCase().includes(query)) return false
+        if (availableOnly && !item.avail) return false
+        if (item.rating < minimumRating) return false
+        if (purpose === 'rent' && item.availabilityType === 'buy') return false
+        if (purpose === 'buy' && (!item.purchasePrice || item.availabilityType === 'rent')) return false
+        if (purpose === 'both' && item.availabilityType !== 'both') return false
+        return true
+      })
+      .sort((a, b) => {
+        if (sortBy === 'rating') return b.item.rating - a.item.rating
+        if (sortBy === 'rent-price') return a.item.dailyRate - b.item.dailyRate
+        if (sortBy === 'buy-price') return (a.item.purchasePrice || Infinity) - (b.item.purchasePrice || Infinity)
+        if (!origin) return 0
+        const aDistance = a.distanceKm ?? (typeof a.item.lat === 'number' && typeof a.item.lng === 'number'
+          ? calculateDistanceKm(origin.lat, origin.lng, a.item.lat, a.item.lng)
+          : Infinity)
+        const bDistance = b.distanceKm ?? (typeof b.item.lat === 'number' && typeof b.item.lng === 'number'
+          ? calculateDistanceKm(origin.lat, origin.lng, b.item.lat, b.item.lng)
+          : Infinity)
+        return aDistance - bDistance
+      })
+  }, [availableOnly, category, currentLocation, district, equipment, minimumRating, origin, purpose, searchQuery, sortBy])
+
+  const useMyLocation = () => {
+    if (!navigator.geolocation) {
+      setLocationMessage(isTamil
+        ? 'இந்த உலாவியில் இருப்பிட வசதி இல்லை. மாவட்டத்தைத் தேர்ந்தெடுத்து தேடவும்.'
+        : 'Location is unavailable in this browser. Select a district to search.')
       return
     }
-
-    setIsLocating(true)
-    setLocationStatus({
-      type: 'default',
-      message: isTamil ? 'இருப்பிடத்தை தேடுகிறது...' : 'Requesting one-time location permission...',
-    })
-
+    setLocating(true)
+    setLocationMessage(isTamil ? 'உங்கள் இருப்பிடத்தைக் கண்டறிகிறது...' : 'Finding your location...')
     navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        setIsLocating(false)
-        const lat = pos.coords.latitude
-        const lng = pos.coords.longitude
-        setCurrentCoord({ lat, lng })
-        setLocationStatus({
-          type: 'gps',
-          message: isTamil
-            ? `📍 நேரடி ஜி.பி.எஸ் இருப்பிடம் கண்டறியப்பட்டது (${lat.toFixed(3)}° N, ${lng.toFixed(3)}° E)`
-            : `📍 GPS Live Location active (${lat.toFixed(3)}° N, ${lng.toFixed(3)}° E) • Calculating true distance`,
-        })
+      ({ coords }) => {
+        setCurrentLocation({ lat: coords.latitude, lng: coords.longitude })
+        setLocating(false)
+        setLocationMessage(isTamil
+          ? 'இருப்பிடம் இந்த தேடலுக்கு மட்டும் பயன்படுத்தப்படுகிறது; சேமிக்கப்படவில்லை.'
+          : 'Your location is used for this search only and is not saved.')
       },
-      (err) => {
-        setIsLocating(false)
-        console.warn('Geolocation prompt response:', err.message)
-        setLocationStatus({
-          type: 'denied',
-          message: isTamil
-            ? 'இருப்பிட அனுமதி மறுக்கப்பட்டது அல்லது கிடைக்கவில்லை. இயல்பு மண்டலம் பயன்படுத்தப்படுகிறது.'
-            : 'Location permission was denied. Fallback regional selector is active.',
-        })
+      (error) => {
+        setCurrentLocation(null)
+        setLocating(false)
+        setLocationMessage(error.code === error.PERMISSION_DENIED
+          ? (isTamil
+            ? 'இருப்பிட அனுமதி மறுக்கப்பட்டது. உபகரணங்களைக் கண்டறிய மாவட்டத்தைத் தேர்ந்தெடுக்கவும்.'
+            : 'Location access was denied. Select a district to find equipment.')
+          : (isTamil
+            ? 'இருப்பிடத்தைக் கண்டறிய முடியவில்லை. மாவட்டத்தைத் தேர்ந்தெடுத்து தேடவும்.'
+            : 'Could not determine your location. Select a district to search.'))
       },
-      { timeout: 8000, enableHighAccuracy: false, maximumAge: 60000 }
+      { timeout: 10000, enableHighAccuracy: false, maximumAge: 0 },
     )
   }
 
-  // Handle Hub Selection
-  const handleHubChange = (hubId: string) => {
-    setSelectedHubId(hubId)
-    const hub = REGIONAL_HUBS.find((h) => h.id === hubId)
-    if (hub) {
-      setCurrentCoord({ lat: hub.lat, lng: hub.lng })
-      setLocationStatus({
-        type: 'default',
-        message: isTamil
-          ? `மண்டலம் மாற்றப்பட்டது: ${hub.nameTa}`
-          : `Switched to regional hub: ${hub.name}`,
-      })
-    }
-  }
-
-  // Catalog Processing with Dynamic Distance
-  const catalogList = getFullCatalog()
-
-  const nearbyItems = useMemo(() => {
-    return catalogList.map((item) => {
-      const dist = calculateDistanceKm(currentCoord.lat, currentCoord.lng, item.lat ?? 10.998, item.lng ?? 76.96)
-      return {
-        ...item,
-        computedDistance: dist,
-        distanceDisplay: `${dist.toFixed(1)} km`,
-      }
-    })
-  }, [catalogList, currentCoord])
-
-  // Filter & Sort
-  const processedItems = useMemo(() => {
-    return nearbyItems
-      .filter((item) => {
-        if (selectedCategory === 'All') return true
-        if (selectedCategory === 'Rotavator') {
-          return item.cat === 'Rotavator' || item.cat === 'Cultivator' || item.name.toLowerCase().includes('plough')
-        }
-        if (selectedCategory === 'Water Sprayer') {
-          return item.cat === 'Water Sprayer' || item.name.toLowerCase().includes('drone') || item.name.toLowerCase().includes('sprayer')
-        }
-        return item.cat === selectedCategory
-      })
-      .sort((a, b) => {
-        if (sortBy === 'nearest') return a.computedDistance - b.computedDistance
-        if (sortBy === 'price_asc') return (a.dailyRate || 0) - (b.dailyRate || 0)
-        if (sortBy === 'price_desc') return (b.dailyRate || 0) - (a.dailyRate || 0)
-        if (sortBy === 'available') return (b.avail ? 1 : 0) - (a.avail ? 1 : 0)
-        return 0
-      })
-  }, [nearbyItems, selectedCategory, sortBy])
-
   const handleSelect = (item: CatalogItem, destination: 'equipment-details' | 'booking') => {
-    if (typeof window !== 'undefined') {
-      window.localStorage.setItem('agrirent_selected_equipment_id', item.id)
-      const url = new URL(window.location.href)
-      url.searchParams.set('id', item.id)
-      window.history.replaceState({}, '', url.toString())
-    }
-    if (onSelectEquipment) onSelectEquipment(item)
+    window.localStorage.setItem('agrirent_selected_equipment_id', item.id)
+    const url = new URL(window.location.href)
+    url.searchParams.set('id', item.id)
+    window.history.replaceState(window.history.state, '', url)
     onNavigate(destination)
   }
 
+  const submitSearch = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    setSearchQuery(equipmentQuery)
+  }
+
   return (
-    <section
-      className="nearby-equipment-section"
-      style={{
-        padding: '52px 0',
-        background: '#F9FAFB',
-        borderTop: '1px solid #E5E7EB',
-        borderBottom: '1px solid #E5E7EB',
-      }}
-    >
-      <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 24px' }}>
-        {/* Header Block */}
-        <div
-          style={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            justifyContent: 'space-between',
-            alignItems: 'flex-start',
-            marginBottom: 24,
-            gap: 20,
-          }}
-        >
+    <section id="nearby-equipment" className="nearby-equipment-section">
+      <div className="nearby-equipment-inner">
+        <header className="nearby-equipment-header">
           <div>
-            <div
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 6,
-                background: '#E8F5E9',
-                color: '#2E7D32',
-                padding: '5px 12px',
-                borderRadius: 20,
-                fontSize: 12,
-                fontWeight: 700,
-                marginBottom: 10,
-              }}
-            >
-              <Navigation size={13} />
-              <span>{isTamil ? 'புவிசார் இருப்பிடம் & அருகாமை' : 'GPS Proximity & Dispatch'}</span>
-            </div>
-            <h2
-              style={{
-                fontSize: 28,
-                fontWeight: 900,
-                color: '#111827',
-                margin: 0,
-                letterSpacing: '-0.5px',
-              }}
-            >
-              {isTamil ? 'அருகிலுள்ள விவசாய இயந்திரங்கள்' : 'Nearby Available Equipment'}
-            </h2>
-            <p style={{ color: '#6B7280', fontSize: 14, margin: '6px 0 0' }}>
-              {isTamil
-                ? 'உங்கள் நிலத்திற்கு அருகாமையில் இருக்கும் உபகரணங்கள் மற்றும் விரைவு விநியோக தூரம்.'
-                : 'Machinery located nearest to your farm, sorted by direct dispatch distance.'}
-            </p>
+            <span className="nearby-eyebrow"><Navigation size={14} /> {isTamil ? 'உள்ளூர் உபகரண தேடல்' : 'Local equipment discovery'}</span>
+            <h2>{isTamil ? 'அருகிலுள்ள உபகரணங்களைக் கண்டறியவும்' : 'Find Equipment Near Me'}</h2>
+            <p>{isTamil ? 'மாவட்டம் மற்றும் தேவையைத் தேர்ந்தெடுத்து, உள்ளூர் உபகரணங்களை வரைபடத்தில் ஒப்பிடுங்கள்.' : 'Choose a Tamil Nadu district and equipment type, then compare local providers on the map.'}</p>
           </div>
+          <button type="button" className="nearby-location-button" onClick={useMyLocation} disabled={locating}>
+            {locating ? <LoaderCircle size={17} className="nearby-spin" /> : <Navigation size={17} />}
+            {isTamil ? 'என் இருப்பிடத்தைப் பயன்படுத்து' : 'Use My Location'}
+          </button>
+        </header>
 
-          {/* Location Controls & Geolocation Button */}
-          <div
-            style={{
-              background: '#fff',
-              border: '1px solid #E5E7EB',
-              borderRadius: 16,
-              padding: '12px 16px',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 10,
-              boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-              {/* Live Geolocation Button */}
-              <button
-                type="button"
-                onClick={handleRequestLiveLocation}
-                disabled={isLocating}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 6,
-                  background: locationStatus.type === 'gps' ? '#15803D' : '#2E7D32',
-                  color: '#fff',
-                  border: 'none',
-                  borderRadius: 10,
-                  padding: '8px 14px',
-                  fontSize: 12,
-                  fontWeight: 700,
-                  cursor: isLocating ? 'not-allowed' : 'pointer',
-                  transition: 'background 0.2s',
-                }}
-              >
-                <Compass size={14} className={isLocating ? 'animate-spin' : ''} />
-                <span>
-                  {isLocating
-                    ? isTamil ? 'இருப்பிடம் தேடுகிறது...' : 'Locating...'
-                    : isTamil ? '📍 நேரடி இருப்பிடத்தைப் பயன்படுத்துக' : '📍 Use My Live Location'}
-                </span>
-              </button>
+        {locationMessage && <p className="nearby-location-message" role="status">{locationMessage}</p>}
 
-              <span style={{ fontSize: 12, color: '#9CA3AF' }}>{isTamil ? 'அல்லது மண்டலம்:' : 'or Regional Hub:'}</span>
-
-              {/* Fallback Regional Selector */}
-              <select
-                value={selectedHubId}
-                onChange={(e) => handleHubChange(e.target.value)}
-                style={{
-                  background: '#F9FAFB',
-                  border: '1px solid #D1D5DB',
-                  borderRadius: 8,
-                  padding: '7px 12px',
-                  fontSize: 12,
-                  fontWeight: 600,
-                  color: '#111827',
-                  cursor: 'pointer',
-                }}
-              >
-                {REGIONAL_HUBS.map((hub) => (
-                  <option key={hub.id} value={hub.id}>
-                    {isTamil ? hub.nameTa : hub.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Geolocation Status Message */}
-            <div
-              style={{
-                fontSize: 11,
-                fontWeight: 600,
-                color: locationStatus.type === 'denied' ? '#DC2626' : locationStatus.type === 'gps' ? '#15803D' : '#6B7280',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 6,
-              }}
-            >
-              {locationStatus.type === 'gps' && <CheckCircle2 size={12} />}
-              <span>{locationStatus.message}</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Filter and Sort Toolbar */}
-        <div
-          style={{
-            background: '#fff',
-            borderRadius: 16,
-            padding: '14px 18px',
-            border: '1px solid #E5E7EB',
-            marginBottom: 24,
-            display: 'flex',
-            flexWrap: 'wrap',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: 14,
-          }}
-        >
-          {/* Category Filter Pills */}
-          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
-            <span style={{ fontSize: 12, fontWeight: 700, color: '#6B7280', marginRight: 4, display: 'flex', alignItems: 'center', gap: 4 }}>
-              <Filter size={13} />
-              <span>{isTamil ? 'வகை:' : 'Category:'}</span>
-            </span>
-            {categories.map((c) => (
-              <button
-                key={c.id}
-                type="button"
-                onClick={() => setSelectedCategory(c.id)}
-                style={{
-                  padding: '5px 12px',
-                  borderRadius: 20,
-                  fontSize: 12,
-                  fontWeight: 600,
-                  border: selectedCategory === c.id ? '1.5px solid #2E7D32' : '1px solid #E5E7EB',
-                  background: selectedCategory === c.id ? '#E8F5E9' : '#fff',
-                  color: selectedCategory === c.id ? '#2E7D32' : '#4B5563',
-                  cursor: 'pointer',
-                  transition: 'all 0.15s ease',
-                }}
-              >
-                {isTamil ? c.labelTa : c.labelEn}
-              </button>
-            ))}
-          </div>
-
-          {/* Sorting Options */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginLeft: 'auto' }}>
-            <span style={{ fontSize: 12, fontWeight: 700, color: '#6B7280', display: 'flex', alignItems: 'center', gap: 4 }}>
-              <ArrowUpDown size={13} />
-              <span>{isTamil ? 'வரிசைப்படுத்து:' : 'Sort By:'}</span>
-            </span>
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as any)}
-              style={{
-                background: '#F9FAFB',
-                border: '1px solid #D1D5DB',
-                borderRadius: 8,
-                padding: '6px 12px',
-                fontSize: 12,
-                fontWeight: 600,
-                color: '#111827',
-                cursor: 'pointer',
-              }}
-            >
-              <option value="nearest">{isTamil ? 'மிக அருகில் (Nearest)' : 'Nearest Distance'}</option>
-              <option value="price_asc">{isTamil ? 'வாடகை: குறைந்தது முதல்' : 'Price: Low to High'}</option>
-              <option value="price_desc">{isTamil ? 'வாடகை: அதிகம் முதல்' : 'Price: High to Low'}</option>
-              <option value="available">{isTamil ? 'கிடைக்கும் கருவிகள் முதலில்' : 'Availability First'}</option>
+        <form className="nearby-filters" onSubmit={submitSearch}>
+          <label>
+            <span>{isTamil ? 'மாவட்டம்' : 'District'}</span>
+            <select value={district} onChange={(event) => setDistrict(event.target.value)}>
+              <option value="">{isTamil ? 'அனைத்து மாவட்டங்களும்' : 'All Tamil Nadu districts'}</option>
+              {tamilNaduDistricts.map((name) => <option key={name} value={name}>{name}</option>)}
             </select>
-          </div>
+          </label>
+          <label>
+            <span>{isTamil ? 'உபகரண வகை' : 'Equipment category'}</span>
+            <select value={category} onChange={(event) => setCategory(event.target.value)}>
+              {categoryNames.map((name) => <option key={name} value={name}>{name === 'All' ? (isTamil ? 'அனைத்து வகைகளும்' : 'All categories') : name}</option>)}
+            </select>
+          </label>
+          <label>
+            <span>{isTamil ? 'உபகரணத்தைத் தேடு' : 'Specific equipment'}</span>
+            <div className="nearby-search-input">
+              <Search size={16} />
+              <input value={equipmentQuery} onChange={(event) => setEquipmentQuery(event.target.value)} placeholder="e.g. Mahindra tractor" />
+            </div>
+          </label>
+          <label>
+            <span>{isTamil ? 'தேவை' : 'Purpose'}</span>
+            <select value={purpose} onChange={(event) => setPurpose(event.target.value as Purpose)}>
+              <option value="all">{isTamil ? 'வாடகை / வாங்க' : 'Rent / Buy / Both'}</option>
+              <option value="rent">{isTamil ? 'வாடகை' : 'Rent'}</option>
+              <option value="buy">{isTamil ? 'வாங்க' : 'Buy'}</option>
+              <option value="both">{isTamil ? 'இரண்டும்' : 'Both only'}</option>
+            </select>
+          </label>
+          <button type="submit" className="nearby-search-button">{isTamil ? 'தேடு' : 'Search'}</button>
+        </form>
+
+        <div className="nearby-filter-row">
+          <label><input type="checkbox" checked={availableOnly} onChange={(event) => setAvailableOnly(event.target.checked)} /> {isTamil ? 'கிடைக்கும் உபகரணங்கள் மட்டும்' : 'Available only'}</label>
+          <label className="nearby-compact-filter">
+            <SlidersHorizontal size={15} />
+            <span>{isTamil ? 'குறைந்த மதிப்பீடு' : 'Minimum rating'}</span>
+            <select value={minimumRating} onChange={(event) => setMinimumRating(Number(event.target.value))}>
+              <option value={0}>{isTamil ? 'எதுவும்' : 'Any'}</option>
+              <option value={3}>3+ ★</option>
+              <option value={4}>4+ ★</option>
+              <option value={4.5}>4.5+ ★</option>
+            </select>
+          </label>
+          <label className="nearby-compact-filter">
+            <span>{isTamil ? 'வரிசைப்படுத்து' : 'Sort by'}</span>
+            <select value={sortBy} onChange={(event) => setSortBy(event.target.value as SortOption)}>
+              <option value="nearest">{currentLocation ? (isTamil ? 'அருகில்' : 'Nearest') : (isTamil ? 'தேர்ந்தெடுத்த மாவட்டத்துக்கு அருகில்' : 'Nearest to district')}</option>
+              <option value="rating">{isTamil ? 'அதிக மதிப்பீடு' : 'Highest rated'}</option>
+              <option value="rent-price">{isTamil ? 'குறைந்த வாடகை' : 'Lowest rental price'}</option>
+              <option value="buy-price">{isTamil ? 'குறைந்த வாங்கும் விலை' : 'Lowest purchase price'}</option>
+            </select>
+          </label>
         </div>
 
-        {/* Results Count & Privacy Notice */}
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginBottom: 16,
-            fontSize: 12,
-            color: '#6B7280',
-          }}
-        >
-          <span>
-            {isTamil
-              ? `${processedItems.length} உபகரணங்கள் கிடைக்கின்றன`
-              : `Showing ${processedItems.length} machines near selected location`}
-          </span>
-          <span style={{ fontSize: 11, color: '#9CA3AF' }}>
-            🔒 {isTamil ? 'தனியுரிமை பாதுகாப்பு: உங்கள் இருப்பிடம் உலாவி அளவில் மட்டுமே பயன்படுத்தப்படுகிறது.' : 'Privacy Safe: Location calculated in-browser only.'}
-          </span>
+        {vendorError && <p className="nearby-load-note" role="status">{vendorError}</p>}
+        {loadError && <p className="nearby-load-error" role="alert">{loadError}</p>}
+        <div className="nearby-results-count">
+          {loading
+            ? (isTamil ? 'அருகிலுள்ள உபகரணங்களைத் தேடுகிறது...' : 'Finding nearby equipment...')
+            : `${results.length} ${isTamil ? 'உபகரணங்கள் / வழங்குநர்கள்' : 'equipment / providers'}`}
+          {!currentLocation && !loading && <span>{isTamil ? 'தூரம் காட்டப்படவில்லை — மாவட்டம்/இடம் பயன்படுத்தப்படுகிறது.' : 'Distances are hidden until you choose Use My Location; district/location is shown instead.'}</span>}
         </div>
 
-        {/* Grid of Equipment Cards */}
-        {processedItems.length === 0 ? (
-          <div
-            style={{
-              background: '#fff',
-              borderRadius: 16,
-              padding: '48px 24px',
-              textAlign: 'center',
-              border: '1px solid #E5E7EB',
-            }}
-          >
-            <div style={{ fontSize: 36, marginBottom: 12 }}>🚜</div>
-            <h3 style={{ fontSize: 16, fontWeight: 700, color: '#111827', margin: 0 }}>
-              {isTamil ? 'இயந்திரங்கள் ஏதும் கிடைக்கவில்லை' : 'No machinery found for this category'}
-            </h3>
-            <p style={{ fontSize: 13, color: '#6B7280', marginTop: 6 }}>
-              {isTamil ? 'வேறு வகையை அல்லது அருகில் உள்ள மண்டலத்தை தேர்ந்தெடுக்கவும்.' : 'Try choosing "All Equipment" or select a nearby regional hub.'}
-            </p>
-            <button
-              type="button"
-              onClick={() => setSelectedCategory('All')}
-              style={{
-                marginTop: 14,
-                padding: '8px 18px',
-                background: '#2E7D32',
-                color: '#fff',
-                border: 'none',
-                borderRadius: 8,
-                fontSize: 13,
-                fontWeight: 600,
-                cursor: 'pointer',
-              }}
-            >
-              Show All Equipment
-            </button>
+        {!loading && !loadError && results.length === 0 ? (
+          <div className="nearby-empty-state">
+            <MapPin size={26} />
+            <strong>{currentLocation
+              ? (isTamil ? 'உங்கள் இருப்பிடத்திற்கு அருகில் உபகரணங்கள் இல்லை.' : 'No equipment found near your location.')
+              : (isTamil ? 'இந்த இடத்தில் உபகரணங்கள் இல்லை.' : 'No equipment available in this location.')}</strong>
+            <span>{isTamil ? 'வேறு மாவட்டம் அல்லது வகையைத் தேர்ந்தெடுத்து மீண்டும் தேடுங்கள்.' : 'Try another district, category, or purpose.'}</span>
           </div>
-        ) : (
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(290px, 1fr))',
-              gap: 22,
-            }}
-          >
-            {processedItems.map((item) => (
-              <div
-                key={item.id}
-                className="card-shadow card-shadow-hover"
-                style={{
-                  background: '#fff',
-                  borderRadius: 18,
-                  border: '1px solid #F3F4F6',
-                  overflow: 'hidden',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-                }}
-              >
-                {/* Photo & Status Overlay */}
-                <div style={{ position: 'relative', height: 180, background: '#F3F4F6' }}>
+        ) : null}
+
+        {!loading && !loadError && results.length > 0 && (
+          <div className="nearby-results-layout">
+            <NearbyEquipmentMap
+              items={results}
+              center={districtCenter}
+              currentLocation={currentLocation}
+              onSelect={(item) => setSelectedId(item.id)}
+              onViewDetails={(item) => handleSelect(item, 'equipment-details')}
+            />
+            <div className="nearby-provider-list" aria-label="Equipment and vendor results">
+              {results.map(({ item, district: itemDistrict, distanceKm }) => (
+                <article key={item.id} className={`nearby-provider-card${selectedId === item.id ? ' is-selected' : ''}`}>
                   <img
-                    src={item.imageUrl || item.img}
+                    src={item.imageUrl || getCategoryFallback(item.category)}
                     alt={item.name}
-                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                    onError={(e) => {
-                      e.currentTarget.src = getCategoryFallback(item.category || item.cat)
-                    }}
+                    onError={(event) => { event.currentTarget.src = getCategoryFallback(item.category) }}
                   />
-
-                  {/* Calculated Dynamic Distance Badge */}
-                  <div
-                    style={{
-                      position: 'absolute',
-                      top: 10,
-                      left: 10,
-                      background: 'rgba(17, 24, 39, 0.88)',
-                      color: '#fff',
-                      backdropFilter: 'blur(4px)',
-                      borderRadius: 14,
-                      padding: '4px 10px',
-                      fontSize: 11,
-                      fontWeight: 700,
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 4,
-                    }}
-                  >
-                    <MapPin size={12} style={{ color: '#4ADE80' }} />
-                    <span>{item.distanceDisplay} {isTamil ? 'தொலைவில்' : 'away'}</span>
-                  </div>
-
-                  {/* Availability Badge */}
-                  <div
-                    style={{
-                      position: 'absolute',
-                      bottom: 10,
-                      left: 10,
-                      background: item.avail ? 'rgba(232, 245, 233, 0.95)' : 'rgba(243, 244, 246, 0.95)',
-                      color: item.avail ? '#2E7D32' : '#6B7280',
-                      borderRadius: 10,
-                      padding: '3px 8px',
-                      fontSize: 11,
-                      fontWeight: 700,
-                      border: item.avail ? '1px solid #C8E6C9' : '1px solid #E5E7EB',
-                    }}
-                  >
-                    {item.avail
-                      ? isTamil ? '● கிடைக்கிறது' : '● Available Now'
-                      : isTamil ? '● முன்பதிவானது' : '● Booked'}
-                  </div>
-                </div>
-
-                {/* Card Content */}
-                <div style={{ padding: '16px 18px 20px', display: 'flex', flexDirection: 'column', flex: 1 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-                    <span
-                      style={{
-                        fontSize: 11,
-                        fontWeight: 700,
-                        color: '#2E7D32',
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.04em',
-                      }}
-                    >
-                      {item.category || item.cat}
-                    </span>
-                    {item.brand && (
-                      <span style={{ fontSize: 10, fontWeight: 800, color: '#64748B', textTransform: 'uppercase' }}>
-                        {item.brand}
-                      </span>
-                    )}
-                  </div>
-
-                  <h3
-                    style={{
-                      fontSize: 15,
-                      fontWeight: 700,
-                      color: '#111827',
-                      margin: '0 0 6px',
-                      lineHeight: 1.3,
-                    }}
-                  >
-                    {item.name}
-                  </h3>
-
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
-                    <Star size={13} style={{ fill: '#F59E0B', color: '#F59E0B' }} />
-                    <span style={{ fontSize: 13, fontWeight: 700, color: '#111827' }}>{item.rating}</span>
-                    <span style={{ fontSize: 11, color: '#9CA3AF' }}>({item.reviews})</span>
-                    <span style={{ marginLeft: 'auto', fontSize: 11, color: '#6B7280' }}>
-                      📍 {item.location}
-                    </span>
-                  </div>
-
-                  <div style={{ fontSize: 12, color: '#4B5563', marginBottom: 14 }}>
-                    👤 {isTamil ? 'உரிமையாளர்' : 'Owner'}: <strong>{item.owner || 'Verified Partner'}</strong>
-                  </div>
-
-                  {/* Pricing and Action Buttons */}
-                  <div
-                    style={{
-                      marginTop: 'auto',
-                      paddingTop: 12,
-                      borderTop: '1px solid #F3F4F6',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                    }}
-                  >
-                    <div>
-                      <span style={{ fontSize: 18, fontWeight: 800, color: '#2E7D32' }}>{item.price}</span>
-                      <small style={{ fontSize: 11, color: '#6B7280' }}>{item.unit}</small>
+                  <div className="nearby-provider-info">
+                    <div className="nearby-provider-heading">
+                      <div>
+                        <span className="nearby-category">{item.category}</span>
+                        <h3>{item.name}</h3>
+                      </div>
+                      <span className={`nearby-availability${item.avail ? ' available' : ''}`}>{item.avail ? (isTamil ? 'கிடைக்கிறது' : 'Available') : (isTamil ? 'முன்பதிவு' : 'Unavailable')}</span>
                     </div>
-
-                    <div style={{ display: 'flex', gap: 6 }}>
-                      <button
-                        type="button"
-                        onClick={() => handleSelect(item, 'equipment-details')}
-                        style={{
-                          padding: '6px 12px',
-                          background: '#F3F4F6',
-                          border: 'none',
-                          borderRadius: 8,
-                          fontSize: 12,
-                          fontWeight: 600,
-                          cursor: 'pointer',
-                          color: '#374151',
-                        }}
-                      >
-                        {isTamil ? 'விவரங்கள்' : 'Details'}
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => handleSelect(item, 'booking')}
-                        style={{
-                          padding: '6px 14px',
-                          background: '#2E7D32',
-                          border: 'none',
-                          borderRadius: 8,
-                          fontSize: 12,
-                          fontWeight: 700,
-                          cursor: 'pointer',
-                          color: '#fff',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: 4,
-                        }}
-                      >
-                        <span>{isTamil ? 'முன்பதிவு' : 'Book'}</span>
-                        <ArrowRight size={13} />
-                      </button>
+                    <p className="nearby-vendor">{item.vendorName || item.owner}</p>
+                    <p className="nearby-location-line"><MapPin size={14} /> {itemDistrict || item.location}{distanceKm === null ? '' : ` · ${formatDistance(distanceKm)}`}</p>
+                    <div className="nearby-rating-line"><Star size={15} fill="#F59E0B" color="#F59E0B" /> <strong>{item.rating.toFixed(1)}</strong> <span>({item.reviews} {isTamil ? 'மதிப்புரைகள்' : 'reviews'})</span></div>
+                    <div className="nearby-prices">
+                      {item.availabilityType !== 'buy' && <span>Rent: <strong>{money(item.dailyRate)}/day</strong></span>}
+                      {item.purchasePrice && item.availabilityType !== 'rent' && <span>Buy: <strong>{money(item.purchasePrice)}</strong></span>}
+                      <span className="nearby-mode">{item.availabilityType === 'both' ? 'Rent / Buy' : item.availabilityType === 'buy' ? 'Buy' : 'Rent'}</span>
+                    </div>
+                    <div className="nearby-actions">
+                      <button type="button" className="nearby-details-button" onClick={() => handleSelect(item, 'equipment-details')}>{isTamil ? 'விவரங்கள்' : 'View Details'}</button>
+                      {item.avail && item.availabilityType !== 'buy' && <button type="button" className="nearby-rent-button" onClick={() => handleSelect(item, 'booking')}>{isTamil ? 'வாடகைக்கு' : 'Rent Now'} <ArrowRight size={14} /></button>}
+                      {item.avail && item.purchasePrice && item.availabilityType !== 'rent' && <button type="button" className="nearby-buy-button" onClick={() => handleSelect(item, 'equipment-details')}>{isTamil ? 'வாங்க' : 'Buy Now'}</button>}
                     </div>
                   </div>
-                </div>
-              </div>
-            ))}
+                </article>
+              ))}
+            </div>
           </div>
         )}
       </div>

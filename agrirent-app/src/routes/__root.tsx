@@ -7,7 +7,7 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -16,6 +16,7 @@ import { ThemeProvider } from "../context/ThemeContext";
 import SettingsModal from "../components/SettingsModal";
 import AgriRentApp from "../components/AgriRentApp";
 import { Toaster } from "../components/ui/sonner";
+import { api } from "../lib/api-client";
 
 function NotFoundComponent() {
   return <AgriRentApp />;
@@ -108,13 +109,23 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const [authVersion, setAuthVersion] = useState(0);
+
+  useEffect(() => {
+    const onAuthChange = () => setAuthVersion((version) => version + 1);
+    window.addEventListener("agrirent_auth_change", onAuthChange);
+    void api.restoreSession().catch((error: unknown) => {
+      console.error("Failed to restore authenticated session", error);
+    });
+    return () => window.removeEventListener("agrirent_auth_change", onAuthChange);
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
         <LanguageProvider>
           {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-          <Outlet />
+          <Outlet key={authVersion} />
           <SettingsModal />
           <Toaster richColors position="top-right" />
         </LanguageProvider>
@@ -122,4 +133,3 @@ function RootComponent() {
     </QueryClientProvider>
   );
 }
-

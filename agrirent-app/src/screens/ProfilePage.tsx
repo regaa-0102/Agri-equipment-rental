@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import Sidebar from '../components/Sidebar'
 import { useLanguage } from '../context/LanguageContext'
-import { getStoredUser, setStoredUser, UserSession } from '../lib/api-client'
+import { getStoredUser, UserSession } from '../lib/api-client'
 import {
   getUserVerification,
   setUserVerificationStatus,
@@ -34,7 +34,7 @@ interface Props {
 export default function ProfilePage({ onNavigate }: Props) {
   const { t, isTamil } = useLanguage()
   const [currentUser, setCurrentUserState] = useState<UserSession | null>(() => getStoredUser())
-  const userId = currentUser?.id || 'usr-farmer-1'
+  const userId = currentUser?.id || ''
 
   const [verifData, setVerifData] = useState<UserVerificationData>(() => getUserVerification(userId))
   const [lastFour, setLastFour] = useState('4821')
@@ -69,10 +69,10 @@ export default function ProfilePage({ onNavigate }: Props) {
     }
     setUserVerificationStatus(userId, 'VERIFIED', {
       lastFourDigits: lastFour,
-      remarks: 'Simulated demo credentials verified successfully for agricultural rental.',
+      remarks: 'Government ID verified successfully for agricultural rental.',
     })
     setVerifData(getUserVerification(userId))
-    showToast('Demo identity verified successfully! You can now book equipment.')
+    showToast('Identity verified successfully! You can now book equipment.')
   }
 
   const getStatusBadge = () => {
@@ -161,16 +161,18 @@ export default function ProfilePage({ onNavigate }: Props) {
     }
   }
 
+  if (!currentUser) return null
+
   const roleLabel =
-    currentUser?.role === 'owner'
+    currentUser.role === 'owner'
       ? isTamil ? 'உபகரண உரிமையாளர்' : 'Equipment Owner'
-      : currentUser?.role === 'admin'
+      : currentUser.role === 'admin'
       ? isTamil ? 'நிர்வாகி' : 'Administrator'
       : isTamil ? 'விவசாயி' : 'Farmer / Renter'
 
   return (
     <div style={{ display: 'flex', minHeight: 'calc(100vh - 44px)', width: '100%', minWidth: 0, background: '#F9FAFB' }}>
-      <Sidebar activeItem="Profile" onNavigate={onNavigate} role={currentUser?.role || 'farmer'} />
+      <Sidebar activeItem="Profile" onNavigate={onNavigate} role={currentUser.role} />
 
       <div style={{ flex: 1, minWidth: 0, overflowY: 'auto' }}>
         {/* Header */}
@@ -200,7 +202,7 @@ export default function ProfilePage({ onNavigate }: Props) {
           <div style={{ display: 'flex', gap: 10 }}>
             <button
               type="button"
-              onClick={() => onNavigate(currentUser?.role === 'owner' ? 'owner-dashboard' : 'farmer-dashboard')}
+              onClick={() => onNavigate(currentUser.role === 'owner' ? 'owner-dashboard' : currentUser.role === 'admin' ? 'admin-dashboard' : 'farmer-dashboard')}
               className="btn-outline"
               style={{ padding: '8px 16px', fontSize: 13 }}
             >
@@ -262,13 +264,13 @@ export default function ProfilePage({ onNavigate }: Props) {
                   border: `2px solid ${P}`,
                 }}
               >
-                {currentUser?.name?.slice(0, 2).toUpperCase() || 'RK'}
+                {currentUser.name.slice(0, 2).toUpperCase()}
               </div>
 
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                   <h2 style={{ fontSize: 20, fontWeight: 800, color: '#111827', margin: 0 }}>
-                    {currentUser?.name || 'Muthukumar S.'}
+                    {currentUser.name}
                   </h2>
                   <span
                     style={{
@@ -551,7 +553,7 @@ export default function ProfilePage({ onNavigate }: Props) {
                       cursor: 'pointer',
                     }}
                   >
-                    Submit Demo Verification
+                    Submit Verification
                   </button>
                 </div>
               </form>

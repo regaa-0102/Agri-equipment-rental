@@ -26,6 +26,11 @@ export interface CatalogItem {
   rating: number
   reviews: number
   avail: boolean
+  availabilityType?: ('rent' | 'buy' | 'both') | undefined
+  purchasePrice?: number | undefined
+  vendorId?: string | undefined
+  vendorName?: string | undefined
+  vendorDistance?: string | undefined
   distance?: string | undefined
   owner: string
   ownerId: string
@@ -59,6 +64,9 @@ export interface CatalogFilters {
   brand?: string | undefined
   minPrice?: number | undefined
   maxPrice?: number | undefined
+  minRating?: number | undefined
+  availability?: ('rent' | 'buy' | 'both') | undefined
+  sortBy?: ('rating' | 'reviews' | 'price_asc' | 'price_desc' | 'nearest') | undefined
   availableOnly?: boolean | undefined
   location?: string | undefined
 }
@@ -184,19 +192,86 @@ export const categories: CatalogCategory[] = [
 export const categoryNames = ['All', ...categories.map((c) => c.name)]
 
 export const tamilNaduDistricts = [
-  'Coimbatore',
-  'Thanjavur',
-  'Madurai',
-  'Salem',
-  'Erode',
-  'Tiruchirappalli',
-  'Dindigul',
-  'Tirunelveli',
-  'Vellore',
+  'Ariyalur',
+  'Chengalpattu',
+  'Chennai',
   'Cuddalore',
+  'Coimbatore',
+  'Dharmapuri',
+  'Dindigul',
+  'Erode',
+  'Kallakurichi',
+  'Kancheepuram',
+  'Kanniyakumari',
+  'Karur',
+  'Krishnagiri',
+  'Madurai',
+  'Mayiladuthurai',
   'Nagapattinam',
-  'Villupuram',
+  'Namakkal',
+  'The Nilgiris',
+  'Perambalur',
+  'Pudukkottai',
+  'Ramanathapuram',
+  'Ranipet',
+  'Salem',
+  'Sivaganga',
+  'Tenkasi',
+  'Thanjavur',
+  'Theni',
+  'Thoothukudi',
+  'Tiruchirappalli',
+  'Tirunelveli',
+  'Tirupathur',
+  'Tiruppur',
+  'Tiruvallur',
+  'Tiruvannamalai',
+  'Tiruvarur',
+  'Vellore',
+  'Viluppuram',
+  'Virudhunagar',
 ]
+
+export const tamilNaduDistrictCoordinates: Record<string, { lat: number; lng: number }> = {
+  Ariyalur: { lat: 11.1401, lng: 79.0786 },
+  Chengalpattu: { lat: 12.6819, lng: 79.9888 },
+  Chennai: { lat: 13.0827, lng: 80.2707 },
+  Coimbatore: { lat: 11.0168, lng: 76.9558 },
+  Cuddalore: { lat: 11.748, lng: 79.7714 },
+  Dharmapuri: { lat: 12.1277, lng: 78.1579 },
+  Dindigul: { lat: 10.3673, lng: 77.9803 },
+  Erode: { lat: 11.341, lng: 77.7172 },
+  Kallakurichi: { lat: 11.7385, lng: 78.9639 },
+  Kancheepuram: { lat: 12.8342, lng: 79.7036 },
+  Kanniyakumari: { lat: 8.1833, lng: 77.4119 },
+  Karur: { lat: 10.9601, lng: 78.0766 },
+  Krishnagiri: { lat: 12.5186, lng: 78.2137 },
+  Madurai: { lat: 9.9252, lng: 78.1198 },
+  Mayiladuthurai: { lat: 11.1035, lng: 79.655 },
+  Nagapattinam: { lat: 10.7672, lng: 79.8449 },
+  Namakkal: { lat: 11.2189, lng: 78.1677 },
+  'The Nilgiris': { lat: 11.4102, lng: 76.695 },
+  Perambalur: { lat: 11.2333, lng: 78.8833 },
+  Pudukkottai: { lat: 10.3833, lng: 78.8001 },
+  Ramanathapuram: { lat: 9.3639, lng: 78.8395 },
+  Ranipet: { lat: 12.9273, lng: 79.3333 },
+  Salem: { lat: 11.6643, lng: 78.146 },
+  Sivaganga: { lat: 9.8433, lng: 78.4809 },
+  Tenkasi: { lat: 8.9595, lng: 77.3152 },
+  Thanjavur: { lat: 10.787, lng: 79.1378 },
+  Theni: { lat: 10.0104, lng: 77.4768 },
+  Thoothukudi: { lat: 8.7642, lng: 78.1348 },
+  Tiruchirappalli: { lat: 10.7905, lng: 78.7047 },
+  Tirunelveli: { lat: 8.7139, lng: 77.7567 },
+  Tirupathur: { lat: 12.4967, lng: 78.5677 },
+  Tiruppur: { lat: 11.1085, lng: 77.3411 },
+  Tiruvallur: { lat: 13.1439, lng: 79.9089 },
+  Tiruvannamalai: { lat: 12.2253, lng: 79.0747 },
+  Tiruvarur: { lat: 10.7661, lng: 79.6344 },
+  Vellore: { lat: 12.9165, lng: 79.1325 },
+  Viluppuram: { lat: 11.9401, lng: 79.4861 },
+  Virudhunagar: { lat: 9.5851, lng: 77.9579 },
+}
 
 /**
  * Exactly 18 Verified Realistic Agricultural Equipment Listings
@@ -992,18 +1067,52 @@ export function getDynamicCategories(items?: CatalogItem[]): CatalogCategory[] {
   })
 }
 
+export const PURCHASE_PRICE_MAP: Record<string, { purchasePrice: number; vendorId: string; vendorName: string }> = {
+  'eq-tractor-1': { purchasePrice: 850000, vendorId: 'vnd-1', vendorName: 'Sri Murugan Mahindra Tractors & Implements' },
+  'eq-tractor-2': { purchasePrice: 1120000, vendorId: 'vnd-3', vendorName: 'Deere PowerTech Agricultural Center' },
+  'eq-tractor-3': { purchasePrice: 680000, vendorId: 'vnd-1', vendorName: 'Sri Murugan Mahindra Tractors & Implements' },
+  'eq-harvester-1': { purchasePrice: 2450000, vendorId: 'vnd-4', vendorName: 'Kisan Harvester & Drone SuperStore' },
+  'eq-harvester-2': { purchasePrice: 2200000, vendorId: 'vnd-4', vendorName: 'Kisan Harvester & Drone SuperStore' },
+  'eq-harvester-3': { purchasePrice: 2100000, vendorId: 'vnd-2', vendorName: 'Cauvery Delta Agro Machinery & Implements Dealer' },
+  'eq-tillage-1': { purchasePrice: 75000, vendorId: 'vnd-1', vendorName: 'Sri Murugan Mahindra Tractors & Implements' },
+  'eq-tillage-2': { purchasePrice: 135000, vendorId: 'vnd-5', vendorName: 'Kongu Agro Implements & Spares Hub' },
+  'eq-tillage-3': { purchasePrice: 88000, vendorId: 'vnd-2', vendorName: 'Cauvery Delta Agro Machinery & Implements Dealer' },
+  'eq-seeding-1': { purchasePrice: 62000, vendorId: 'vnd-1', vendorName: 'Sri Murugan Mahindra Tractors & Implements' },
+  'eq-seeding-2': { purchasePrice: 195000, vendorId: 'vnd-5', vendorName: 'Kongu Agro Implements & Spares Hub' },
+  'eq-seeding-3': { purchasePrice: 84000, vendorId: 'vnd-2', vendorName: 'Cauvery Delta Agro Machinery & Implements Dealer' },
+  'eq-drone-1': { purchasePrice: 980000, vendorId: 'vnd-4', vendorName: 'Kisan Harvester & Drone SuperStore' },
+  'eq-drone-2': { purchasePrice: 550000, vendorId: 'vnd-4', vendorName: 'Kisan Harvester & Drone SuperStore' },
+  'eq-drone-3': { purchasePrice: 145000, vendorId: 'vnd-5', vendorName: 'Kongu Agro Implements & Spares Hub' },
+  'eq-pump-1': { purchasePrice: 42000, vendorId: 'vnd-2', vendorName: 'Cauvery Delta Agro Machinery & Implements Dealer' },
+  'eq-pump-2': { purchasePrice: 175000, vendorId: 'vnd-5', vendorName: 'Kongu Agro Implements & Spares Hub' },
+  'eq-pump-3': { purchasePrice: 58000, vendorId: 'vnd-1', vendorName: 'Sri Murugan Mahindra Tractors & Implements' },
+}
+
+function enrichItem(item: CatalogItem): CatalogItem {
+  const p = PURCHASE_PRICE_MAP[item.id]
+  return {
+    ...item,
+    availabilityType: item.availabilityType || 'both',
+    purchasePrice: item.purchasePrice || p?.purchasePrice || (item.dailyRate * 350),
+    vendorId: item.vendorId || p?.vendorId || 'vnd-1',
+    vendorName: item.vendorName || p?.vendorName || 'Sri Murugan Mahindra Tractors & Implements',
+  }
+}
+
 export function getFullCatalog(): CatalogItem[] {
-  if (typeof window === 'undefined') return SEED_CATALOG
-  try {
-    const raw = window.localStorage.getItem(CATALOG_STORAGE_KEY)
-    if (raw) {
-      const customs: CatalogItem[] = JSON.parse(raw)
-      const customIds = new Set(customs.map((c) => c.id))
-      const remainingSeed = SEED_CATALOG.filter((s) => !customIds.has(s.id))
-      return [...customs, ...remainingSeed]
-    }
-  } catch {}
-  return SEED_CATALOG
+  let list = SEED_CATALOG
+  if (typeof window !== 'undefined') {
+    try {
+      const raw = window.localStorage.getItem(CATALOG_STORAGE_KEY)
+      if (raw) {
+        const customs: CatalogItem[] = JSON.parse(raw)
+        const customIds = new Set(customs.map((c) => c.id))
+        const remainingSeed = SEED_CATALOG.filter((s) => !customIds.has(s.id))
+        list = [...customs, ...remainingSeed]
+      }
+    } catch {}
+  }
+  return list.map(enrichItem)
 }
 
 export function addCatalogItem(item: CatalogItem): void {
@@ -1090,8 +1199,8 @@ export async function syncCatalogWithServer(): Promise<CatalogItem[]> {
             reviews: l.reviews || 0,
             avail: l.available !== false,
             owner: l.ownerName || 'Verified Fleet Owner',
-            ownerId: l.ownerId || 'usr-owner-1',
-            ownerPhone: l.ownerPhone || '+91 94432 10987',
+            ownerId: l.ownerId || '',
+            ownerPhone: l.ownerPhone || '',
             securityDeposit: l.securityDeposit || 2000,
             pricePerHour: l.pricePerHour,
             condition: l.condition,
@@ -1146,7 +1255,7 @@ export function searchCatalog(
 ): CatalogItem[] {
   const q = (query || '').trim().toLowerCase()
 
-  return items.filter((item) => {
+  const filtered: CatalogItem[] = items.filter((item) => {
     // 1. Text Search
     if (q) {
       const name = (item.name || '').toLowerCase()
@@ -1242,6 +1351,37 @@ export function searchCatalog(
       }
     }
 
+    // 8. Rating Filter
+    if (filters?.minRating && filters.minRating > 0) {
+      if ((item.rating || 0) < filters.minRating) {
+        return false
+      }
+    }
+
+    // 9. Availability Mode (Rent vs Buy)
+    if (filters?.availability && filters.availability !== 'both') {
+      if (filters.availability === 'rent') {
+        if (item.availabilityType === 'buy') return false
+      } else if (filters.availability === 'buy') {
+        if (item.availabilityType === 'rent' && (!item.purchasePrice || item.purchasePrice === 0)) return false
+      }
+    }
+
     return true
   })
+
+  // Sorting
+  if (filters?.sortBy) {
+    if (filters.sortBy === 'rating') {
+      filtered.sort((a, b) => (b.rating || 0) - (a.rating || 0))
+    } else if (filters.sortBy === 'reviews') {
+      filtered.sort((a, b) => (b.reviews || 0) - (a.reviews || 0))
+    } else if (filters.sortBy === 'price_asc') {
+      filtered.sort((a, b) => a.dailyRate - b.dailyRate)
+    } else if (filters.sortBy === 'price_desc') {
+      filtered.sort((a, b) => b.dailyRate - a.dailyRate)
+    }
+  }
+
+  return filtered
 }

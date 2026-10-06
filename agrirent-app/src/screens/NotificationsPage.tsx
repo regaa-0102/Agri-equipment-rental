@@ -21,8 +21,7 @@ interface Props {
 export default function NotificationsPage({ onNavigate }: Props) {
   const { t, isTamil } = useLanguage()
   const currentUser = getStoredUser()
-  const userRole = currentUser?.role || 'farmer'
-  const userId = currentUser?.id || (userRole === 'farmer' ? 'usr-farmer-1' : 'usr-owner-1')
+  const userId = currentUser?.id || ''
 
   const [notifications, setNotifications] = useState<NotificationItem[]>(() => getUserNotifications(userId))
   const [filterType, setFilterType] = useState<'all' | 'unread' | 'bookings' | 'verification'>('all')
@@ -35,6 +34,8 @@ export default function NotificationsPage({ onNavigate }: Props) {
     return () => unsubscribe()
   }, [userId])
 
+  if (!currentUser) return null
+  const userRole = currentUser.role
   const unreadCount = notifications.filter((n) => !n.read).length
 
   const handleMarkOne = (id: string) => {
@@ -134,8 +135,8 @@ export default function NotificationsPage({ onNavigate }: Props) {
             </div>
             <p style={{ color: '#6B7280', fontSize: 13, margin: '6px 0 0' }}>
               {isTamil
-                ? `${currentUser?.name || 'பயனர்'} கணக்கிற்கான நிகழ்வு அறிவிப்புகள் மற்றும் புதுப்பிப்புகள்.`
-                : `Account notifications & updates for ${currentUser?.name || 'User'} (${userRole.toUpperCase()})`}
+                ? `${currentUser.name} கணக்கிற்கான நிகழ்வு அறிவிப்புகள் மற்றும் புதுப்பிப்புகள்.`
+                : `Account notifications & updates for ${currentUser.name} (${userRole.toUpperCase()})`}
             </p>
           </div>
 

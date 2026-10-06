@@ -1,5 +1,6 @@
+import { randomBytes, timingSafeEqual } from "node:crypto";
 import { decodeJwt, signJwt, verifyJwt, type JwtPayload } from "./jwt";
-import { hashPassword, storage, type StoredListing, type StoredUser, type StoredBooking } from "./storage";
+import { hashPassword, verifyPassword, storage, type StoredListing, type StoredUser, type StoredBooking } from "./storage";
 
 const jsonHeaders = {
   "content-type": "application/json; charset=utf-8",
@@ -8,8 +9,8 @@ const jsonHeaders = {
   "access-control-allow-headers": "Content-Type, Authorization",
 };
 
-function json(data: unknown, status = 200) {
-  return new Response(JSON.stringify(data), { status, headers: jsonHeaders });
+function json(data: unknown, status = 200, extraHeaders?: Record<string, string>) {
+  return new Response(JSON.stringify(data), { status, headers: { ...jsonHeaders, ...extraHeaders } });
 }
 
 async function readBody<T = Record<string, unknown>>(request: Request): Promise<T | null> {
@@ -21,11 +22,78 @@ async function readBody<T = Record<string, unknown>>(request: Request): Promise<
 }
 
 function getJwtFromHeader(request: Request): JwtPayload | null {
-  const auth = request.headers.get("authorization");
-  if (!auth) return null;
-  const token = auth.replace(/^Bearer\s+/i, "").trim();
+  const cookie = request.headers.get("cookie") || "";
+  const token = cookie
+    .split(";")
+    .map((part) => part.trim())
+    .find((part) => part.startsWith("agrirent_session="))
+    ?.slice("agrirent_session=".length);
   if (!token) return null;
-  return verifyJwt(token);
+  const claims = verifyJwt(token);
+  if (!claims) return null;
+  const user = storage.findUserById(claims.userId);
+  if (!user || user.status !== "active" || user.role !== claims.role) return null;
+  return {
+    ...claims,
+    name: user.name,
+    email: user.email,
+    role: user.role,
+    provider: user.provider || "local",
+  };
+}
+
+function sessionCookie(token: string, request: Request, maxAge = 30 * 24 * 60 * 60): string {
+  const secure = new URL(request.url).protocol === "https:" ? "; Secure" : "";
+  return `agrirent_session=${token}; HttpOnly; SameSite=Lax; Path=/; Max-Age=${maxAge}${secure}`;
+}
+
+function cookieValue(request: Request, name: string): string | null {
+  return (request.headers.get("cookie") || "")
+    .split(";")
+    .map((part) => part.trim())
+    .find((part) => part.startsWith(`${name}=`))
+    ?.slice(name.length + 1) || null;
+}
+
+function clearCookie(name: string, request: Request): string {
+  const secure = new URL(request.url).protocol === "https:" ? "; Secure" : "";
+  return `${name}=; HttpOnly; SameSite=Lax; Path=/; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:00 GMT${secure}`;
+}
+
+function jsonWithCookies(data: unknown, status: number, cookies: string[]): Response {
+  const headers = new Headers(jsonHeaders);
+  for (const cookie of cookies) headers.append("set-cookie", cookie);
+  return new Response(JSON.stringify(data), { status, headers });
+}
+
+function googleRedirect(request: Request, result: string, cookies: string[] = []): Response {
+  const url = new URL("/login", request.url);
+  url.searchParams.set("google", result);
+  const headers = new Headers({ location: url.toString() });
+  for (const cookie of cookies) headers.append("set-cookie", cookie);
+  return new Response(null, { status: 302, headers });
+}
+
+function googleConfiguration() {
+  const clientId = process.env["GOOGLE_CLIENT_ID"]?.trim();
+  const clientSecret = process.env["GOOGLE_CLIENT_SECRET"]?.trim();
+  const redirectUri = process.env["GOOGLE_REDIRECT_URI"]?.trim();
+  if (!clientId || !clientSecret || !redirectUri) return null;
+  try {
+    const parsed = new URL(redirectUri);
+    if (parsed.protocol !== "https:" && parsed.hostname !== "localhost" && parsed.hostname !== "127.0.0.1") {
+      return null;
+    }
+  } catch {
+    return null;
+  }
+  return { clientId, clientSecret, redirectUri };
+}
+
+function isEqualSecret(a: string, b: string): boolean {
+  const left = Buffer.from(a);
+  const right = Buffer.from(b);
+  return left.length === right.length && timingSafeEqual(left, right);
 }
 
 // -------------------------------------------------------------
@@ -221,7 +289,7 @@ export async function handleApiRequest(request: Request): Promise<Response | nul
     if (request.method === "GET" && pathname === "/api/db-status") {
       return json({
         connected: true,
-        driver: "Dual Hybrid (MySQL2 Ready + Local Persistent Store)",
+        driver: "File-Backed Persistent Store (.workspace/agrirent-store.json)",
         tables: ["users", "sessions", "listings", "bookings", "escrow_audit"],
         usersCount: storage.getUsers().length,
         listingsCount: storage.getListings().length,
@@ -229,29 +297,244 @@ export async function handleApiRequest(request: Request): Promise<Response | nul
       });
     }
 
-    // 2. Auth: 5 Pre-Seeded Accounts Directory (For 1-Click Verification)
+    // 2. Auth: Seed Users disabled (No demo accounts)
     if (request.method === "GET" && pathname === "/api/auth/seed-users") {
-      const users = storage.getUsers().slice(0, 5).map((u) => ({
-        id: u.id,
-        name: u.name,
-        email: u.email,
-        role: u.role,
-        phone: u.phone,
-        location: u.location,
-        avatar: u.avatar,
-        defaultPassword: u.role === "admin" ? "Admin@123" : u.role === "owner" ? "Owner@123" : "Farmer@123",
-      }));
-      return json({ seedUsers: users });
+      return json({ seedUsers: [] });
     }
 
-    // 3. Auth: Login
+    if (request.method === "GET" && pathname === "/api/auth/google/start") {
+      const config = googleConfiguration();
+      if (!config) return googleRedirect(request, "not-configured");
+
+      const state = randomBytes(32).toString("hex");
+      const secure = new URL(request.url).protocol === "https:" ? "; Secure" : "";
+      const authorizationUrl = new URL("https://accounts.google.com/o/oauth2/v2/auth");
+      authorizationUrl.search = new URLSearchParams({
+        client_id: config.clientId,
+        redirect_uri: config.redirectUri,
+        response_type: "code",
+        scope: "openid email profile",
+        state,
+        prompt: "select_account",
+      }).toString();
+
+      return new Response(null, {
+        status: 302,
+        headers: {
+          location: authorizationUrl.toString(),
+          "set-cookie": `agrirent_google_state=${state}; HttpOnly; SameSite=Lax; Path=/; Max-Age=600${secure}`,
+        },
+      });
+    }
+
+    if (request.method === "GET" && pathname === "/api/auth/google/callback") {
+      const config = googleConfiguration();
+      const stateCookie = cookieValue(request, "agrirent_google_state");
+      const state = url.searchParams.get("state");
+      const code = url.searchParams.get("code");
+      const oauthError = url.searchParams.get("error");
+      const clearState = clearCookie("agrirent_google_state", request);
+      const clearPending = clearCookie("agrirent_google_pending", request);
+
+      if (!state || !stateCookie || !isEqualSecret(state, stateCookie)) {
+        return googleRedirect(request, "failed", [clearState]);
+      }
+      if (oauthError === "access_denied") {
+        return googleRedirect(request, "cancelled", [clearState]);
+      }
+      if (!config) return googleRedirect(request, "not-configured", [clearState]);
+      if (!code) return googleRedirect(request, "failed", [clearState]);
+
+      try {
+        const tokenResponse = await fetch("https://oauth2.googleapis.com/token", {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: new URLSearchParams({
+            code,
+            client_id: config.clientId,
+            client_secret: config.clientSecret,
+            redirect_uri: config.redirectUri,
+            grant_type: "authorization_code",
+          }),
+        });
+        if (!tokenResponse.ok) return googleRedirect(request, "failed", [clearState]);
+        const tokens = await tokenResponse.json() as { access_token?: string; token_type?: string };
+        if (!tokens.access_token || tokens.token_type?.toLowerCase() !== "bearer") {
+          return googleRedirect(request, "failed", [clearState]);
+        }
+
+        const profileResponse = await fetch("https://openidconnect.googleapis.com/v1/userinfo", {
+          headers: { Authorization: `Bearer ${tokens.access_token}` },
+        });
+        if (!profileResponse.ok) return googleRedirect(request, "failed", [clearState]);
+        const profile = await profileResponse.json() as {
+          sub?: string;
+          email?: string;
+          email_verified?: boolean;
+          name?: string;
+          picture?: string;
+        };
+        if (
+          !profile.sub ||
+          profile.sub.length > 255 ||
+          !profile.email ||
+          profile.email.length > 254 ||
+          !profile.name ||
+          profile.name.length > 200 ||
+          profile.email_verified !== true ||
+          !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(profile.email)
+        ) {
+          return googleRedirect(request, "failed", [clearState]);
+        }
+
+        const email = profile.email.toLowerCase();
+        const existingByGoogleId = storage.findUserByGoogleId(profile.sub);
+        const existingByEmail = storage.findUserByEmail(email);
+        if (existingByGoogleId) {
+          if (existingByEmail && existingByEmail.id !== existingByGoogleId.id) {
+            return googleRedirect(request, "conflict", [clearState, clearPending]);
+          }
+          if (existingByGoogleId.status !== "active") {
+            return googleRedirect(request, "inactive", [clearState, clearPending]);
+          }
+          const token = signJwt({
+            userId: existingByGoogleId.id,
+            name: existingByGoogleId.name,
+            email: existingByGoogleId.email,
+            role: existingByGoogleId.role,
+            provider: "google",
+          });
+          return googleRedirect(request, "success", [
+            clearState,
+            clearPending,
+            sessionCookie(token, request),
+          ]);
+        }
+        if (existingByEmail) {
+          return googleRedirect(request, "conflict", [clearState, clearPending]);
+        }
+
+        const pendingToken = signJwt({
+          userId: profile.sub,
+          name: profile.name,
+          email,
+          role: "farmer",
+          provider: "google",
+          purpose: "google-pending",
+          googleId: profile.sub,
+          avatar: profile.picture || "",
+        }, 10 * 60);
+        const secure = new URL(request.url).protocol === "https:" ? "; Secure" : "";
+        return googleRedirect(request, "role", [
+          clearState,
+          `agrirent_google_pending=${pendingToken}; HttpOnly; SameSite=Lax; Path=/; Max-Age=600${secure}`,
+        ]);
+      } catch (error) {
+        console.error("Google OAuth callback failed", error);
+        return googleRedirect(request, "failed", [clearState]);
+      }
+    }
+
+    if (request.method === "POST" && pathname === "/api/auth/google/complete") {
+      const body = await readBody<{ role?: string }>(request);
+      if (body?.role !== "farmer" && body?.role !== "owner") {
+        return json({ error: "Select Farmer or Equipment Owner to continue." }, 400);
+      }
+      const pendingToken = cookieValue(request, "agrirent_google_pending");
+      const pending = pendingToken ? verifyJwt(pendingToken) : null;
+      if (
+        !pending ||
+        pending.purpose !== "google-pending" ||
+        pending.provider !== "google" ||
+        !pending.googleId ||
+        !pending.email ||
+        !pending.name
+      ) {
+        return jsonWithCookies(
+          { error: "Google sign-in expired. Please start again." },
+          401,
+          [clearCookie("agrirent_google_pending", request)]
+        );
+      }
+
+      const existingByGoogleId = storage.findUserByGoogleId(pending.googleId);
+      const existingByEmail = storage.findUserByEmail(pending.email);
+      if (existingByGoogleId) {
+        if (existingByEmail && existingByEmail.id !== existingByGoogleId.id) {
+          return jsonWithCookies(
+            { error: "An account with this email already exists. Sign in with that account's existing method." },
+            409,
+            [clearCookie("agrirent_google_pending", request)]
+          );
+        }
+        if (existingByGoogleId.status !== "active") {
+          return jsonWithCookies(
+            { error: "This AgriRent account is inactive." },
+            403,
+            [clearCookie("agrirent_google_pending", request)]
+          );
+        }
+        const token = signJwt({
+          userId: existingByGoogleId.id,
+          name: existingByGoogleId.name,
+          email: existingByGoogleId.email,
+          role: existingByGoogleId.role,
+          provider: "google",
+        });
+        const { passwordHash: _passwordHash, googleId: _googleId, ...safeUser } = existingByGoogleId;
+        return jsonWithCookies(
+          { user: safeUser },
+          200,
+          [sessionCookie(token, request), clearCookie("agrirent_google_pending", request)]
+        );
+      }
+      if (existingByEmail) {
+        return jsonWithCookies(
+          { error: "An account with this email already exists. Sign in with that account's existing method." },
+          409,
+          [clearCookie("agrirent_google_pending", request)]
+        );
+      }
+
+      const user = storage.createUser({
+        name: pending.name,
+        email: pending.email,
+        role: body.role,
+        status: "active",
+        provider: "google",
+        googleId: pending.googleId,
+        phone: "",
+        location: "Tamil Nadu, India",
+        avatar: pending.avatar || "",
+        verificationStatus: "NOT_VERIFIED",
+      });
+      const token = signJwt({
+        userId: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        provider: "google",
+      });
+      const { passwordHash: _passwordHash, googleId: _googleId, ...safeUser } = user;
+      return jsonWithCookies(
+        { user: safeUser },
+        201,
+        [sessionCookie(token, request), clearCookie("agrirent_google_pending", request)]
+      );
+    }
+
+    // 3. Auth: Real Database Login with Password Verification & Role Authorization
     if (request.method === "POST" && pathname === "/api/auth/login") {
-      const body = await readBody<{ email?: string; password?: string }>(request);
+      const body = await readBody<{ email?: string; password?: string; role?: string; remember?: boolean }>(request);
       const email = body?.email?.toLowerCase().trim();
-      const password = body?.password?.trim();
+      const password = body?.password;
+      const requestedRole = body?.role;
 
       if (!email || !password) {
         return json({ error: "Email and password are required" }, 400);
+      }
+      if (!["farmer", "owner", "admin"].includes(requestedRole || "")) {
+        return json({ error: "A valid registered role is required" }, 400);
       }
 
       const user = storage.findUserByEmail(email);
@@ -259,27 +542,42 @@ export async function handleApiRequest(request: Request): Promise<Response | nul
         return json({ error: "Account not found with this email" }, 401);
       }
 
-      if (user.passwordHash !== hashPassword(password)) {
-        return json({ error: "Invalid password. Check credentials or use quick demo account" }, 401);
-      }
-
-      if (user.status === "suspended") {
+      if (user.status !== "active") {
         return json({ error: "This account has been suspended by the administrator" }, 403);
       }
 
+      if (!user.passwordHash || !verifyPassword(password, user.passwordHash)) {
+        return json({ error: "Incorrect password. Please verify your credentials." }, 401);
+      }
+
+      if (!user.passwordHash.startsWith("scrypt$")) {
+        storage.updateUserPasswordHash(user.id, hashPassword(password));
+      }
+
+      // Role authorization verification:
+      // If user selected or requested a specific role, verify they actually have permission for that role in the database!
+      if (user.role !== requestedRole) {
+        const registeredRole = user.role === "farmer" ? "Farmer" : user.role === "owner" ? "Equipment Owner" : "Administrator";
+        return json(
+          {
+            error: `Access denied for selected role. This account is registered as '${registeredRole}'. Please select your registered role.`,
+          },
+          403
+        );
+      }
+
+      const maxAge = body.remember === false ? 8 * 60 * 60 : 30 * 24 * 60 * 60;
       const token = signJwt({
         userId: user.id,
         name: user.name,
         email: user.email,
         role: user.role,
         provider: user.provider || "local",
-      });
+      }, maxAge);
 
-      return json({
-        token,
-        tokenType: "Bearer",
-        expiresInDays: 30,
-        user: {
+      return json(
+        {
+          user: {
           id: user.id,
           name: user.name,
           email: user.email,
@@ -287,26 +585,75 @@ export async function handleApiRequest(request: Request): Promise<Response | nul
           phone: user.phone,
           location: user.location,
           avatar: user.avatar,
+          theme: user.theme,
           provider: user.provider || "local",
+          verificationStatus: user.verificationStatus,
+          },
         },
-      });
+        200,
+        { "set-cookie": sessionCookie(token, request, maxAge) }
+      );
     }
 
-    // 4. Auth: Register
+    if (request.method === "POST" && pathname === "/api/auth/logout") {
+      const secure = new URL(request.url).protocol === "https:" ? "; Secure" : "";
+      return json(
+        { success: true },
+        200,
+        { "set-cookie": `agrirent_session=; HttpOnly; SameSite=Lax; Path=/; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:00 GMT${secure}` }
+      );
+    }
+
+    // 4. Auth: Real Account Registration (Persisted in DB with Role & Validation)
     if (request.method === "POST" && pathname === "/api/auth/register") {
-      const body = await readBody<{ name?: string; email?: string; password?: string; role?: "farmer" | "owner"; phone?: string; location?: string }>(request);
+      const body = await readBody<{
+        name?: string;
+        email?: string;
+        password?: string;
+        confirmPassword?: string;
+        role?: "farmer" | "owner";
+        phone?: string;
+        location?: string;
+      }>(request);
+
       const name = body?.name?.trim();
       const email = body?.email?.toLowerCase().trim();
-      const password = body?.password?.trim();
-      const role = body?.role || "farmer";
+      const password = body?.password;
+      const role = body?.role;
+      const phone = body?.phone?.trim();
 
-      if (!name || !email || !password || !["farmer", "owner"].includes(role)) {
-        return json({ error: "Name, email, password, and valid role (farmer or owner) are required" }, 400);
+      if (!name || name.length < 2) {
+        return json({ error: "Full Name is required (minimum 2 characters)" }, 400);
       }
 
-      const existing = storage.findUserByEmail(email);
-      if (existing) {
-        return json({ error: "An account with this email already exists" }, 409);
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        return json({ error: "A valid email address is required" }, 400);
+      }
+
+      const phoneDigits = phone?.replace(/\D/g, "") || "";
+      if (!phone || phoneDigits.length < 10 || phoneDigits.length > 15) {
+        return json({ error: "A valid phone number with 10 to 15 digits is required" }, 400);
+      }
+
+      if (!password || password.trim().length < 6) {
+        return json({ error: "Password must be at least 6 characters long" }, 400);
+      }
+      if (password !== body?.confirmPassword) {
+        return json({ error: "Password confirmation does not match" }, 400);
+      }
+
+      if (role !== "farmer" && role !== "owner") {
+        return json({ error: "Valid role selection (Farmer or Equipment Owner) is required" }, 400);
+      }
+
+      const existingEmail = storage.findUserByEmail(email);
+      if (existingEmail) {
+        return json({ error: "An account with this email already exists. Please sign in." }, 409);
+      }
+
+      const existingPhone = storage.findUserByPhone(phone);
+      if (existingPhone) {
+        return json({ error: "An account with this phone number already exists." }, 409);
       }
 
       const newUser = storage.createUser({
@@ -314,12 +661,12 @@ export async function handleApiRequest(request: Request): Promise<Response | nul
         email,
         passwordHash: hashPassword(password),
         role,
-        phone: body?.phone || "+91 98000 00000",
+        phone,
         location: body?.location || "Tamil Nadu, India",
         avatar: `https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80`,
         status: "active",
         provider: "local",
-        verificationStatus: "VERIFIED",
+        verificationStatus: "NOT_VERIFIED",
       });
 
       const token = signJwt({
@@ -330,54 +677,42 @@ export async function handleApiRequest(request: Request): Promise<Response | nul
         provider: "local",
       });
 
-      return json({ token, tokenType: "Bearer", user: newUser }, 201);
+      return json(
+        {
+          user: {
+            id: newUser.id,
+            name: newUser.name,
+            email: newUser.email,
+            role: newUser.role,
+            phone: newUser.phone,
+            location: newUser.location,
+            avatar: newUser.avatar,
+            theme: newUser.theme,
+            provider: "local",
+            verificationStatus: newUser.verificationStatus,
+          },
+        },
+        201,
+        { "set-cookie": sessionCookie(token, request) }
+      );
     }
 
-    // 5. Auth: Google OAuth 2.0 Simulation & Verification
-    if (request.method === "POST" && pathname === "/api/auth/oauth") {
-      const body = await readBody<{ googleId?: string; email?: string; name?: string; avatar?: string; role?: "farmer" | "owner" }>(request);
-      const email = body?.email?.toLowerCase().trim() || "google.farmer@gmail.com";
-      const name = body?.name?.trim() || "Google Verified Farmer";
-      const avatar = body?.avatar || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80";
-      const role = body?.role || "farmer";
-
-      let user = storage.findUserByEmail(email);
-      if (!user) {
-        user = storage.createUser({
-          name,
-          email,
-          passwordHash: hashPassword("GoogleOAuth@Secure2026"),
-          role,
-          phone: "+91 98450 12345",
-          location: "Coimbatore, Tamil Nadu",
-          avatar,
-          status: "active",
-          provider: "google",
-          verificationStatus: "VERIFIED",
-        });
+    // 5. User Theme Persistence API
+    if (request.method === "PATCH" && pathname === "/api/users/theme") {
+      const jwtUser = getJwtFromHeader(request);
+      if (!jwtUser) {
+        return json({ error: "Authentication required" }, 401);
       }
 
-      const token = signJwt({
-        userId: user.id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        provider: "google",
-      });
+      const body = await readBody<{ theme?: string }>(request);
+      if (!body?.theme) {
+        return json({ error: "Theme identifier is required" }, 400);
+      }
 
-      return json({
-        token,
-        tokenType: "Bearer",
-        oauthProvider: "Google OAuth 2.0",
-        user: {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          role: user.role,
-          avatar: user.avatar,
-          provider: "google",
-        },
-      });
+      const updated = storage.updateUserTheme(jwtUser.userId, body.theme);
+      if (!updated) return json({ error: "User not found" }, 404);
+
+      return json({ success: true, theme: updated.theme });
     }
 
     // 6. Auth: Current User Verification (JWT Protected)
@@ -390,15 +725,19 @@ export async function handleApiRequest(request: Request): Promise<Response | nul
       if (!user) {
         return json({ error: "User no longer exists" }, 404);
       }
-      return json({ user, jwtClaims: jwtUser });
+      const { passwordHash: _, ...safeUser } = user;
+      return json({ user: safeUser, jwtClaims: jwtUser });
     }
 
-    // 7. Equipment Listings (Public REST API with filters)
+    // 7. Equipment Listings (Public REST API with filters & ratings)
     if (request.method === "GET" && pathname === "/api/listings") {
       const search = url.searchParams.get("search") || undefined;
       const category = url.searchParams.get("category") || undefined;
       const minPrice = url.searchParams.has("minPrice") ? Number(url.searchParams.get("minPrice")) : undefined;
       const maxPrice = url.searchParams.has("maxPrice") ? Number(url.searchParams.get("maxPrice")) : undefined;
+      const minRating = url.searchParams.has("minRating") ? Number(url.searchParams.get("minRating")) : undefined;
+      const availability = url.searchParams.get("availability") || undefined; // 'rent' | 'buy' | 'both'
+      const sortBy = url.searchParams.get("sortBy") || undefined;
 
       const filters: { search?: string; category?: string; minPrice?: number; maxPrice?: number } = {};
       if (search) filters.search = search;
@@ -406,23 +745,153 @@ export async function handleApiRequest(request: Request): Promise<Response | nul
       if (minPrice !== undefined) filters.minPrice = minPrice;
       if (maxPrice !== undefined) filters.maxPrice = maxPrice;
 
-      const items = storage.getListings(filters);
+      let items = storage.getListings(filters);
+      items = items.map((listing) => {
+        const ratingSummary = storage.getEquipmentRatingSummary(listing.id);
+        return {
+          ...listing,
+          rating: ratingSummary.averageRating,
+          reviews: ratingSummary.totalReviews,
+        };
+      });
+
+      if (minRating !== undefined) {
+        items = items.filter((l) => l.rating >= minRating);
+      }
+
+      if (availability && availability !== "all") {
+        if (availability === "rent") {
+          items = items.filter((l) => l.availabilityType === "rent" || l.availabilityType === "both" || !l.availabilityType);
+        } else if (availability === "buy") {
+          items = items.filter((l) => l.availabilityType === "buy" || l.availabilityType === "both" || (l.purchasePrice && l.purchasePrice > 0));
+        }
+      }
+
+      if (sortBy === "rating") {
+        items.sort((a, b) => b.rating - a.rating);
+      } else if (sortBy === "reviews") {
+        items.sort((a, b) => b.reviews - a.reviews);
+      } else if (sortBy === "price_asc") {
+        items.sort((a, b) => a.pricePerDay - b.pricePerDay);
+      } else if (sortBy === "price_desc") {
+        items.sort((a, b) => b.pricePerDay - a.pricePerDay);
+      }
+
       return json({ count: items.length, listings: items });
     }
 
-    // Single Equipment Item
+    // Single Equipment Item with Reviews & Vendor Info
     if (request.method === "GET" && pathname.startsWith("/api/listings/")) {
       const id = pathname.replace("/api/listings/", "").trim();
       const item = storage.findListingById(id);
       if (!item) return json({ error: "Equipment not found" }, 404);
-      return json({ listing: item });
+
+      const ratingSummary = storage.getEquipmentRatingSummary(id);
+      const reviews = storage.getReviews(id);
+      const vendor = item.vendorId ? storage.findVendorById(item.vendorId) : null;
+
+      return json({
+        listing: item,
+        ratingSummary,
+        reviews,
+        vendor,
+      });
+    }
+
+    // 8. Equipment Reviews System
+    if (request.method === "GET" && pathname === "/api/reviews") {
+      const equipmentId = url.searchParams.get("equipmentId") || undefined;
+      const reviews = storage.getReviews(equipmentId);
+      const summary = equipmentId ? storage.getEquipmentRatingSummary(equipmentId) : null;
+      return json({ reviews, summary });
+    }
+
+    if (request.method === "POST" && pathname === "/api/reviews") {
+      const jwtUser = getJwtFromHeader(request);
+      if (!jwtUser || jwtUser.role !== "farmer") {
+        return json({ error: "Farmer authentication is required to submit an equipment review" }, 403);
+      }
+
+      const body = await readBody<{
+        equipmentId?: string;
+        bookingId?: string;
+        rating?: number;
+        reviewText?: string;
+      }>(request);
+
+      const equipmentId = body?.equipmentId?.trim();
+      const bookingId = body?.bookingId?.trim();
+      const rating = Number(body?.rating);
+      const reviewText = body?.reviewText?.trim() || "";
+
+      if (!equipmentId || !bookingId || !Number.isInteger(rating) || rating < 1 || rating > 5) {
+        return json({ error: "equipmentId, bookingId, and an integer star rating (1-5) are required" }, 400);
+      }
+
+      const result = storage.createReview({
+        equipmentId,
+        bookingId,
+        userId: jwtUser.userId,
+        userName: jwtUser.name,
+        rating,
+        reviewText: reviewText || "Good quality agricultural equipment. Satisfied with performance.",
+      });
+
+      if (!result.success) {
+        return json({ error: result.error || "Could not submit review" }, 400);
+      }
+
+      const summary = storage.getEquipmentRatingSummary(equipmentId);
+
+      // Create notification for equipment owner
+      const listing = storage.findListingById(equipmentId);
+      const listingOwner = listing ? storage.findUserById(listing.ownerId) : null;
+      if (listing && listingOwner?.role === "owner" && listingOwner.status === "active") {
+        storage.createNotification({
+          userId: listing.ownerId,
+          title: `New Review for ${listing.name}`,
+          message: `${jwtUser.name} rated ${listing.name} ${rating} stars: "${reviewText || 'Verified Rental Rating'}"`,
+          type: "review_received",
+          read: false,
+          relatedId: listing.id,
+        });
+      }
+
+      return json({ success: true, review: result.review, summary }, 201);
+    }
+
+    // 9. Nearby Vendors for Equipment Purchase
+    if (request.method === "GET" && pathname === "/api/vendors") {
+      const city = url.searchParams.get("city") || undefined;
+      const search = url.searchParams.get("search") || undefined;
+      const lat = url.searchParams.has("lat") ? Number(url.searchParams.get("lat")) : undefined;
+      const lng = url.searchParams.has("lng") ? Number(url.searchParams.get("lng")) : undefined;
+      const sortBy = (url.searchParams.get("sortBy") as "distance" | "rating") || "distance";
+
+      const vendorFilters = {
+        ...(city !== undefined ? { city } : {}),
+        ...(search !== undefined ? { search } : {}),
+        ...(lat !== undefined ? { lat } : {}),
+        ...(lng !== undefined ? { lng } : {}),
+        sortBy,
+      }
+
+      const vendors = storage.getVendors(vendorFilters);
+      return json({ count: vendors.length, vendors });
+    }
+
+    if (request.method === "GET" && pathname.startsWith("/api/vendors/")) {
+      const id = pathname.replace("/api/vendors/", "").trim();
+      const vendor = storage.findVendorById(id);
+      if (!vendor) return json({ error: "Vendor not found" }, 404);
+      return json({ vendor });
     }
 
     // Create Equipment (Owner / Admin JWT Required)
     if (request.method === "POST" && pathname === "/api/listings") {
       const jwtUser = getJwtFromHeader(request);
-      if (!jwtUser || (jwtUser.role !== "owner" && jwtUser.role !== "admin")) {
-        return json({ error: "Equipment owner or Admin authorization required" }, 403);
+      if (!jwtUser || jwtUser.role !== "owner") {
+        return json({ error: "Equipment owner authorization required" }, 403);
       }
 
       const body = await readBody<Partial<StoredListing>>(request);
@@ -475,8 +944,8 @@ export async function handleApiRequest(request: Request): Promise<Response | nul
     // Update Equipment (Owner / Admin JWT Required)
     if (request.method === "PUT" && pathname.startsWith("/api/listings/")) {
       const jwtUser = getJwtFromHeader(request);
-      if (!jwtUser || (jwtUser.role !== "owner" && jwtUser.role !== "admin")) {
-        return json({ error: "Equipment owner or Admin authorization required" }, 403);
+      if (!jwtUser || jwtUser.role !== "owner") {
+        return json({ error: "Equipment owner authorization required" }, 403);
       }
 
       const id = pathname.replace("/api/listings/", "").trim();
@@ -485,7 +954,7 @@ export async function handleApiRequest(request: Request): Promise<Response | nul
         return json({ error: "Equipment listing not found" }, 404);
       }
 
-      if (jwtUser.role !== "admin" && existing.ownerId !== jwtUser.userId) {
+      if (existing.ownerId !== jwtUser.userId) {
         return json({ error: "You can only edit your own equipment listings" }, 403);
       }
 
@@ -542,8 +1011,8 @@ export async function handleApiRequest(request: Request): Promise<Response | nul
     // Delete Equipment (Owner / Admin JWT Required + Booking Safety)
     if (request.method === "DELETE" && pathname.startsWith("/api/listings/")) {
       const jwtUser = getJwtFromHeader(request);
-      if (!jwtUser || (jwtUser.role !== "owner" && jwtUser.role !== "admin")) {
-        return json({ error: "Equipment owner or Admin authorization required" }, 403);
+      if (!jwtUser || jwtUser.role !== "owner") {
+        return json({ error: "Equipment owner authorization required" }, 403);
       }
 
       const id = pathname.replace("/api/listings/", "").trim();
@@ -552,7 +1021,7 @@ export async function handleApiRequest(request: Request): Promise<Response | nul
         return json({ error: "Equipment listing not found" }, 404);
       }
 
-      if (jwtUser.role !== "admin" && existing.ownerId !== jwtUser.userId) {
+      if (existing.ownerId !== jwtUser.userId) {
         return json({ error: "You can only delete your own equipment listings" }, 403);
       }
 
@@ -586,8 +1055,8 @@ export async function handleApiRequest(request: Request): Promise<Response | nul
 
     if (request.method === "POST" && pathname === "/api/bookings") {
       const jwtUser = getJwtFromHeader(request);
-      if (!jwtUser) {
-        return json({ error: "Farmer JWT Authentication required" }, 401);
+      if (!jwtUser || jwtUser.role !== "farmer") {
+        return json({ error: "Farmer authorization required to book equipment" }, 403);
       }
 
       const body = await readBody<{ listingId?: string; startDate?: string; endDate?: string; days?: number }>(request);
@@ -632,25 +1101,66 @@ export async function handleApiRequest(request: Request): Promise<Response | nul
         relatedId: booking.id,
       });
 
-      // Notification for Owner
-      storage.createNotification({
-        userId: listing.ownerId,
-        title: `New Booking Received: ${listing.name}`,
-        message: `Farmer ${jwtUser.name} booked ${listing.name} from ${body.startDate} to ${body.endDate}. ₹${totalAmount.toLocaleString()} held in escrow.`,
-        type: "booking_received",
-        read: false,
-        relatedId: booking.id,
-      });
+      if (owner?.role === "owner" && owner.status === "active") {
+        storage.createNotification({
+          userId: owner.id,
+          title: `New Booking Received: ${listing.name}`,
+          message: `Farmer ${jwtUser.name} booked ${listing.name} from ${body.startDate} to ${body.endDate}. ₹${totalAmount.toLocaleString()} held in escrow.`,
+          type: "booking_received",
+          read: false,
+          relatedId: booking.id,
+        });
+      }
 
       return json({ booking }, 201);
     }
 
-    // Update Booking Status
+    // Update Booking Status (Authenticated & Authorized)
     if (request.method === "PATCH" && pathname.startsWith("/api/bookings/")) {
+      const jwtUser = getJwtFromHeader(request);
+      if (!jwtUser) {
+        return json({ error: "Authentication required to update booking status" }, 401);
+      }
+
       const bookingId = pathname.replace("/api/bookings/", "").replace("/status", "");
+      if (pathname.endsWith("/extend")) {
+        const bookingIdForExtension = pathname.slice("/api/bookings/".length, -"/extend".length);
+        const booking = storage.findBookingById(bookingIdForExtension);
+        if (!booking) return json({ error: "Booking not found" }, 404);
+        if (jwtUser.role !== "farmer" || booking.farmerId !== jwtUser.userId) {
+          return json({ error: "Only the farmer who made this booking can extend it" }, 403);
+        }
+
+        const body = await readBody<{ endDate?: string }>(request);
+        if (!body?.endDate || !/^\d{4}-\d{2}-\d{2}$/.test(body.endDate)) {
+          return json({ error: "A valid endDate in YYYY-MM-DD format is required" }, 400);
+        }
+        const updatedBooking = storage.extendBooking(bookingIdForExtension, body.endDate);
+        if (!updatedBooking) {
+          return json({ error: "Only active bookings can be extended to a date after the current end date" }, 400);
+        }
+        return json({ booking: updatedBooking });
+      }
+      const existingBooking = storage.findBookingById(bookingId);
+      if (!existingBooking) {
+        return json({ error: "Booking not found" }, 404);
+      }
+
+      const isFarmer = jwtUser.role === "farmer" && existingBooking.farmerId === jwtUser.userId;
+      const isOwner = jwtUser.role === "owner" && existingBooking.ownerId === jwtUser.userId;
+      const isAdmin = jwtUser.role === "admin";
+
+      if (!isFarmer && !isOwner && !isAdmin) {
+        return json({ error: "Not authorized to update this booking" }, 403);
+      }
+
       const body = await readBody<{ status: StoredBooking["status"]; escrowStatus?: StoredBooking["escrowStatus"] }>(request);
       if (!body?.status) {
         return json({ error: "status is required" }, 400);
+      }
+
+      if (isFarmer && !isAdmin && body.status !== "cancelled") {
+        return json({ error: "Farmers can only cancel their bookings" }, 403);
       }
 
       const updated = storage.updateBookingStatus(bookingId, body.status, body.escrowStatus);
@@ -681,33 +1191,51 @@ export async function handleApiRequest(request: Request): Promise<Response | nul
     // 9. Notifications Center API (Scoped per user)
     if (request.method === "GET" && pathname === "/api/notifications") {
       const jwtUser = getJwtFromHeader(request);
-      const queryUserId = url.searchParams.get("userId") || undefined;
-      const targetUserId = jwtUser?.userId || queryUserId || "usr-farmer-1";
+      if (!jwtUser) {
+        return json({ error: "Authentication required" }, 401);
+      }
+      const targetUserId = jwtUser.role === "admin" ? (url.searchParams.get("userId") || jwtUser.userId) : jwtUser.userId;
       const notifs = storage.getNotifications(targetUserId);
       return json({ count: notifs.length, notifications: notifs });
     }
 
     if (request.method === "PATCH" && pathname.startsWith("/api/notifications/") && pathname.endsWith("/read")) {
+      const jwtUser = getJwtFromHeader(request);
+      if (!jwtUser) {
+        return json({ error: "Authentication required" }, 401);
+      }
       const notifId = pathname.replace("/api/notifications/", "").replace("/read", "");
-      const updated = storage.markNotificationRead(notifId);
+      const updated = storage.markNotificationRead(notifId, jwtUser.userId, jwtUser.role === "admin");
       if (!updated) return json({ error: "Notification not found" }, 404);
       return json({ notification: updated });
     }
 
     if (request.method === "POST" && pathname === "/api/notifications/mark-all-read") {
       const jwtUser = getJwtFromHeader(request);
-      const queryUserId = url.searchParams.get("userId") || undefined;
-      const targetUserId = jwtUser?.userId || queryUserId || "usr-farmer-1";
+      if (!jwtUser) {
+        return json({ error: "Authentication required" }, 401);
+      }
+      const targetUserId = jwtUser.role === "admin" ? (url.searchParams.get("userId") || jwtUser.userId) : jwtUser.userId;
       storage.markAllNotificationsRead(targetUserId);
       return json({ ok: true, message: "All notifications marked as read" });
     }
 
     // 10. User Identity Verification API
     if (request.method === "POST" && pathname.startsWith("/api/users/") && pathname.endsWith("/verification")) {
+      const jwtUser = getJwtFromHeader(request);
+      if (!jwtUser) {
+        return json({ error: "Authentication required" }, 401);
+      }
       const userId = pathname.replace("/api/users/", "").replace("/verification", "");
+      if (jwtUser.role !== "admin" && jwtUser.userId !== userId) {
+        return json({ error: "Not authorized to modify verification status for other users" }, 403);
+      }
       const body = await readBody<{ status: "NOT_VERIFIED" | "PENDING" | "VERIFIED" | "REJECTED" }>(request);
       if (!body?.status) {
         return json({ error: "status is required" }, 400);
+      }
+      if (jwtUser.role !== "admin" && body.status !== "PENDING") {
+        return json({ error: "Only administrators can approve or reject verification" }, 403);
       }
       const user = storage.updateUserVerification(userId, body.status);
       if (!user) return json({ error: "User not found" }, 404);
@@ -720,18 +1248,25 @@ export async function handleApiRequest(request: Request): Promise<Response | nul
         read: false,
       });
 
-      return json({ user, verificationStatus: user.verificationStatus });
+      const { passwordHash: _passwordHash, ...safeUser } = user;
+      return json({ user: safeUser, verificationStatus: user.verificationStatus });
     }
 
-    // 11. Admin Dashboard Metrics & Management (Mandatory Admin Features)
+    // 11. Admin Dashboard Metrics & Management (Admin Authorization Strictly Required)
     if (request.method === "GET" && pathname === "/api/admin/metrics") {
       const jwtUser = getJwtFromHeader(request);
-      // Allow demo read, enforce admin role for edits
+      if (!jwtUser || jwtUser.role !== "admin") {
+        return json({ error: "Administrator authorization required" }, 403);
+      }
       const metrics = storage.getMetrics();
-      return json({ metrics, userRole: jwtUser?.role || "guest" });
+      return json({ metrics, userRole: jwtUser.role });
     }
 
     if (request.method === "GET" && pathname === "/api/admin/users") {
+      const jwtUser = getJwtFromHeader(request);
+      if (!jwtUser || jwtUser.role !== "admin") {
+        return json({ error: "Administrator authorization required" }, 403);
+      }
       const users = storage.getUsers().map((u) => ({
         id: u.id,
         name: u.name,
@@ -747,10 +1282,15 @@ export async function handleApiRequest(request: Request): Promise<Response | nul
     }
 
     if (request.method === "POST" && pathname.startsWith("/api/admin/users/") && pathname.endsWith("/toggle")) {
+      const jwtUser = getJwtFromHeader(request);
+      if (!jwtUser || jwtUser.role !== "admin") {
+        return json({ error: "Administrator authorization required" }, 403);
+      }
       const userId = pathname.replace("/api/admin/users/", "").replace("/toggle", "");
       const updated = storage.toggleUserStatus(userId);
       if (!updated) return json({ error: "User not found" }, 404);
-      return json({ user: updated });
+      const { passwordHash: _passwordHash, ...safeUser } = updated;
+      return json({ user: safeUser });
     }
 
     // 10. Live Agricultural Weather API
@@ -836,14 +1376,16 @@ export async function handleApiRequest(request: Request): Promise<Response | nul
         message,
       });
 
-      // Create admin notification
-      storage.createNotification({
-        userId: "usr-admin-1",
-        title: `Contact Inquiry: ${created.category}`,
-        message: `${created.fullName} (${created.phone}) sent inquiry: "${created.subject}"`,
-        type: "contact_received",
-        read: false,
-      });
+      const admin = storage.getUsers().find((user) => user.role === "admin" && user.status === "active");
+      if (admin) {
+        storage.createNotification({
+          userId: admin.id,
+          title: `Contact Inquiry: ${created.category}`,
+          message: `${created.fullName} (${created.phone}) sent inquiry: "${created.subject}"`,
+          type: "contact_received",
+          read: false,
+        });
+      }
 
       return json({
         success: true,

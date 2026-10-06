@@ -266,6 +266,10 @@ export default function AddEquipment({ onNavigate }: Props) {
 
   // Final Publish Handler
   const handlePublish = async () => {
+    if (!currentUser || currentUser.role !== 'owner') {
+      onNavigate('login')
+      return
+    }
     if (!validateStep(1) || !validateStep(3) || !validateStep(4)) {
       return
     }
@@ -283,10 +287,10 @@ export default function AddEquipment({ onNavigate }: Props) {
     const coords = LOCATION_COORDINATES[district] || { lat: 10.998, lng: 76.96 }
     const locationString = `${district}, Tamil Nadu`
 
-    // Owner info from authenticated user or fallback demo owner
-    const ownerName = currentUser?.name || 'Selvam Murugan'
-    const ownerPhone = currentUser?.phone || '+91 94432 10987'
-    const ownerId = currentUser?.id || 'usr-owner-1'
+    // Owner info from authenticated user
+    const ownerName = currentUser?.name || ''
+    const ownerPhone = currentUser?.phone || ''
+    const ownerId = currentUser?.id || ''
 
     // Construct adaptive specs
     const specsList = [
@@ -1378,7 +1382,7 @@ export default function AddEquipment({ onNavigate }: Props) {
                         {isTamil ? 'உரிமையாளர்' : 'Owner'}
                       </div>
                       <div style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>
-                        {currentUser?.name || 'Selvam Murugan'} ({currentUser?.phone || '+91 94432 10987'})
+                        {currentUser?.name || ''}{currentUser?.phone ? ` (${currentUser.phone})` : ''}
                       </div>
                     </div>
 

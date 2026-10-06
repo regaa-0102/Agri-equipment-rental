@@ -25,14 +25,6 @@ import {
 const P = '#2E7D32'
 const PM = '#E8F5E9'
 
-const bookingRequests = [
-  { id: 'REQ-4821', farmer: 'Rajesh Kumar', equipment: 'John Deere 5310', from: '10 Aug', to: '13 Aug', amount: '₹8,800', status: 'pending', location: 'Thanjavur' },
-  { id: 'REQ-4799', farmer: 'Sunita Patel', equipment: 'John Deere 5310', from: '15 Aug', to: '17 Aug', amount: '₹6,600', status: 'pending', location: 'Coimbatore' },
-  { id: 'REQ-4755', farmer: 'Mohan Reddy', equipment: 'New Holland TC5.30', from: '20 Aug', to: '25 Aug', amount: '₹29,000', status: 'approved', location: 'Salem' },
-  { id: 'REQ-4712', farmer: 'Kiran Patil', equipment: 'John Deere 5310', from: '01 Sep', to: '03 Sep', amount: '₹6,600', status: 'approved', location: 'Madurai' },
-  { id: 'REQ-4678', farmer: 'Balram Yadav', equipment: 'Shaktiman Rotary Tiller', from: '28 Jul', to: '29 Jul', amount: '₹2,200', status: 'completed', location: 'Coimbatore' },
-]
-
 const revenueMonths = [
   { month: 'Mar', v: 28 }, { month: 'Apr', v: 42 }, { month: 'May', v: 35 },
   { month: 'Jun', v: 55 }, { month: 'Jul', v: 48 }, { month: 'Aug', v: 72 },
@@ -51,10 +43,20 @@ export default function OwnerDashboard({ onNavigate }: Props) {
   const [deleteWarning, setDeleteWarning] = useState<string | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
   const [toastMessage, setToastMessage] = useState<string | null>(null)
+  const [bookingRequests, setBookingRequests] = useState<Array<{
+    id: string
+    farmerName: string
+    equipmentName: string
+    startDate: string
+    endDate: string
+    totalAmount: number
+    status: string
+  }>>([])
+  const [bookingError, setBookingError] = useState<string | null>(null)
 
   const currentUser = getStoredUser()
-  const ownerId = currentUser?.id || 'usr-owner-1'
-  const ownerName = currentUser?.name || 'Selvam Murugan'
+  const ownerId = currentUser?.id || ''
+  const ownerName = currentUser?.name || ''
 
   useEffect(() => {
     setEquipmentList(getFullCatalog())
@@ -68,17 +70,22 @@ export default function OwnerDashboard({ onNavigate }: Props) {
     return () => window.removeEventListener('agrirent_catalog_updated', handleUpdate)
   }, [])
 
+  useEffect(() => {
+    void api.getBookings()
+      .then(({ bookings }) => setBookingRequests(bookings))
+      .catch((error: unknown) => {
+        setBookingError(error instanceof Error ? error.message : 'Could not load bookings.')
+        console.error('Could not load owner bookings', error)
+      })
+  }, [])
+
   // Filter listings belonging to this owner
   const myEquipment = useMemo(() => {
     return equipmentList.filter((item) => {
-      return (
-        item.ownerId === ownerId ||
-        item.owner?.toLowerCase().includes('selvam') ||
-        item.owner?.toLowerCase().includes(ownerName.toLowerCase().split(' ')[0] || '') ||
-        item.id.startsWith('eq-owner-')
-      )
+      return Boolean(ownerId) && item.ownerId === ownerId
     })
-  }, [equipmentList, ownerId, ownerName])
+  }, [equipmentList, ownerId])
+  const pendingBookingCount = bookingRequests.filter((booking) => booking.status === 'pending').length
 
   // Dynamic Dashboard Statistics
   const totalEquipmentCount = myEquipment.length
@@ -454,26 +461,30 @@ export default function OwnerDashboard({ onNavigate }: Props) {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18 }}>
                 <h3 style={{ fontWeight: 700, fontSize: 17, color: '#111827', margin: 0 }}>{t('Booking Requests')}</h3>
                 <span style={{ background: '#FEF3C7', color: '#D97706', fontSize: 12, fontWeight: 700, borderRadius: 8, padding: '4px 10px' }}>
-                  2 {isTamil ? 'நிலுவையில்' : 'Pending'}
+                  {pendingBookingCount} {isTamil ? 'நிலுவையில்' : 'Pending'}
                 </span>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                 {bookingRequests.slice(0, 3).map((b) => (
                   <div key={b.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px', background: '#F9FAFB', borderRadius: 12 }}>
                     <div>
-                      <div style={{ fontWeight: 700, fontSize: 13, color: '#111827' }}>{b.equipment}</div>
+                      <div style={{ fontWeight: 700, fontSize: 13, color: '#111827' }}>{b.equipmentName}</div>
                       <div style={{ fontSize: 11, color: '#6B7280' }}>
-                        {b.farmer} • {b.from} → {b.to}
+                        {b.farmerName} • {new Date(b.startDate).toLocaleDateString()} → {new Date(b.endDate).toLocaleDateString()}
                       </div>
                     </div>
                     <div style={{ textAlign: 'right' }}>
-                      <div style={{ fontWeight: 800, fontSize: 13, color: P }}>{b.amount}</div>
+                      <div style={{ fontWeight: 800, fontSize: 13, color: P }}>₹{b.totalAmount.toLocaleString('en-IN')}</div>
                       <span style={{ fontSize: 10, fontWeight: 700, color: b.status === 'pending' ? '#D97706' : '#16A34A', textTransform: 'uppercase' }}>
                         {b.status}
                       </span>
                     </div>
                   </div>
                 ))}
+                {bookingError && <div role="alert" style={{ color: '#991B1B', fontSize: 12 }}>{bookingError}</div>}
+                {!bookingError && bookingRequests.length === 0 && (
+                  <div style={{ color: '#6B7280', fontSize: 13 }}>{isTamil ? 'முன்பதிவுகள் எதுவும் இல்லை.' : 'No bookings yet.'}</div>
+                )}
               </div>
             </div>
           </div>

@@ -82,11 +82,11 @@ export default function BookingRequestsPage({ onNavigate }: Props) {
 
     // Send notification to farmer
     addNotification({
-      userId: 'usr-farmer-1',
+      userId: req.id,
       title: isTamil ? `முன்பதிவு ஏற்கப்பட்டது: ${req.equipment}` : `Booking Approved: ${req.equipment}`,
       message: isTamil
         ? `உரிமையாளர் ${currentUser?.name || 'உரிமையாளர்'} உங்கள் ${req.equipment} முன்பதிவை (${req.dates}) உறுதிப்படுத்தியுள்ளார்.`
-        : `Owner ${currentUser?.name || 'Selvam Murugan'} has confirmed and approved your booking for ${req.equipment} (${req.dates}).`,
+        : `Owner ${currentUser?.name || 'Equipment Owner'} has confirmed and approved your booking for ${req.equipment} (${req.dates}).`,
       type: 'booking_confirmed',
       relatedId: req.id,
     })
@@ -101,7 +101,7 @@ export default function BookingRequestsPage({ onNavigate }: Props) {
 
     // Send notification to farmer
     addNotification({
-      userId: 'usr-farmer-1',
+      userId: req.id,
       title: isTamil ? `முன்பதிவு நிராகரிக்கப்பட்டது: ${req.equipment}` : `Booking Declined: ${req.equipment}`,
       message: isTamil
         ? `கருவி வேறு பணியில் இருப்பதால் உங்கள் முன்பதிவு ரத்து செய்யப்பட்டது. முழு வைப்புத்தொகை திரும்பப் பெறப்பட்டது.`

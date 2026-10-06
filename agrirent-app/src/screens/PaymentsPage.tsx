@@ -1,8 +1,8 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Sidebar from '../components/Sidebar'
 import { useLanguage } from '../context/LanguageContext'
-import { getStoredUser } from '../lib/api-client'
-import { getStoredBookings } from '../lib/bookings'
+import { api, getStoredUser } from '../lib/api-client'
+import { findCatalogItem } from '../lib/catalog'
 import { CreditCard, ShieldCheck, ArrowDownRight, Clock, CheckCircle2, Download, AlertCircle } from 'lucide-react'
 
 const P = '#2E7D32'
@@ -15,13 +15,36 @@ interface Props {
 export default function PaymentsPage({ onNavigate }: Props) {
   const { t, isTamil } = useLanguage()
   const currentUser = getStoredUser()
-  const role = currentUser?.role || 'farmer'
-  const bookings = getStoredBookings()
+  const [bookings, setBookings] = useState<Array<{
+    id: string
+    listingId: string
+    equipmentName: string
+    ownerName: string
+    startDate: string
+    endDate: string
+    totalAmount: number
+    securityDeposit: number
+    status: string
+    escrowStatus: string
+  }>>([])
+  const [loadError, setLoadError] = useState('')
+  useEffect(() => {
+    void api.getBookings().then((response) => setBookings(response.bookings)).catch((error: unknown) => {
+      setLoadError(error instanceof Error ? error.message : 'Could not load payment records.')
+    })
+  }, [])
 
   const [activeTab, setActiveTab] = useState<'all' | 'escrow' | 'completed'>('all')
+  if (!currentUser) return null
+  const role = currentUser.role
 
-  const totalSpent = bookings.reduce((sum, b) => sum + (b.totalNumeric || 0), 0)
-  const escrowHeld = bookings.filter((b) => b.status === 'active' || b.status === 'confirmed').reduce((sum, b) => sum + 2500, 0)
+  const visibleBookings = bookings.filter((booking) =>
+    activeTab === 'all' ||
+    (activeTab === 'escrow' && booking.escrowStatus === 'held') ||
+    (activeTab === 'completed' && booking.status === 'completed')
+  )
+  const totalSpent = bookings.reduce((sum, booking) => sum + booking.totalAmount, 0)
+  const escrowHeld = bookings.filter((booking) => booking.escrowStatus === 'held').reduce((sum, booking) => sum + booking.securityDeposit, 0)
 
   return (
     <div style={{ display: 'flex', minHeight: 'calc(100vh - 44px)', width: '100%', minWidth: 0, background: '#F9FAFB' }}>
@@ -65,6 +88,7 @@ export default function PaymentsPage({ onNavigate }: Props) {
         </div>
 
         <div style={{ padding: '28px', maxWidth: 1100 }}>
+          {loadError && <div role="alert" style={{ marginBottom: 16, padding: 12, borderRadius: 8, color: '#B91C1C', background: '#FEF2F2' }}>{loadError}</div>}
           {/* Summary Metric Cards */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 20, marginBottom: 28 }}>
             <div className="card-shadow" style={{ background: '#fff', borderRadius: 18, padding: 22, border: '1px solid #E5E7EB' }}>
@@ -119,7 +143,7 @@ export default function PaymentsPage({ onNavigate }: Props) {
               <h3 style={{ margin: 0, fontSize: 16, fontWeight: 800, color: '#111827' }}>
                 {isTamil ? 'பரிவர்த்தனை வரலாறு' : 'Recent Payment Transactions'}
               </h3>
-              <span style={{ fontSize: 12, color: '#9CA3AF' }}>Showing {bookings.length} payments</span>
+              <span style={{ fontSize: 12, color: '#9CA3AF' }}>Showing {visibleBookings.length} payments</span>
             </div>
 
             <div style={{ overflowX: 'auto' }}>
@@ -136,23 +160,23 @@ export default function PaymentsPage({ onNavigate }: Props) {
                   </tr>
                 </thead>
                 <tbody>
-                  {bookings.map((b) => (
+                  {visibleBookings.map((b) => (
                     <tr key={b.id} style={{ borderBottom: '1px solid #F3F4F6' }}>
                       <td style={{ padding: '16px 24px', fontWeight: 700, color: '#111827' }}>
                         TXN-{b.id}
                       </td>
                       <td style={{ padding: '16px 16px' }}>
-                        <div style={{ fontWeight: 700, color: '#111827' }}>{b.equipment}</div>
-                        <div style={{ fontSize: 11, color: '#9CA3AF' }}>{b.cat}</div>
+                        <div style={{ fontWeight: 700, color: '#111827' }}>{b.equipmentName}</div>
+                        <div style={{ fontSize: 11, color: '#9CA3AF' }}>{findCatalogItem(b.listingId)?.cat || 'Equipment'}</div>
                       </td>
                       <td style={{ padding: '16px 16px', color: '#4B5563' }}>
-                        {b.owner}
+                        {b.ownerName}
                       </td>
                       <td style={{ padding: '16px 16px', color: '#6B7280' }}>
-                        {b.from} → {b.to}
+                        {b.startDate} → {b.endDate}
                       </td>
                       <td style={{ padding: '16px 16px', fontWeight: 800, color: P }}>
-                        {b.amount}
+                        ₹{b.totalAmount.toLocaleString('en-IN')}
                       </td>
                       <td style={{ padding: '16px 16px' }}>
                         <span
@@ -169,7 +193,7 @@ export default function PaymentsPage({ onNavigate }: Props) {
                           }}
                         >
                           <ShieldCheck size={12} />
-                          <span>AgriSafe™ Held</span>
+                          <span>{b.escrowStatus}</span>
                         </span>
                       </td>
                       <td style={{ padding: '16px 24px' }}>

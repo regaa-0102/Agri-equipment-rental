@@ -201,7 +201,8 @@ export function saveNotifications(items: NotificationItem[]): void {
  * Farmers never see owners' private notifications and vice-versa.
  */
 export function getUserNotifications(targetUserId?: string): NotificationItem[] {
-  const currentUserId = targetUserId || getStoredUser()?.id || 'usr-farmer-1'
+  const currentUserId = targetUserId || getStoredUser()?.id
+  if (!currentUserId) return []
   const all = getStoredNotifications()
   return all
     .filter((n) => n.userId === currentUserId || n.userId === 'all')
@@ -213,17 +214,21 @@ export function getUnreadCount(targetUserId?: string): number {
 }
 
 export function markAsRead(notificationId: string): void {
+  const currentUserId = getStoredUser()?.id
+  if (!currentUserId) return
   const list = getStoredNotifications()
   const idx = list.findIndex((n) => n.id === notificationId)
   const item = list[idx]
-  if (idx !== -1 && item) {
+  if (idx !== -1 && item && (item.userId === currentUserId || item.userId === 'all')) {
     list[idx] = { ...item, read: true }
     saveNotifications(list)
   }
 }
 
 export function markAllAsRead(targetUserId?: string): void {
-  const currentUserId = targetUserId || getStoredUser()?.id || 'usr-farmer-1'
+  const authenticatedUserId = getStoredUser()?.id
+  if (!authenticatedUserId || (targetUserId && targetUserId !== authenticatedUserId)) return
+  const currentUserId = targetUserId || authenticatedUserId
   const list = getStoredNotifications()
   const updated = list.map((n) => {
     if (n.userId === currentUserId || n.userId === 'all') {

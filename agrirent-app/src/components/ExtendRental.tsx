@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { CalendarDays, Check, Clock, AlertCircle, X } from 'lucide-react'
 import { useLanguage } from '../context/LanguageContext'
-import { BookingItem, extendBookingRental } from '../lib/bookings'
+import { BookingItem } from '../lib/bookings'
+import { api } from '../lib/api-client'
 
 interface Props {
   booking: BookingItem
@@ -63,20 +64,26 @@ export default function ExtendRental({ booking, isOpen, onClose, onSuccess }: Pr
     setIsConfirming(true)
   }
 
-  const handleConfirm = () => {
-    const res = extendBookingRental(booking.id, newEndDate)
-    if (res.success && res.booking) {
+  const handleConfirm = async () => {
+    try {
+      await api.extendBooking(booking.id, newEndDate)
       setSuccessMsg(
         isTamil
           ? `வாடகை ${newEndDate} வரை வெற்றிகரமாக நீட்டிக்கப்பட்டது!`
           : `Rental successfully extended to ${newEndDate}!`
       )
       setTimeout(() => {
-        if (onSuccess && res.booking) onSuccess(res.booking)
+        if (onSuccess) onSuccess({
+          ...booking,
+          to: newEndDate,
+          days: (booking.days || 0) + extraDays,
+          totalNumeric: updatedTotal,
+          amount: `₹${updatedTotal.toLocaleString()}`,
+        })
         onClose()
       }, 1400)
-    } else {
-      setErrorMsg(res.error || (isTamil ? 'நீட்டிப்பு தோல்வியடைந்தது' : 'Extension failed'))
+    } catch (error) {
+      setErrorMsg(error instanceof Error ? error.message : (isTamil ? 'நீட்டிப்பு தோல்வியடைந்தது' : 'Extension failed'))
       setIsConfirming(false)
     }
   }

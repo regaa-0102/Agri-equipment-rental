@@ -15,46 +15,7 @@ export interface UserVerificationData {
 const STORAGE_KEY = 'agrirent_user_verifications'
 const EVENT_KEY = 'agrirent_verification_changed'
 
-const DEFAULT_VERIFICATIONS: Record<string, UserVerificationData> = {
-  'usr-farmer-1': {
-    status: 'VERIFIED',
-    idType: 'Aadhaar (Prototype Demo)',
-    maskedId: '•••• •••• 4821',
-    submittedAt: '2026-02-14T10:00:00.000Z',
-    verifiedAt: '2026-02-14T11:30:00.000Z',
-    remarks: 'Profile and identity credentials verified successfully.',
-  },
-  'usr-farmer-2': {
-    status: 'NOT_VERIFIED',
-    idType: 'Aadhaar (Prototype Demo)',
-    maskedId: '',
-    remarks: 'Identity verification not yet initiated.',
-  },
-  'usr-owner-1': {
-    status: 'VERIFIED',
-    idType: 'Aadhaar (Prototype Demo)',
-    maskedId: '•••• •••• 9012',
-    submittedAt: '2026-01-20T09:00:00.000Z',
-    verifiedAt: '2026-01-20T10:15:00.000Z',
-    remarks: 'Commercial fleet owner identity verified.',
-  },
-  'usr-owner-2': {
-    status: 'VERIFIED',
-    idType: 'Aadhaar (Prototype Demo)',
-    maskedId: '•••• •••• 7734',
-    submittedAt: '2026-01-25T15:00:00.000Z',
-    verifiedAt: '2026-01-25T16:00:00.000Z',
-    remarks: 'Verified enterprise equipment partner.',
-  },
-  'usr-admin-1': {
-    status: 'VERIFIED',
-    idType: 'Government / Admin ID',
-    maskedId: '•••• •••• 0001',
-    submittedAt: '2026-01-10T10:00:00.000Z',
-    verifiedAt: '2026-01-10T10:00:00.000Z',
-    remarks: 'Administrator superuser.',
-  },
-}
+const DEFAULT_VERIFICATIONS: Record<string, UserVerificationData> = {}
 
 function loadAllVerifications(): Record<string, UserVerificationData> {
   if (typeof window === 'undefined') return DEFAULT_VERIFICATIONS
@@ -81,14 +42,24 @@ function saveAllVerifications(data: Record<string, UserVerificationData>): void 
 }
 
 export function getUserVerification(userId?: string): UserVerificationData {
-  const currentUserId = userId || getStoredUser()?.id || 'usr-farmer-1'
+  const activeUser = getStoredUser()
+  const currentUserId = userId || activeUser?.id || ''
   const all = loadAllVerifications()
-  if (all[currentUserId]) {
+  if (currentUserId && all[currentUserId]) {
     return all[currentUserId]
+  }
+  if (activeUser && (!currentUserId || activeUser.id === currentUserId)) {
+    const lastFour = activeUser.phone?.replace(/\D/g, '').slice(-4)
+    return {
+      status: activeUser.verificationStatus || 'NOT_VERIFIED',
+      idType: 'Government / Mobile ID',
+      maskedId: lastFour ? `•••• •••• ${lastFour}` : '',
+      remarks: 'Identity verification status from the authenticated account.',
+    }
   }
   return {
     status: 'NOT_VERIFIED',
-    idType: 'Aadhaar (Prototype Demo)',
+    idType: 'Aadhaar / Government ID',
     maskedId: '',
     remarks: 'No verification record found.',
   }
