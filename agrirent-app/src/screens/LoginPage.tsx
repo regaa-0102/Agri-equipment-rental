@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { ShieldCheck, Lock, Mail, UserCheck } from 'lucide-react'
 import { useLanguage } from '../context/LanguageContext'
 import { api, setAuthenticatedUser } from '../lib/api-client'
+import { DEMO_OTP_ROLE_EMAIL } from '../lib/auth-config'
 
 const P = '#2E7D32'
 
@@ -11,7 +12,7 @@ interface Props {
 
 export default function LoginPage({ onNavigate }: Props) {
   const { t, isTamil } = useLanguage()
-  const [tab, setTab] = useState<'farmer' | 'owner'>('farmer')
+  const [tab, setTab] = useState<'farmer' | 'owner' | 'admin'>('farmer')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [remember, setRemember] = useState(true)
@@ -20,6 +21,19 @@ export default function LoginPage({ onNavigate }: Props) {
   const [googleRoleStep, setGoogleRoleStep] = useState(false)
   const [googleRole, setGoogleRole] = useState<'farmer' | 'owner'>('farmer')
   const [googleLoading, setGoogleLoading] = useState(false)
+  const [otpMode, setOtpMode] = useState(false)
+  const [otpCode, setOtpCode] = useState('')
+  const [otpRequested, setOtpRequested] = useState(false)
+  const [otpResendSeconds, setOtpResendSeconds] = useState(0)
+  const [otpRole, setOtpRole] = useState<'farmer' | 'owner' | 'admin'>('farmer')
+  const [otpLoading, setOtpLoading] = useState(false)
+  const isDemoOtpEmail = email.trim().toLowerCase() === DEMO_OTP_ROLE_EMAIL
+
+  useEffect(() => {
+    if (otpResendSeconds <= 0) return
+    const timer = window.setTimeout(() => setOtpResendSeconds((seconds) => seconds - 1), 1000)
+    return () => window.clearTimeout(timer)
+  }, [otpResendSeconds])
 
   useEffect(() => {
     const result = new URLSearchParams(window.location.search).get('google')
@@ -67,7 +81,7 @@ export default function LoginPage({ onNavigate }: Props) {
     }
   }, [isTamil, onNavigate])
 
-  const handleRoleTab = (role: 'farmer' | 'owner') => {
+  const handleRoleTab = (role: 'farmer' | 'owner' | 'admin') => {
     setTab(role)
     setError(null)
   }
@@ -127,6 +141,39 @@ export default function LoginPage({ onNavigate }: Props) {
       }
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleRequestEmailOtp = async () => {
+    setOtpLoading(true)
+    setError(null)
+    try {
+      await api.requestEmailOtp(email.trim(), isDemoOtpEmail ? otpRole : undefined)
+      setOtpRequested(true)
+      setOtpResendSeconds(30)
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : ''
+      setError(message || (isTamil
+        ? 'உள்நுழைவு குறியீட்டை அனுப்ப முடியவில்லை. மீண்டும் முயற்சிக்கவும்.'
+        : 'Could not send the sign-in code. Please try again.'))
+    } finally {
+      setOtpLoading(false)
+    }
+  }
+
+  const handleVerifyEmailOtp = async () => {
+    setOtpLoading(true)
+    setError(null)
+    try {
+      const res = await api.verifyEmailOtp(email.trim(), otpCode.trim(), isDemoOtpEmail ? otpRole : undefined)
+      onNavigate(res.user.role === 'admin' ? 'admin-dashboard' : res.user.role === 'owner' ? 'owner-dashboard' : 'farmer-dashboard')
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : ''
+      setError(message || (isTamil
+        ? 'குறியீடு சரிபார்க்கப்படவில்லை. மீண்டும் முயற்சிக்கவும்.'
+        : 'The code could not be verified. Please try again.'))
+    } finally {
+      setOtpLoading(false)
     }
   }
 
@@ -247,7 +294,7 @@ export default function LoginPage({ onNavigate }: Props) {
               {isTamil ? 'உள்நுழைவு பாத்திரம் (Role)' : 'Select Your Role'}
             </label>
             <div style={{ display: 'flex', background: '#F1F5F9', borderRadius: 12, padding: 4 }}>
-              {(['farmer', 'owner'] as const).map((r) => (
+              {(['farmer', 'owner', 'admin'] as const).map((r) => (
                 <button
                   key={r}
                   type="button"
@@ -268,7 +315,9 @@ export default function LoginPage({ onNavigate }: Props) {
                 >
                   {r === 'farmer'
                     ? (isTamil ? '🌾 விவசாயி (Farmer)' : '🌾 Farmer')
-                    : (isTamil ? '🔧 உபகரண உரிமையாளர்' : '🔧 Equipment Owner')}
+                    : r === 'owner'
+                      ? (isTamil ? '🔧 உபகரண உரிமையாளர்' : '🔧 Equipment Owner')
+                      : (isTamil ? '⚙️ நிர்வாகி' : '⚙️ Admin')}
                 </button>
               ))}
             </div>
@@ -301,7 +350,12 @@ export default function LoginPage({ onNavigate }: Props) {
                   className="input-field"
                   type="email"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => {
+                    setEmail(e.target.value)
+                    setOtpRequested(false)
+                    setOtpResendSeconds(0)
+                    setOtpCode('')
+                  }}
                   placeholder="name@example.com"
                   required
                   autoComplete="email"
@@ -369,6 +423,153 @@ export default function LoginPage({ onNavigate }: Props) {
               </span>
             </button>
           </form>
+
+          {!otpMode ? (
+            <button
+              type="button"
+              onClick={() => {
+                setOtpRequested(false)
+                setOtpResendSeconds(0)
+                setOtpCode('')
+                setOtpMode(true)
+                setError(null)
+              }}
+              style={{
+                width: '100%',
+                marginTop: 12,
+                padding: '11px',
+                borderRadius: 12,
+                background: '#fff',
+                color: P,
+                border: '1px solid #BBF7D0',
+                fontSize: 14,
+                fontWeight: 800,
+                cursor: 'pointer',
+              }}
+            >
+              {isTamil ? 'மின்னஞ்சல் OTP மூலம் உள்நுழைக' : 'Login with Email OTP'}
+            </button>
+          ) : (
+            <div style={{ marginTop: 14, padding: 14, border: '1px solid #BBF7D0', borderRadius: 12, background: '#F0FDF4' }}>
+              <div style={{ fontSize: 15, fontWeight: 800, color: '#166534', marginBottom: 12 }}>
+                {isTamil ? 'மின்னஞ்சல் OTP மூலம் உள்நுழைக' : 'Login with Email OTP'}
+              </div>
+              <p style={{ fontSize: 12, color: '#475569', margin: '0 0 10px' }}>
+                {isTamil
+                  ? isDemoOtpEmail
+                    ? 'இந்த டெமோ மின்னஞ்சலுக்கு, OTP சரிபார்த்த பிறகு தேர்ந்தெடுத்த பங்கு பயன்படுத்தப்படும்.'
+                    : 'மேலே உள்ள மின்னஞ்சலைப் பயன்படுத்துகிறது. உங்கள் கணக்கின் தற்போதைய பங்கு பாதுகாக்கப்படும்.'
+                  : isDemoOtpEmail
+                    ? 'For this demo email, the selected role is used after OTP verification.'
+                    : 'Uses the email above and keeps the role saved on your account.'}
+              </p>
+              {isDemoOtpEmail && (
+                <div style={{ marginBottom: 10 }}>
+                  <label htmlFor="otp-demo-role" style={{ display: 'block', fontSize: 13, fontWeight: 700, color: '#334155', marginBottom: 6 }}>
+                    {isTamil ? 'டெமோ பங்கு' : 'Demo role'}
+                  </label>
+                  <select
+                    id="otp-demo-role"
+                    value={otpRole}
+                    disabled={otpRequested || otpLoading}
+                    onChange={(e) => {
+                      const role = e.target.value
+                      if (role === 'farmer' || role === 'owner' || role === 'admin') setOtpRole(role)
+                    }}
+                    className="input-field"
+                    style={{ width: '100%' }}
+                  >
+                    <option value="farmer">{isTamil ? 'விவசாயி (Farmer)' : 'Farmer'}</option>
+                    <option value="owner">{isTamil ? 'உபகரண உரிமையாளர்' : 'Equipment Owner'}</option>
+                    <option value="admin">{isTamil ? 'நிர்வாகி' : 'Admin'}</option>
+                  </select>
+                </div>
+              )}
+              {!otpRequested ? (
+                <button
+                  type="button"
+                  onClick={() => void handleRequestEmailOtp()}
+                  disabled={otpLoading || !email.trim()}
+                  className="btn-primary"
+                  style={{ width: '100%', padding: 11, borderRadius: 10, fontWeight: 800 }}
+                >
+                  {otpLoading
+                    ? (isTamil ? 'அனுப்புகிறது...' : 'Sending code...')
+                    : (isTamil ? 'OTP அனுப்பு' : 'Send OTP')}
+                </button>
+              ) : (
+                <>
+                  <p role="status" style={{ fontSize: 12, color: '#166534', margin: '0 0 10px' }}>
+                    {isTamil
+                      ? 'கணக்கு இருந்தால், 5 நிமிடங்களுக்குள் காலாவதியாகும் குறியீடு மின்னஞ்சலில் அனுப்பப்படும்.'
+                      : 'If an account exists, a code has been sent and will expire in 5 minutes.'}
+                  </p>
+                  {otpResendSeconds > 0 && (
+                    <p role="status" style={{ fontSize: 12, color: '#475569', margin: '0 0 10px', textAlign: 'center' }}>
+                      {isTamil
+                        ? `${otpResendSeconds} விநாடிகளில் மீண்டும் OTP அனுப்பலாம்`
+                        : `You can resend an OTP in ${otpResendSeconds} seconds`}
+                    </p>
+                  )}
+                  <label htmlFor="otp-code" style={{ display: 'block', fontSize: 13, fontWeight: 700, color: '#334155', marginBottom: 6 }}>
+                    {isTamil ? '6 இலக்க குறியீடு' : '6-digit code'}
+                  </label>
+                  <input
+                    id="otp-code"
+                    className="input-field"
+                    type="text"
+                    inputMode="numeric"
+                    autoComplete="one-time-code"
+                    pattern="[0-9]{6}"
+                    maxLength={6}
+                    value={otpCode}
+                    onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                    required
+                    style={{ width: '100%', marginBottom: 10 }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => void handleVerifyEmailOtp()}
+                    disabled={otpLoading || otpCode.length !== 6}
+                    className="btn-primary"
+                    style={{ width: '100%', padding: 11, borderRadius: 10, fontWeight: 800 }}
+                  >
+                    {otpLoading
+                      ? (isTamil ? 'சரிபார்க்கிறது...' : 'Verifying code...')
+                      : (isTamil ? 'குறியீட்டை சரிபார்த்து உள்நுழைக' : 'Verify Code & Sign In')}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => void handleRequestEmailOtp()}
+                    disabled={otpLoading || otpResendSeconds > 0}
+                    style={{
+                      display: 'block',
+                      margin: '10px auto 0',
+                      background: 'none',
+                      border: 0,
+                      color: otpResendSeconds > 0 ? '#94A3B8' : P,
+                      fontSize: 12,
+                      cursor: otpResendSeconds > 0 ? 'not-allowed' : 'pointer',
+                    }}
+                  >
+                    {otpResendSeconds > 0
+                      ? (isTamil ? `மீண்டும் அனுப்பு (${otpResendSeconds})` : `Resend OTP (${otpResendSeconds}s)`)
+                      : (isTamil ? 'மீண்டும் OTP அனுப்பு' : 'Resend OTP')}
+                  </button>
+                </>
+              )}
+              <button
+                type="button"
+                onClick={() => {
+                  setOtpMode(false)
+                  setError(null)
+                }}
+                style={{ display: 'block', margin: '10px auto 0', background: 'none', border: 0, color: '#64748B', fontSize: 12, cursor: 'pointer' }}
+              >
+                {isTamil ? 'கடவுச்சொல் உள்நுழைவுக்குத் திரும்பு' : 'Back to email and password'}
+              </button>
+            </div>
+          )}
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '20px 0', color: '#94A3B8', fontSize: 12, fontWeight: 700 }}>
             <span style={{ height: 1, background: '#E2E8F0', flex: 1 }} />

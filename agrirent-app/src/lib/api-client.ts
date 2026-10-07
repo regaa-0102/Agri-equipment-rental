@@ -49,7 +49,13 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
     } catch {}
     if (
       response.status === 401 &&
-      !['/api/auth/login', '/api/auth/register', '/api/auth/logout'].includes(endpoint)
+      ![
+        '/api/auth/login',
+        '/api/auth/register',
+        '/api/auth/logout',
+        '/api/auth/email-otp/request',
+        '/api/auth/email-otp/verify',
+      ].includes(endpoint)
     ) {
       setAuthenticatedUser(null)
     }
@@ -65,6 +71,22 @@ export const api = {
     const res = await request<{ user: UserSession }>('/api/auth/login', {
       method: 'POST',
       body: JSON.stringify({ email, password, role, remember }),
+    })
+    setAuthenticatedUser(res.user)
+    return res
+  },
+
+  async requestEmailOtp(email: string, role?: 'farmer' | 'owner' | 'admin') {
+    return request<{ success: boolean }>('/api/auth/email-otp/request', {
+      method: 'POST',
+      body: JSON.stringify({ email, role }),
+    })
+  },
+
+  async verifyEmailOtp(email: string, code: string, role?: 'farmer' | 'owner' | 'admin') {
+    const res = await request<{ user: UserSession }>('/api/auth/email-otp/verify', {
+      method: 'POST',
+      body: JSON.stringify({ email, code, role }),
     })
     setAuthenticatedUser(res.user)
     return res
@@ -245,7 +267,7 @@ export const api = {
   },
 
   async createBooking(data: { listingId: string; startDate: string; endDate: string; days: number }) {
-    return request<{ booking: any }>('/api/bookings', {
+    return request<{ booking: any; invoiceEmailSent: boolean }>('/api/bookings', {
       method: 'POST',
       body: JSON.stringify(data),
     })

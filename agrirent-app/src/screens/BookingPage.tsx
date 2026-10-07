@@ -63,6 +63,7 @@ export default function BookingPage({ onNavigate, selectedEquipment }: Props) {
   const [showConfirmModal, setShowConfirmModal] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [bookingSuccess, setBookingSuccess] = useState(false)
+  const [invoiceEmailSent, setInvoiceEmailSent] = useState(false)
   const [bookingError, setBookingError] = useState<string | null>(null)
 
   // Dynamic days calculation
@@ -100,12 +101,13 @@ export default function BookingPage({ onNavigate, selectedEquipment }: Props) {
     setBookingError(null)
 
     try {
-      await api.createBooking({ listingId: eq.id, startDate, endDate, days })
+      const result = await api.createBooking({ listingId: eq.id, startDate, endDate, days })
 
+      setInvoiceEmailSent(result.invoiceEmailSent)
       setBookingSuccess(true)
       setTimeout(() => {
         onNavigate('payment-success')
-      }, 700)
+      }, 1800)
     } catch (error) {
       setBookingError(error instanceof Error ? error.message : 'Booking could not be saved.')
     } finally {
@@ -675,6 +677,13 @@ export default function BookingPage({ onNavigate, selectedEquipment }: Props) {
               {bookingError && (
                 <div role="alert" style={{ color: '#991B1B', background: '#FEF2F2', border: '1px solid #FCA5A5', borderRadius: 10, padding: 12, marginBottom: 16 }}>
                   {bookingError}
+                </div>
+              )}
+              {bookingSuccess && (
+                <div role="status" style={{ color: '#166534', background: '#F0FDF4', border: '1px solid #BBF7D0', borderRadius: 10, padding: 12, marginBottom: 16 }}>
+                  {invoiceEmailSent
+                    ? (isTamil ? 'முன்பதிவு உறுதி செய்யப்பட்டது. விலைப்பட்டியல் உங்கள் மின்னஞ்சலுக்கு அனுப்பப்பட்டது.' : 'Booking confirmed. Invoice sent to your email.')
+                    : (isTamil ? 'முன்பதிவு உறுதி செய்யப்பட்டது.' : 'Booking confirmed.')}
                 </div>
               )}
               {/* Equipment Item Row */}

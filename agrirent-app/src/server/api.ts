@@ -1,6 +1,7 @@
-import { randomBytes, timingSafeEqual } from "node:crypto";
+import { createHmac, randomBytes, randomInt, timingSafeEqual } from "node:crypto";
 import { decodeJwt, signJwt, verifyJwt, type JwtPayload } from "./jwt";
 import { hashPassword, verifyPassword, storage, type StoredListing, type StoredUser, type StoredBooking } from "./storage";
+import { DEMO_OTP_ROLE_EMAIL } from "../lib/auth-config";
 
 const jsonHeaders = {
   "content-type": "application/json; charset=utf-8",
@@ -8,6 +9,12 @@ const jsonHeaders = {
   "access-control-allow-methods": "GET, POST, PUT, PATCH, DELETE, OPTIONS",
   "access-control-allow-headers": "Content-Type, Authorization",
 };
+
+type AuthRole = StoredUser["role"];
+
+function isAuthRole(role: unknown): role is AuthRole {
+  return role === "farmer" || role === "owner" || role === "admin";
+}
 
 function json(data: unknown, status = 200, extraHeaders?: Record<string, string>) {
   return new Response(JSON.stringify(data), { status, headers: { ...jsonHeaders, ...extraHeaders } });
@@ -32,12 +39,14 @@ function getJwtFromHeader(request: Request): JwtPayload | null {
   const claims = verifyJwt(token);
   if (!claims) return null;
   const user = storage.findUserById(claims.userId);
-  if (!user || user.status !== "active" || user.role !== claims.role) return null;
+  const isDemoOtpRole = user?.email.toLowerCase() === DEMO_OTP_ROLE_EMAIL &&
+    (claims.role === "farmer" || claims.role === "owner" || claims.role === "admin");
+  if (!user || user.status !== "active" || (user.role !== claims.role && !isDemoOtpRole)) return null;
   return {
     ...claims,
     name: user.name,
     email: user.email,
-    role: user.role,
+    role: claims.role,
     provider: user.provider || "local",
   };
 }
@@ -88,6 +97,165 @@ function googleConfiguration() {
     return null;
   }
   return { clientId, clientSecret, redirectUri };
+}
+
+const emailOtpPepper = randomBytes(32);
+const emailOtps = new Map<string, { hash: Buffer; expiresAt: number; attempts: number; role: AuthRole | null }>();
+const emailOtpRateLimits = new Map<string, number[]>();
+let lastEmailOtpCleanup = 0;
+
+function checkEmailOtpRateLimit(key: string, limit: number, windowMs: number, now: number): boolean {
+  const recent = (emailOtpRateLimits.get(key) || []).filter((timestamp) => now - timestamp < windowMs);
+  if (recent.length >= limit) {
+    emailOtpRateLimits.set(key, recent);
+    return false;
+  }
+  recent.push(now);
+  emailOtpRateLimits.set(key, recent);
+  return true;
+}
+
+function cleanupEmailOtpState(now: number): void {
+  if (now - lastEmailOtpCleanup < 60_000) return;
+  lastEmailOtpCleanup = now;
+  for (const [email, otp] of emailOtps) {
+    if (otp.expiresAt <= now) emailOtps.delete(email);
+  }
+  for (const [key, timestamps] of emailOtpRateLimits) {
+    const recent = timestamps.filter((timestamp) => now - timestamp < 15 * 60_000);
+    if (recent.length) emailOtpRateLimits.set(key, recent);
+    else emailOtpRateLimits.delete(key);
+  }
+}
+
+function hashEmailOtp(email: string, code: string): Buffer {
+  return createHmac("sha256", emailOtpPepper).update(`${email}:${code}`).digest();
+}
+
+async function sendEmailOtp(email: string, code: string): Promise<boolean> {
+  const apiKey = process.env["RESEND_API_KEY"]?.trim();
+  const from = process.env["AUTH_EMAIL_FROM"]?.trim();
+  if (!apiKey || !from) return false;
+
+  const response = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      authorization: `Bearer ${apiKey}`,
+      "content-type": "application/json",
+    },
+    body: JSON.stringify({
+      from,
+      to: [email],
+      subject: "Your AgriRent sign-in code",
+      text: `Your AgriRent sign-in code is ${code}. It expires in 5 minutes. If you did not request it, you can ignore this email.`,
+    }),
+  });
+  return response.ok;
+}
+
+function pdfText(value: string): string {
+  return value
+    .replace(/₹/g, "Rs. ")
+    .replace(/[–—]/g, "-")
+    .replace(/[^\x20-\x7E]/g, "?")
+    .replace(/([\\()])/g, "\\$1");
+}
+
+function createBookingInvoicePdf(booking: StoredBooking, farmerEmail: string, category: string, ownerEmail: string): Buffer {
+  const invoiceNumber = `INV-${booking.id}`;
+  const invoiceDate = new Date(booking.createdAt).toISOString().slice(0, 10);
+  const rows: [string, string][] = [
+    ["Invoice number", invoiceNumber],
+    ["Booking ID", booking.id],
+    ["Invoice date", invoiceDate],
+    ["Customer", booking.farmerName],
+    ["Customer email", farmerEmail],
+    ["Equipment", booking.equipmentName],
+    ["Category", category],
+    ["Equipment owner", booking.ownerName],
+    ...(ownerEmail ? [["Owner email", ownerEmail] as [string, string]] : []),
+    ["Rental start date", booking.startDate],
+    ["Rental end date", booking.endDate],
+    ["Rental duration", `${booking.days} day${booking.days === 1 ? "" : "s"}`],
+    ["Rental price", `Rs. ${booking.dailyRate.toLocaleString("en-IN")} / day`],
+    ["Total amount", `Rs. ${booking.totalAmount.toLocaleString("en-IN")}`],
+    ["Booking status", booking.status.toUpperCase()],
+  ];
+
+  const commands = [
+    "0.08 0.35 0.18 rg 0 744 612 48 re f",
+    "1 1 1 rg",
+    "BT /F1 20 Tf 48 762 Td (AgriRent) Tj ET",
+    "0.08 0.35 0.18 rg",
+    "BT /F1 10 Tf 48 724 Td (Booking Invoice) Tj ET",
+    "0 0 0 rg",
+  ];
+  let y = 696;
+  for (const [label, value] of rows) {
+    commands.push(`BT /F1 10 Tf 48 ${y} Td (${pdfText(label)}) Tj ET`);
+    commands.push(`BT /F1 10 Tf 210 ${y} Td (${pdfText(value)}) Tj ET`);
+    y -= 30;
+  }
+  commands.push("0.55 0.6 0.55 RG 48 72 m 564 72 l S");
+  commands.push("BT /F1 9 Tf 48 54 Td (Thank you for booking with AgriRent.) Tj ET");
+  const content = commands.join("\n");
+  const objects = [
+    "<< /Type /Catalog /Pages 2 0 R >>",
+    "<< /Type /Pages /Kids [3 0 R] /Count 1 >>",
+    "<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>",
+    "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>",
+    `<< /Length ${Buffer.byteLength(content, "ascii")} >>\nstream\n${content}\nendstream`,
+  ];
+
+  let document = "%PDF-1.4\n";
+  const offsets = [0];
+  for (const [index, object] of objects.entries()) {
+    offsets.push(Buffer.byteLength(document, "ascii"));
+    document += `${index + 1} 0 obj\n${object}\nendobj\n`;
+  }
+  const xrefOffset = Buffer.byteLength(document, "ascii");
+  document += `xref\n0 ${objects.length + 1}\n0000000000 65535 f \n`;
+  for (const offset of offsets.slice(1)) {
+    document += `${offset.toString().padStart(10, "0")} 00000 n \n`;
+  }
+  document += `trailer\n<< /Size ${objects.length + 1} /Root 1 0 R >>\nstartxref\n${xrefOffset}\n%%EOF`;
+  return Buffer.from(document, "ascii");
+}
+
+async function sendBookingInvoiceEmail(
+  email: string,
+  booking: StoredBooking,
+  invoicePdf: Buffer
+): Promise<boolean> {
+  const apiKey = process.env["RESEND_API_KEY"]?.trim();
+  const from = process.env["AUTH_EMAIL_FROM"]?.trim();
+  if (!apiKey || !from) {
+    console.warn(`Booking invoice email not sent for ${booking.id}: Resend is not configured.`);
+    return false;
+  }
+
+  const invoiceNumber = `INV-${booking.id}`;
+  const response = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      authorization: `Bearer ${apiKey}`,
+      "content-type": "application/json",
+    },
+    body: JSON.stringify({
+      from,
+      to: [email],
+      subject: `AgriRent Booking Invoice - ${invoiceNumber}`,
+      text: `Hello ${booking.farmerName},\n\nYour booking ${booking.id} for ${booking.equipmentName} is confirmed. The invoice PDF is attached.\n\nAgriRent`,
+      attachments: [{
+        filename: `${invoiceNumber}.pdf`,
+        content: invoicePdf.toString("base64"),
+      }],
+    }),
+  });
+  if (!response.ok) {
+    console.error(`Booking invoice email failed for ${booking.id}: Resend returned HTTP ${response.status}.`);
+  }
+  return response.ok;
 }
 
 function isEqualSecret(a: string, b: string): boolean {
@@ -300,6 +468,115 @@ export async function handleApiRequest(request: Request): Promise<Response | nul
     // 2. Auth: Seed Users disabled (No demo accounts)
     if (request.method === "GET" && pathname === "/api/auth/seed-users") {
       return json({ seedUsers: [] });
+    }
+
+    if (request.method === "POST" && pathname === "/api/auth/email-otp/request") {
+      const body = await readBody<{ email?: string; role?: string }>(request);
+      const email = body?.email?.toLowerCase().trim();
+      if (!email || email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        return json({ error: "A valid email address is required" }, 400);
+      }
+      const requestedRole = body?.role;
+      if (email === DEMO_OTP_ROLE_EMAIL && !isAuthRole(requestedRole)) {
+        return json({ error: "Select a valid role for this demo account." }, 400);
+      }
+      if (!process.env["RESEND_API_KEY"]?.trim() || !process.env["AUTH_EMAIL_FROM"]?.trim()) {
+        return json({ error: "Email OTP sign-in is not configured. Set RESEND_API_KEY and AUTH_EMAIL_FROM on the server." }, 503);
+      }
+
+      const now = Date.now();
+      cleanupEmailOtpState(now);
+      const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+      if (
+        !checkEmailOtpRateLimit(`otp-email-cooldown:${email}`, 1, 30_000, now) ||
+        !checkEmailOtpRateLimit(`otp-email-window:${email}`, 3, 15 * 60_000, now) ||
+        !checkEmailOtpRateLimit(`otp-ip-window:${ip}`, 20, 15 * 60_000, now)
+      ) {
+        return json({ error: "Too many code requests. Please wait before trying again." }, 429);
+      }
+
+      const user = storage.findUserByEmail(email);
+      if (user?.status === "active") {
+        const code = randomInt(0, 1_000_000).toString().padStart(6, "0");
+        const delivered = await sendEmailOtp(email, code);
+        if (!delivered) {
+          return json({ error: "Could not send the sign-in code. Please try again later." }, 502);
+        }
+        emailOtps.set(email, {
+          hash: hashEmailOtp(email, code),
+          expiresAt: now + 5 * 60_000,
+          attempts: 0,
+          role: email === DEMO_OTP_ROLE_EMAIL && isAuthRole(requestedRole) ? requestedRole : null,
+        });
+      }
+      return json({ success: true });
+    }
+
+    if (request.method === "POST" && pathname === "/api/auth/email-otp/verify") {
+      const body = await readBody<{ email?: string; code?: string; role?: string }>(request);
+      const email = body?.email?.toLowerCase().trim();
+      const code = body?.code?.trim();
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !code || !/^\d{6}$/.test(code)) {
+        return json({ error: "Enter a valid email address and 6-digit code." }, 400);
+      }
+
+      const now = Date.now();
+      cleanupEmailOtpState(now);
+      const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+      if (
+        !checkEmailOtpRateLimit(`otp-verify-email:${email}`, 10, 15 * 60_000, now) ||
+        !checkEmailOtpRateLimit(`otp-verify-ip:${ip}`, 30, 15 * 60_000, now)
+      ) {
+        return json({ error: "Too many verification attempts. Please request a new code later." }, 429);
+      }
+
+      const pending = emailOtps.get(email);
+      if (!pending || pending.expiresAt <= now) {
+        emailOtps.delete(email);
+        return json({ error: "The code is invalid or expired. Request a new code and try again." }, 401);
+      }
+      if (email === DEMO_OTP_ROLE_EMAIL && pending.role !== body?.role) {
+        return json({ error: "The selected role must match the role used when requesting this code." }, 400);
+      }
+      const submittedHash = hashEmailOtp(email, code);
+      if (!timingSafeEqual(pending.hash, submittedHash)) {
+        pending.attempts += 1;
+        if (pending.attempts >= 5) emailOtps.delete(email);
+        return json({ error: "The code is invalid or expired. Request a new code and try again." }, 401);
+      }
+
+      emailOtps.delete(email);
+      const user = storage.findUserByEmail(email);
+      if (!user || user.status !== "active") {
+        return json({ error: "The code is invalid or expired. Request a new code and try again." }, 401);
+      }
+      const sessionRole = email === DEMO_OTP_ROLE_EMAIL ? pending.role || user.role : user.role;
+
+      const token = signJwt({
+        userId: user.id,
+        name: user.name,
+        email: user.email,
+        role: sessionRole,
+        provider: user.provider || "local",
+      });
+      return json(
+        {
+          user: {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            role: sessionRole,
+            phone: user.phone,
+            location: user.location,
+            avatar: user.avatar,
+            theme: user.theme,
+            provider: user.provider || "local",
+            verificationStatus: user.verificationStatus,
+          },
+        },
+        200,
+        { "set-cookie": sessionCookie(token, request) }
+      );
     }
 
     if (request.method === "GET" && pathname === "/api/auth/google/start") {
@@ -726,7 +1003,7 @@ export async function handleApiRequest(request: Request): Promise<Response | nul
         return json({ error: "User no longer exists" }, 404);
       }
       const { passwordHash: _, ...safeUser } = user;
-      return json({ user: safeUser, jwtClaims: jwtUser });
+      return json({ user: { ...safeUser, role: jwtUser.role }, jwtClaims: jwtUser });
     }
 
     // 7. Equipment Listings (Public REST API with filters & ratings)
@@ -1112,7 +1389,20 @@ export async function handleApiRequest(request: Request): Promise<Response | nul
         });
       }
 
-      return json({ booking }, 201);
+      let invoiceEmailSent = false;
+      const farmer = storage.findUserById(booking.farmerId);
+      try {
+        if (!farmer?.email) {
+          console.warn(`Booking invoice email not sent for ${booking.id}: farmer email is unavailable.`);
+        } else {
+          const invoicePdf = createBookingInvoicePdf(booking, farmer.email, listing.category, owner?.email || "");
+          invoiceEmailSent = await sendBookingInvoiceEmail(farmer.email, booking, invoicePdf);
+        }
+      } catch (error) {
+        console.error(`Booking invoice email failed for ${booking.id}:`, error);
+      }
+
+      return json({ booking, invoiceEmailSent }, 201);
     }
 
     // Update Booking Status (Authenticated & Authorized)

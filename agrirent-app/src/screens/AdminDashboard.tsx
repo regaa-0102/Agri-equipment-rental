@@ -267,22 +267,26 @@ export default function AdminDashboard({ onNavigate }: Props) {
                       <th style={{ padding: '12px 16px' }}>Farmer</th>
                       <th style={{ padding: '12px 16px' }}>Rental Total</th>
                       <th style={{ padding: '12px 16px' }}>Escrow Deposit</th>
+                      <th style={{ padding: '12px 16px' }}>Booking Status</th>
                       <th style={{ padding: '12px 16px' }}>Escrow Status</th>
                       <th style={{ padding: '12px 16px' }}>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {(bookings.length ? bookings : [
-                      { id: 'BK-9021', equipmentName: 'DJI Agras T40 Agricultural Drone', farmerName: 'Muthukumar S.', totalAmount: 8400, securityDeposit: 5000, escrowStatus: 'held', status: 'active' },
-                      { id: 'BK-8510', equipmentName: 'John Deere 5310', farmerName: 'Rajesh Kumar Patil', totalAmount: 8800, securityDeposit: 3500, escrowStatus: 'held', status: 'active' },
-                      { id: 'BK-8842', equipmentName: 'Claas Crop Tiger 30', farmerName: 'Muthukumar S.', totalAmount: 14400, securityDeposit: 7500, escrowStatus: 'released', status: 'completed' },
-                    ]).map((b: any) => (
+                    {bookings.length === 0 ? (
+                      <tr>
+                        <td colSpan={8} style={{ padding: '32px 16px', textAlign: 'center', color: '#64748B' }}>
+                          No bookings found.
+                        </td>
+                      </tr>
+                    ) : bookings.map((b: any) => (
                       <tr key={b.id} style={{ borderBottom: '1px solid #E2E8F0' }}>
                         <td style={{ padding: '12px 16px', fontWeight: 800, color: '#0F172A' }}>{b.id}</td>
                         <td style={{ padding: '12px 16px', fontWeight: 600 }}>{b.equipmentName}</td>
                         <td style={{ padding: '12px 16px', color: '#475569' }}>{b.farmerName}</td>
                         <td style={{ padding: '12px 16px', fontWeight: 700 }}>₹{b.totalAmount?.toLocaleString()}</td>
                         <td style={{ padding: '12px 16px', fontWeight: 700, color: '#D97706' }}>₹{b.securityDeposit?.toLocaleString()}</td>
+                        <td style={{ padding: '12px 16px', color: '#475569', textTransform: 'capitalize' }}>{b.status}</td>
                         <td style={{ padding: '12px 16px' }}>
                           <span
                             style={{
@@ -332,7 +336,7 @@ export default function AdminDashboard({ onNavigate }: Props) {
             <div style={{ background: '#fff', borderRadius: 18, border: '1px solid #E2E8F0', overflow: 'hidden' }}>
               <div style={{ padding: '16px 20px', borderBottom: '1px solid #E2E8F0', background: '#F8FAFC' }}>
                 <h3 style={{ fontSize: 15, fontWeight: 800, margin: 0, color: '#0F172A' }}>
-                  24 Validated Equipment Listings (Exact Name & Photo Verified)
+                  Equipment Listings
                 </h3>
               </div>
 
@@ -363,8 +367,15 @@ export default function AdminDashboard({ onNavigate }: Props) {
                         <td style={{ padding: '10px 14px', color: '#64748B' }}>{l.location}</td>
                         <td style={{ padding: '10px 14px', fontWeight: 800, color: '#15803D' }}>₹{l.pricePerDay || l.dailyRate}/day</td>
                         <td style={{ padding: '10px 14px' }}>
-                          <span style={{ fontSize: 11, background: '#DCFCE7', color: '#15803D', padding: '2px 8px', borderRadius: 4, fontWeight: 700 }}>
-                            ✓ VERIFIED & APPROVED
+                          <span style={{
+                            fontSize: 11,
+                            background: l.available ? '#DCFCE7' : '#FEF2F2',
+                            color: l.available ? '#15803D' : '#DC2626',
+                            padding: '2px 8px',
+                            borderRadius: 4,
+                            fontWeight: 700,
+                          }}>
+                            {l.available ? 'AVAILABLE' : 'UNAVAILABLE'}
                           </span>
                         </td>
                       </tr>
