@@ -64,6 +64,7 @@ export default function BookingPage({ onNavigate, selectedEquipment }: Props) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [bookingSuccess, setBookingSuccess] = useState(false)
   const [invoiceEmailSent, setInvoiceEmailSent] = useState(false)
+  const [bookingSms, setBookingSms] = useState<{ status: 'sent' | 'failed' | 'no_phone'; maskedPhone?: string } | null>(null)
   const [bookingError, setBookingError] = useState<string | null>(null)
 
   // Dynamic days calculation
@@ -104,6 +105,7 @@ export default function BookingPage({ onNavigate, selectedEquipment }: Props) {
       const result = await api.createBooking({ listingId: eq.id, startDate, endDate, days })
 
       setInvoiceEmailSent(result.invoiceEmailSent)
+      setBookingSms(result.sms)
       setBookingSuccess(true)
       setTimeout(() => {
         onNavigate('payment-success')
@@ -681,9 +683,32 @@ export default function BookingPage({ onNavigate, selectedEquipment }: Props) {
               )}
               {bookingSuccess && (
                 <div role="status" style={{ color: '#166534', background: '#F0FDF4', border: '1px solid #BBF7D0', borderRadius: 10, padding: 12, marginBottom: 16 }}>
-                  {invoiceEmailSent
-                    ? (isTamil ? 'முன்பதிவு உறுதி செய்யப்பட்டது. விலைப்பட்டியல் உங்கள் மின்னஞ்சலுக்கு அனுப்பப்பட்டது.' : 'Booking confirmed. Invoice sent to your email.')
-                    : (isTamil ? 'முன்பதிவு உறுதி செய்யப்பட்டது.' : 'Booking confirmed.')}
+                  <div>
+                    {invoiceEmailSent
+                      ? (isTamil ? 'முன்பதிவு உறுதி செய்யப்பட்டது. விலைப்பட்டியல் உங்கள் மின்னஞ்சலுக்கு அனுப்பப்பட்டது.' : 'Booking confirmed. Invoice sent to your email.')
+                      : (isTamil ? 'முன்பதிவு உறுதி செய்யப்பட்டது.' : 'Booking confirmed.')}
+                  </div>
+                  {bookingSms?.status === 'sent' && (
+                    <div>
+                      {isTamil
+                        ? `SMS உறுதிப்படுத்தல் ${bookingSms.maskedPhone || '******'} எண்ணுக்கு அனுப்பப்பட்டது.`
+                        : `SMS confirmation sent to ${bookingSms.maskedPhone || '******'}.`}
+                    </div>
+                  )}
+                  {bookingSms?.status === 'failed' && (
+                    <div role="status">
+                      {isTamil
+                        ? 'முன்பதிவு உறுதி செய்யப்பட்டது, ஆனால் SMS அனுப்ப முடியவில்லை. உங்கள் பதிவு செய்யப்பட்ட தொலைபேசி எண் அல்லது SMS அமைப்பைச் சரிபார்க்கவும்.'
+                        : 'Booking confirmed, but SMS notification could not be sent. Please check your registered phone number or SMS configuration.'}
+                    </div>
+                  )}
+                  {bookingSms?.status === 'no_phone' && (
+                    <div role="status">
+                      {isTamil
+                        ? 'SMS உறுதிப்படுத்தலைப் பெற உங்கள் சுயவிவரத்தில் தொலைபேசி எண்ணைச் சேர்க்கவும்.'
+                        : 'Booking confirmed. Add a phone number to your profile to receive SMS confirmations.'}
+                    </div>
+                  )}
                 </div>
               )}
               {/* Equipment Item Row */}

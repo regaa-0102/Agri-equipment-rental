@@ -1,6 +1,7 @@
 import { createHmac, randomBytes, randomInt, timingSafeEqual } from "node:crypto";
 import { decodeJwt, signJwt, verifyJwt, type JwtPayload } from "./jwt";
 import { hashPassword, verifyPassword, storage, type StoredListing, type StoredUser, type StoredBooking } from "./storage";
+import { sendBookingConfirmationSms } from "./sms";
 import { DEMO_OTP_ROLE_EMAIL } from "../lib/auth-config";
 
 const jsonHeaders = {
@@ -14,6 +15,10 @@ type AuthRole = StoredUser["role"];
 
 function isAuthRole(role: unknown): role is AuthRole {
   return role === "farmer" || role === "owner" || role === "admin";
+}
+
+function googleTestRoleSwitchEnabled(): boolean {
+  return process.env["GOOGLE_TEST_ROLE_SWITCH"]?.trim().toLowerCase() === "true";
 }
 
 function json(data: unknown, status = 200, extraHeaders?: Record<string, string>) {
@@ -41,7 +46,14 @@ function getJwtFromHeader(request: Request): JwtPayload | null {
   const user = storage.findUserById(claims.userId);
   const isDemoOtpRole = user?.email.toLowerCase() === DEMO_OTP_ROLE_EMAIL &&
     (claims.role === "farmer" || claims.role === "owner" || claims.role === "admin");
-  if (!user || user.status !== "active" || (user.role !== claims.role && !isDemoOtpRole)) return null;
+  const isGoogleTestRole = googleTestRoleSwitchEnabled() &&
+    claims.provider === "google" &&
+    user?.provider === "google" &&
+    Boolean(user.googleId) &&
+    isAuthRole(claims.role);
+  if (!user || user.status !== "active" || (user.role !== claims.role && !isDemoOtpRole && !isGoogleTestRole)) {
+    return null;
+  }
   return {
     ...claims,
     name: user.name,
@@ -684,6 +696,24 @@ export async function handleApiRequest(request: Request): Promise<Response | nul
           if (existingUser.status !== "active") {
             return googleRedirect(request, "inactive", [clearState, clearPending]);
           }
+          if (googleTestRoleSwitchEnabled()) {
+            const pendingToken = signJwt({
+              userId: existingUser.id,
+              name: existingUser.name,
+              email: existingUser.email,
+              role: existingUser.role,
+              provider: "google",
+              purpose: "google-role-switch",
+              googleId: profile.sub,
+              avatar: existingUser.avatar,
+            }, 10 * 60);
+            const secure = new URL(request.url).protocol === "https:" ? "; Secure" : "";
+            return googleRedirect(request, "role-switch", [
+              clearState,
+              clearPending,
+              `agrirent_google_pending=${pendingToken}; HttpOnly; SameSite=Lax; Path=/; Max-Age=600${secure}`,
+            ]);
+          }
           const token = signJwt({
             userId: existingUser.id,
             name: existingUser.name,
@@ -721,14 +751,11 @@ export async function handleApiRequest(request: Request): Promise<Response | nul
 
     if (request.method === "POST" && pathname === "/api/auth/google/complete") {
       const body = await readBody<{ role?: string }>(request);
-      if (body?.role !== "farmer" && body?.role !== "owner") {
-        return json({ error: "Select Farmer or Equipment Owner to continue." }, 400);
-      }
       const pendingToken = cookieValue(request, "agrirent_google_pending");
       const pending = pendingToken ? verifyJwt(pendingToken) : null;
       if (
         !pending ||
-        pending.purpose !== "google-pending" ||
+        (pending.purpose !== "google-pending" && pending.purpose !== "google-role-switch") ||
         pending.provider !== "google" ||
         !pending.googleId ||
         !pending.email ||
@@ -739,6 +766,50 @@ export async function handleApiRequest(request: Request): Promise<Response | nul
           401,
           [clearCookie("agrirent_google_pending", request)]
         );
+      }
+
+      if (pending.purpose === "google-role-switch") {
+        if (!googleTestRoleSwitchEnabled()) {
+          return jsonWithCookies(
+            { error: "Google test role switching is disabled." },
+            403,
+            [clearCookie("agrirent_google_pending", request)]
+          );
+        }
+        if (!isAuthRole(body?.role)) {
+          return json({ error: "Select Farmer, Equipment Owner, or Admin to continue." }, 400);
+        }
+        const user = storage.findUserById(pending.userId);
+        if (
+          !user ||
+          user.status !== "active" ||
+          user.provider !== "google" ||
+          user.googleId !== pending.googleId ||
+          user.email.toLowerCase() !== pending.email.toLowerCase()
+        ) {
+          return jsonWithCookies(
+            { error: "This Google account is no longer linked to the AgriRent account." },
+            403,
+            [clearCookie("agrirent_google_pending", request)]
+          );
+        }
+        const token = signJwt({
+          userId: user.id,
+          name: user.name,
+          email: user.email,
+          role: body.role,
+          provider: "google",
+        });
+        const { passwordHash: _passwordHash, googleId: _googleId, ...safeUser } = user;
+        return jsonWithCookies(
+          { user: { ...safeUser, role: body.role } },
+          200,
+          [sessionCookie(token, request), clearCookie("agrirent_google_pending", request)]
+        );
+      }
+
+      if (pending.purpose !== "google-pending" || (body?.role !== "farmer" && body?.role !== "owner")) {
+        return json({ error: "Select Farmer or Equipment Owner to continue." }, 400);
       }
 
       const existingByGoogleId = storage.findUserByGoogleId(pending.googleId);
@@ -1096,7 +1167,10 @@ export async function handleApiRequest(request: Request): Promise<Response | nul
 
     if (request.method === "POST" && pathname === "/api/reviews") {
       const jwtUser = getJwtFromHeader(request);
-      if (!jwtUser || jwtUser.role !== "farmer") {
+      if (!jwtUser) {
+        return json({ error: "Authentication is required to submit an equipment review" }, 401);
+      }
+      if (jwtUser.role !== "farmer") {
         return json({ error: "Farmer authentication is required to submit an equipment review" }, 403);
       }
 
@@ -1107,13 +1181,32 @@ export async function handleApiRequest(request: Request): Promise<Response | nul
         reviewText?: string;
       }>(request);
 
-      const equipmentId = body?.equipmentId?.trim();
-      const bookingId = body?.bookingId?.trim();
-      const rating = Number(body?.rating);
-      const reviewText = body?.reviewText?.trim() || "";
+      const equipmentId = typeof body?.equipmentId === "string" ? body.equipmentId.trim() : "";
+      const bookingId = typeof body?.bookingId === "string" ? body.bookingId.trim() : "";
+      const rating = body?.rating;
+      const reviewText = typeof body?.reviewText === "string" ? body.reviewText.trim() : "";
 
-      if (!equipmentId || !bookingId || !Number.isInteger(rating) || rating < 1 || rating > 5) {
+      if (
+        !equipmentId ||
+        !bookingId ||
+        typeof rating !== "number" ||
+        !Number.isInteger(rating) ||
+        rating < 1 ||
+        rating > 5 ||
+        (body?.reviewText !== undefined && (typeof body.reviewText !== "string" || body.reviewText.length > 2000))
+      ) {
         return json({ error: "equipmentId, bookingId, and an integer star rating (1-5) are required" }, 400);
+      }
+
+      const booking = storage.findBookingById(bookingId);
+      if (!booking || booking.farmerId !== jwtUser.userId || booking.listingId !== equipmentId) {
+        return json({ error: "You can only rate equipment from your own booking." }, 403);
+      }
+      if (booking.status !== "completed") {
+        return json({ error: "You can rate equipment after the booking is completed." }, 403);
+      }
+      if (storage.getReviewForBooking(bookingId)) {
+        return json({ error: "This booking has already been rated." }, 409);
       }
 
       const result = storage.createReview({
@@ -1122,11 +1215,12 @@ export async function handleApiRequest(request: Request): Promise<Response | nul
         userId: jwtUser.userId,
         userName: jwtUser.name,
         rating,
-        reviewText: reviewText || "Good quality agricultural equipment. Satisfied with performance.",
+        reviewText,
       });
 
       if (!result.success) {
-        return json({ error: result.error || "Could not submit review" }, 400);
+        const status = result.error?.includes("already submitted") ? 409 : 400;
+        return json({ error: result.error || "Could not submit review" }, status);
       }
 
       const summary = storage.getEquipmentRatingSummary(equipmentId);
@@ -1138,7 +1232,7 @@ export async function handleApiRequest(request: Request): Promise<Response | nul
         storage.createNotification({
           userId: listing.ownerId,
           title: `New Review for ${listing.name}`,
-          message: `${jwtUser.name} rated ${listing.name} ${rating} stars: "${reviewText || 'Verified Rental Rating'}"`,
+          message: `${jwtUser.name} rated ${listing.name} ${rating} stars${reviewText ? `: "${reviewText}"` : "."}`,
           type: "review_received",
           read: false,
           relatedId: listing.id,
@@ -1338,7 +1432,10 @@ export async function handleApiRequest(request: Request): Promise<Response | nul
 
       const filter = jwtUser.role === "admin" ? undefined : jwtUser.role === "farmer" ? { farmerId: jwtUser.userId } : { ownerId: jwtUser.userId };
       const bookings = storage.getBookings(filter);
-      return json({ count: bookings.length, bookings });
+      const bookingsWithReviews = jwtUser.role === "farmer"
+        ? bookings.map((booking) => ({ ...booking, review: storage.getReviewForBooking(booking.id) }))
+        : bookings;
+      return json({ count: bookings.length, bookings: bookingsWithReviews });
     }
 
     if (request.method === "POST" && pathname === "/api/bookings") {
@@ -1413,7 +1510,57 @@ export async function handleApiRequest(request: Request): Promise<Response | nul
         console.error(`Booking invoice email failed for ${booking.id}:`, error);
       }
 
-      return json({ booking, invoiceEmailSent }, 201);
+      let sms: Awaited<ReturnType<typeof sendBookingConfirmationSms>>
+      try {
+        sms = await sendBookingConfirmationSms(farmer?.phone || "", booking);
+      } catch {
+        sms = { status: "failed", maskedPhone: "******", reason: "SMS provider request failed." };
+      }
+      if (sms.status === "no_phone") {
+        console.warn(`Booking confirmation SMS not sent for ${booking.id}: farmer has no usable registered phone number.`);
+      } else if (sms.status === "failed") {
+        console.warn(`Booking confirmation SMS failed for ${booking.id} (${sms.maskedPhone}): ${sms.reason}`);
+      }
+
+      return json({
+        booking,
+        invoiceEmailSent,
+        sms: sms.status === "no_phone"
+          ? { status: sms.status }
+          : { status: sms.status, maskedPhone: sms.maskedPhone },
+      }, 201);
+    }
+
+    if (request.method === "PATCH" && pathname.startsWith("/api/admin/bookings/") && pathname.endsWith("/complete")) {
+      const jwtUser = getJwtFromHeader(request);
+      if (!jwtUser) {
+        return json({ error: "Authentication is required to complete a booking" }, 401);
+      }
+      if (jwtUser.role !== "admin") {
+        return json({ error: "Administrator authorization required" }, 403);
+      }
+
+      const bookingId = pathname.slice("/api/admin/bookings/".length, -"/complete".length);
+      if (!bookingId || bookingId.includes("/")) {
+        return json({ error: "A valid booking ID is required" }, 400);
+      }
+      const booking = storage.findBookingById(bookingId);
+      if (!booking) {
+        return json({ error: "Booking not found" }, 404);
+      }
+      if (booking.status !== "active" && booking.status !== "delivered") {
+        return json({ error: "Only active or delivered bookings can be completed" }, 400);
+      }
+      const today = new Date().toISOString().slice(0, 10);
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(booking.endDate) || booking.endDate >= today) {
+        return json({ error: "A booking can be completed only after its end date" }, 400);
+      }
+
+      const completedBooking = storage.updateBookingStatus(bookingId, "completed");
+      if (!completedBooking) {
+        return json({ error: "Booking not found" }, 404);
+      }
+      return json({ booking: completedBooking });
     }
 
     // Update Booking Status (Authenticated & Authorized)

@@ -92,7 +92,7 @@ export const api = {
     return res
   },
 
-  async completeGoogleLogin(role: 'farmer' | 'owner') {
+  async completeGoogleLogin(role: 'farmer' | 'owner' | 'admin') {
     const res = await request<{ user: UserSession }>('/api/auth/google/complete', {
       method: 'POST',
       body: JSON.stringify({ role }),
@@ -267,7 +267,11 @@ export const api = {
   },
 
   async createBooking(data: { listingId: string; startDate: string; endDate: string; days: number }) {
-    return request<{ booking: any; invoiceEmailSent: boolean }>('/api/bookings', {
+    return request<{
+      booking: any
+      invoiceEmailSent: boolean
+      sms: { status: 'sent' | 'failed' | 'no_phone'; maskedPhone?: string }
+    }>('/api/bookings', {
       method: 'POST',
       body: JSON.stringify(data),
     })
@@ -277,6 +281,12 @@ export const api = {
     return request<{ booking: any }>(`/api/bookings/${id}/status`, {
       method: 'PATCH',
       body: JSON.stringify({ status, escrowStatus }),
+    })
+  },
+
+  async completeAdminBooking(id: string) {
+    return request<{ booking: any }>(`/api/admin/bookings/${encodeURIComponent(id)}/complete`, {
+      method: 'PATCH',
     })
   },
 

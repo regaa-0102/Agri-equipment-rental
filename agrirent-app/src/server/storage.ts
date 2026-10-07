@@ -1059,9 +1059,17 @@ export const storage = {
     return (store.reviews || []).some((r) => r.userId === userId && r.bookingId === bookingId);
   },
 
+  getReviewForBooking(bookingId: string): StoredReview | null {
+    return (loadStore().reviews || []).find((review) => review.bookingId === bookingId) || null;
+  },
+
   createReview(review: Omit<StoredReview, "id" | "createdAt">): { success: boolean; review?: StoredReview; error?: string } {
     const store = loadStore();
     if (!store.reviews) store.reviews = [];
+
+    if (!Number.isInteger(review.rating) || review.rating < 1 || review.rating > 5) {
+      return { success: false, error: "Rating must be an integer from 1 to 5." };
+    }
 
     // Verify booking
     const booking = store.bookings.find((b) => b.id === review.bookingId);
@@ -1077,14 +1085,13 @@ export const storage = {
     if (booking.farmerId !== review.userId) {
       return { success: false, error: "You can only review rentals that you booked." };
     }
-    if (this.hasUserReviewedBooking(review.userId, review.bookingId)) {
+    if (this.getReviewForBooking(review.bookingId)) {
       return { success: false, error: "You have already submitted a review for this completed booking." };
     }
 
     const newReview: StoredReview = {
       ...review,
       id: `rev-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
-      rating: Math.max(1, Math.min(5, Math.round(review.rating))),
       createdAt: new Date().toISOString(),
     };
 

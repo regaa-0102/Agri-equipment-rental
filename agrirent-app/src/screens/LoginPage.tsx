@@ -19,7 +19,8 @@ export default function LoginPage({ onNavigate }: Props) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [googleRoleStep, setGoogleRoleStep] = useState(false)
-  const [googleRole, setGoogleRole] = useState<'farmer' | 'owner'>('farmer')
+  const [googleRole, setGoogleRole] = useState<'farmer' | 'owner' | 'admin'>('farmer')
+  const [googleTestRoleSwitch, setGoogleTestRoleSwitch] = useState(false)
   const [googleLoading, setGoogleLoading] = useState(false)
   const [otpMode, setOtpMode] = useState(false)
   const [otpCode, setOtpCode] = useState('')
@@ -46,6 +47,10 @@ export default function LoginPage({ onNavigate }: Props) {
     }
 
     if (result === 'role') {
+      setGoogleRoleStep(true)
+      cleanCallbackQuery()
+    } else if (result === 'role-switch') {
+      setGoogleTestRoleSwitch(true)
       setGoogleRoleStep(true)
       cleanCallbackQuery()
     } else if (result === 'success') {
@@ -91,7 +96,13 @@ export default function LoginPage({ onNavigate }: Props) {
     setError(null)
     try {
       const res = await api.completeGoogleLogin(googleRole)
-      onNavigate(res.user.role === 'owner' ? 'owner-dashboard' : 'farmer-dashboard')
+      onNavigate(
+        res.user.role === 'owner'
+          ? 'owner-dashboard'
+          : res.user.role === 'admin'
+            ? 'admin-dashboard'
+            : 'farmer-dashboard'
+      )
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : ''
       setError(err instanceof TypeError
@@ -251,7 +262,7 @@ export default function LoginPage({ onNavigate }: Props) {
                 {isTamil ? 'உங்கள் AgriRent பங்கைத் தேர்ந்தெடுக்கவும்' : 'Choose your AgriRent role'}
               </p>
               <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
-                {(['farmer', 'owner'] as const).map((role) => (
+                {(googleTestRoleSwitch ? ['farmer', 'owner', 'admin'] as const : ['farmer', 'owner'] as const).map((role) => (
                   <button
                     key={role}
                     type="button"
@@ -270,7 +281,9 @@ export default function LoginPage({ onNavigate }: Props) {
                   >
                     {role === 'farmer'
                       ? (isTamil ? 'விவசாயி' : 'Farmer')
-                      : (isTamil ? 'உபகரண உரிமையாளர்' : 'Equipment Owner')}
+                      : role === 'owner'
+                        ? (isTamil ? 'உபகரண உரிமையாளர்' : 'Equipment Owner')
+                        : 'Admin'}
                   </button>
                 ))}
               </div>

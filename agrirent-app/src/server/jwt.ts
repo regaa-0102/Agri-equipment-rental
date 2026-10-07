@@ -8,7 +8,7 @@ export interface JwtPayload {
   email: string;
   role: "farmer" | "owner" | "admin";
   provider?: "local" | "google";
-  purpose?: "google-pending";
+  purpose?: "google-pending" | "google-role-switch";
   googleId?: string;
   avatar?: string;
   iat?: number;

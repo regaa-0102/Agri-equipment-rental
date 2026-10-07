@@ -15,6 +15,7 @@ export interface BookingItem {
   status: 'active' | 'completed' | 'cancelled' | 'pending' | 'confirmed'
   owner: string
   ownerPhone?: string | undefined
+  review?: { rating: number; reviewText: string } | undefined
   trackingStage: number // 0 to 6
   lastLocation?: string | undefined
   distance?: string | undefined

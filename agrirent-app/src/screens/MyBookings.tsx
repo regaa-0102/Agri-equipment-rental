@@ -25,6 +25,7 @@ interface ApiBooking {
   totalAmount: number
   status: string
   ownerName: string
+  review?: { rating: number; reviewText: string } | null
 }
 
 function toBookingItem(booking: ApiBooking): BookingItem {
@@ -49,6 +50,7 @@ function toBookingItem(booking: ApiBooking): BookingItem {
     totalNumeric: booking.totalAmount,
     status,
     owner: booking.ownerName,
+    ...(booking.review ? { review: booking.review } : {}),
     trackingStage: status === 'completed' ? 6 : status === 'active' ? 5 : 0,
   }
 }
@@ -110,6 +112,7 @@ export default function MyBookings({ onNavigate }: Props) {
       })
       setReviewingBooking(null)
       setReviewText('')
+      await loadBookings()
       setReviewNotice(isTamil ? 'உங்கள் மதிப்புரை சேமிக்கப்பட்டது.' : 'Your review has been saved.')
     } catch (error) {
       setReviewError(error instanceof Error ? error.message : 'Could not submit review.')
@@ -490,7 +493,16 @@ export default function MyBookings({ onNavigate }: Props) {
                               <span>{isTamil ? 'நீட்டிக்கவும்' : 'Extend'}</span>
                             </button>
                           )}
-                          {b.status === 'completed' && (
+                          {b.status === 'completed' && b.review && (
+                            <span
+                              aria-label={isTamil ? `ஏற்கனவே ${b.review.rating} நட்சத்திரம் மதிப்பிட்டுள்ளீர்கள்` : `Already rated ${b.review.rating} out of 5 stars`}
+                              style={{ padding: '6px 8px', background: '#FFFBEB', color: '#92400E', border: '1px solid #FDE68A', borderRadius: 8, fontSize: 12, fontWeight: 700, whiteSpace: 'nowrap' }}
+                            >
+                              <Star size={14} fill="currentColor" style={{ verticalAlign: 'text-bottom', marginRight: 4 }} />
+                              {b.review.rating}/5
+                            </span>
+                          )}
+                          {b.status === 'completed' && !b.review && (
                             <button
                               type="button"
                               onClick={() => {
@@ -499,10 +511,10 @@ export default function MyBookings({ onNavigate }: Props) {
                                 setReviewText('')
                                 setReviewError('')
                               }}
-                              title={isTamil ? 'மதிப்புரை எழுதவும்' : 'Review this rental'}
+                              title={isTamil ? 'மதிப்புரை எழுதவும்' : 'Rate this rental'}
                               style={{ padding: '6px 8px', background: '#FFFBEB', color: '#92400E', border: '1px solid #FDE68A', borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 4, whiteSpace: 'nowrap' }}
                             >
-                              <Star size={14} />{isTamil ? 'மதிப்புரை' : 'Review'}
+                              <Star size={14} />{isTamil ? 'மதிப்பிடு' : 'Rate'}
                             </button>
                           )}
 

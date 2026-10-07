@@ -33,6 +33,9 @@ export default function AdminDashboard({ onNavigate }: Props) {
   const [jwtModalOpen, setJwtModalOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const [loadError, setLoadError] = useState('')
+  const [bookingActionId, setBookingActionId] = useState<string | null>(null)
+  const [bookingActionError, setBookingActionError] = useState('')
+  const [bookingActionNotice, setBookingActionNotice] = useState('')
 
   const loadData = async () => {
     setLoading(true)
@@ -78,6 +81,21 @@ export default function AdminDashboard({ onNavigate }: Props) {
     }
   }
 
+  const handleCompleteBooking = async (bookingId: string) => {
+    setBookingActionId(bookingId)
+    setBookingActionError('')
+    setBookingActionNotice('')
+    try {
+      const { booking } = await api.completeAdminBooking(bookingId)
+      setBookings((current) => current.map((item) => item.id === booking.id ? booking : item))
+      setBookingActionNotice('Booking marked as completed.')
+    } catch (error) {
+      setBookingActionError(error instanceof Error ? error.message : 'Could not complete this booking.')
+    } finally {
+      setBookingActionId(null)
+    }
+  }
+
   return (
     <div style={{ display: 'flex', minHeight: 'calc(100vh - 44px)', width: '100%', minWidth: 0, background: '#F8FAFC' }}>
       <Sidebar activeItem="Dashboard" onNavigate={onNavigate} role="admin" />
@@ -89,6 +107,16 @@ export default function AdminDashboard({ onNavigate }: Props) {
           <button type="button" onClick={() => void loadData()} style={{ marginLeft: 12, color: '#991B1B', border: 0, background: 'none', textDecoration: 'underline', cursor: 'pointer' }}>Retry</button>
         </div>
       )}
+        {bookingActionNotice && (
+      <div role="status" style={{ margin: '0 16px 16px', padding: 12, borderRadius: 8, color: '#166534', background: '#F0FDF4' }}>
+        {bookingActionNotice}
+      </div>
+        )}
+        {bookingActionError && (
+      <div role="alert" style={{ margin: '0 16px 16px', padding: 12, borderRadius: 8, color: '#B91C1C', background: '#FEF2F2' }}>
+        {bookingActionError}
+      </div>
+        )}
         {/* Top bar */}
         <div style={{ background: '#fff', borderBottom: '1px solid #E2E8F0', padding: '16px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
           <div>
@@ -303,25 +331,55 @@ export default function AdminDashboard({ onNavigate }: Props) {
                           </span>
                         </td>
                         <td style={{ padding: '12px 16px' }}>
-                          {b.escrowStatus === 'held' ? (
-                            <button
-                              onClick={() => handleReleaseEscrow(b.id)}
-                              style={{
-                                background: '#16A34A',
-                                color: '#fff',
-                                border: 'none',
-                                borderRadius: 6,
-                                padding: '5px 10px',
-                                fontSize: 11,
-                                fontWeight: 700,
-                                cursor: 'pointer',
-                              }}
-                            >
-                              Release Deposit
-                            </button>
-                          ) : (
-                            <span style={{ fontSize: 11, color: '#94A3B8' }}>Audit Finalized</span>
-                          )}
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                            {b.status === 'completed' ? (
+                              <span style={{ fontSize: 11, fontWeight: 700, padding: '3px 8px', borderRadius: 6, background: '#DCFCE7', color: '#166534' }}>
+                                Completed
+                              </span>
+                            ) : (
+                              ['active', 'delivered'].includes(b.status) &&
+                              /^\d{4}-\d{2}-\d{2}$/.test(b.endDate) &&
+                              b.endDate < new Date().toISOString().slice(0, 10) && (
+                                <button
+                                  type="button"
+                                  onClick={() => void handleCompleteBooking(b.id)}
+                                  disabled={bookingActionId === b.id}
+                                  style={{
+                                    background: '#16A34A',
+                                    color: '#fff',
+                                    border: 'none',
+                                    borderRadius: 6,
+                                    padding: '5px 10px',
+                                    fontSize: 11,
+                                    fontWeight: 700,
+                                    cursor: bookingActionId === b.id ? 'wait' : 'pointer',
+                                    opacity: bookingActionId === b.id ? 0.7 : 1,
+                                  }}
+                                >
+                                  {bookingActionId === b.id ? 'Updating…' : 'Mark Completed'}
+                                </button>
+                              )
+                            )}
+                            {b.escrowStatus === 'held' ? (
+                              <button
+                                onClick={() => handleReleaseEscrow(b.id)}
+                                style={{
+                                  background: '#16A34A',
+                                  color: '#fff',
+                                  border: 'none',
+                                  borderRadius: 6,
+                                  padding: '5px 10px',
+                                  fontSize: 11,
+                                  fontWeight: 700,
+                                  cursor: 'pointer',
+                                }}
+                              >
+                                Release Deposit
+                              </button>
+                            ) : (
+                              <span style={{ fontSize: 11, color: '#94A3B8' }}>Audit Finalized</span>
+                            )}
+                          </div>
                         </td>
                       </tr>
                     ))}
