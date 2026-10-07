@@ -93,6 +93,9 @@ function googleConfiguration() {
     if (parsed.protocol !== "https:" && parsed.hostname !== "localhost" && parsed.hostname !== "127.0.0.1") {
       return null;
     }
+    if (parsed.pathname !== "/api/auth/google/callback" || parsed.search || parsed.hash) {
+      return null;
+    }
   } catch {
     return null;
   }
@@ -667,18 +670,25 @@ export async function handleApiRequest(request: Request): Promise<Response | nul
         const email = profile.email.toLowerCase();
         const existingByGoogleId = storage.findUserByGoogleId(profile.sub);
         const existingByEmail = storage.findUserByEmail(email);
-        if (existingByGoogleId) {
-          if (existingByEmail && existingByEmail.id !== existingByGoogleId.id) {
+        let existingUser = existingByGoogleId;
+        if (existingUser && existingByEmail && existingByEmail.id !== existingUser.id) {
+          return googleRedirect(request, "conflict", [clearState, clearPending]);
+        }
+        if (!existingUser && existingByEmail) {
+          existingUser = storage.linkGoogleIdentity(existingByEmail.id, profile.sub);
+          if (!existingUser) {
             return googleRedirect(request, "conflict", [clearState, clearPending]);
           }
-          if (existingByGoogleId.status !== "active") {
+        }
+        if (existingUser) {
+          if (existingUser.status !== "active") {
             return googleRedirect(request, "inactive", [clearState, clearPending]);
           }
           const token = signJwt({
-            userId: existingByGoogleId.id,
-            name: existingByGoogleId.name,
-            email: existingByGoogleId.email,
-            role: existingByGoogleId.role,
+            userId: existingUser.id,
+            name: existingUser.name,
+            email: existingUser.email,
+            role: existingUser.role,
             provider: "google",
           });
           return googleRedirect(request, "success", [
@@ -686,9 +696,6 @@ export async function handleApiRequest(request: Request): Promise<Response | nul
             clearPending,
             sessionCookie(token, request),
           ]);
-        }
-        if (existingByEmail) {
-          return googleRedirect(request, "conflict", [clearState, clearPending]);
         }
 
         const pendingToken = signJwt({
@@ -706,8 +713,8 @@ export async function handleApiRequest(request: Request): Promise<Response | nul
           clearState,
           `agrirent_google_pending=${pendingToken}; HttpOnly; SameSite=Lax; Path=/; Max-Age=600${secure}`,
         ]);
-      } catch (error) {
-        console.error("Google OAuth callback failed", error);
+      } catch {
+        console.error("Google OAuth callback failed.");
         return googleRedirect(request, "failed", [clearState]);
       }
     }
@@ -736,15 +743,26 @@ export async function handleApiRequest(request: Request): Promise<Response | nul
 
       const existingByGoogleId = storage.findUserByGoogleId(pending.googleId);
       const existingByEmail = storage.findUserByEmail(pending.email);
-      if (existingByGoogleId) {
-        if (existingByEmail && existingByEmail.id !== existingByGoogleId.id) {
+      let existingUser = existingByGoogleId;
+      if (existingUser && existingByEmail && existingByEmail.id !== existingUser.id) {
+        return jsonWithCookies(
+          { error: "An account with this email already exists. Sign in with that account's existing method." },
+          409,
+          [clearCookie("agrirent_google_pending", request)]
+        );
+      }
+      if (!existingUser && existingByEmail) {
+        existingUser = storage.linkGoogleIdentity(existingByEmail.id, pending.googleId);
+        if (!existingUser) {
           return jsonWithCookies(
-            { error: "An account with this email already exists. Sign in with that account's existing method." },
+            { error: "This Google account is already linked to another AgriRent account." },
             409,
             [clearCookie("agrirent_google_pending", request)]
           );
         }
-        if (existingByGoogleId.status !== "active") {
+      }
+      if (existingUser) {
+        if (existingUser.status !== "active") {
           return jsonWithCookies(
             { error: "This AgriRent account is inactive." },
             403,
@@ -752,24 +770,17 @@ export async function handleApiRequest(request: Request): Promise<Response | nul
           );
         }
         const token = signJwt({
-          userId: existingByGoogleId.id,
-          name: existingByGoogleId.name,
-          email: existingByGoogleId.email,
-          role: existingByGoogleId.role,
+          userId: existingUser.id,
+          name: existingUser.name,
+          email: existingUser.email,
+          role: existingUser.role,
           provider: "google",
         });
-        const { passwordHash: _passwordHash, googleId: _googleId, ...safeUser } = existingByGoogleId;
+        const { passwordHash: _passwordHash, googleId: _googleId, ...safeUser } = existingUser;
         return jsonWithCookies(
           { user: safeUser },
           200,
           [sessionCookie(token, request), clearCookie("agrirent_google_pending", request)]
-        );
-      }
-      if (existingByEmail) {
-        return jsonWithCookies(
-          { error: "An account with this email already exists. Sign in with that account's existing method." },
-          409,
-          [clearCookie("agrirent_google_pending", request)]
         );
       }
 

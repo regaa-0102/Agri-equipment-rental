@@ -724,6 +724,19 @@ export const storage = {
     return loadStore().users.find((u) => u.provider === "google" && u.googleId === googleId) || null;
   },
 
+  linkGoogleIdentity(userId: string, googleId: string): StoredUser | null {
+    const store = loadStore();
+    const user = store.users.find((u) => u.id === userId);
+    if (!user || (user.provider === "google" && user.googleId !== googleId)) return null;
+    if (store.users.some((u) => u.id !== userId && u.provider === "google" && u.googleId === googleId)) {
+      return null;
+    }
+    user.provider = "google";
+    user.googleId = googleId;
+    saveStore();
+    return user;
+  },
+
   findUserById(id: string): StoredUser | null {
     return loadStore().users.find((u) => u.id === id) || null;
   },
