@@ -1,0 +1,2420 @@
+{
+  "users": [
+    {
+      "name": "Test Farmer",
+      "email": "testfarmer2026@example.com",
+      "passwordHash": "scrypt$zMJtEC8d1kAbhw741NPEiA==$An39ww1cb+L4XgfykvOzGkTwNAhKsUCSCCr2PoNzMy/gFmO2KrgSPl0+EZ92xjJVLdcHx38DPOjGkXYCNKQpiQ==",
+      "role": "farmer",
+      "phone": "9000000001",
+      "location": "Tamil Nadu",
+      "avatar": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80",
+      "status": "active",
+      "provider": "local",
+      "verificationStatus": "NOT_VERIFIED",
+      "id": "4a73ef39-991d-485a-b3a2-2fed302e4076",
+      "createdAt": "2026-10-06T16:43:17.452Z"
+    },
+    {
+      "name": "Yaswanth S",
+      "email": "yashwanthyashwanth12174@gmail.com",
+      "passwordHash": "scrypt$kTMEA3UK/GwFu1L/KszbQg==$LYKncE6ElODGv3HJdf/iTq7dHiwenqp9q/KhbiRk2nPdOmeMZD3f0vjWocTOwoM9sf4aSDUWnS/dcd1ZbRKo6A==",
+      "role": "farmer",
+      "phone": "+917695961439",
+      "location": "Thoothukudi, Tamil Nadu",
+      "avatar": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80",
+      "status": "active",
+      "provider": "local",
+      "verificationStatus": "NOT_VERIFIED",
+      "id": "557722b4-8cbd-4162-b947-2b88d0c59803",
+      "createdAt": "2026-10-06T17:48:59.914Z"
+    },
+    {
+      "id": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "name": "Administrator",
+      "email": "gregaa749@gmail.com",
+      "passwordHash": "scrypt$yOfJNcj3AlvuEc5riHDACQ==$45gHGtfJSHABqbsOx4BbvVYwIhbm6a4vhOdTXVkOoBA2+ZzuYTrnd+jIVP56/snr1ypsjXoviMu4trHAgaHUEA==",
+      "role": "admin",
+      "phone": "+916380167495",
+      "location": "",
+      "avatar": "",
+      "status": "active",
+      "verificationStatus": "VERIFIED",
+      "provider": "google",
+      "createdAt": "2026-01-10T10:00:00.000Z",
+      "googleId": "104931576705907580048"
+    },
+    {
+      "name": "REGAA G CSE-2024",
+      "email": "24104021@nec.edu.in",
+      "role": "owner",
+      "status": "active",
+      "provider": "google",
+      "googleId": "113632381930043800501",
+      "phone": "",
+      "location": "Tamil Nadu, India",
+      "avatar": "https://lh3.googleusercontent.com/a/ACg8ocJ1YuVDQ039J5RQ0MC79y2Ne5TMegh1PLDvuXjfPtODMl60sg=s96-c",
+      "verificationStatus": "NOT_VERIFIED",
+      "id": "46ae166c-071d-4a0d-ae00-4352c539b7ce",
+      "createdAt": "2026-10-09T06:25:17.589Z"
+    }
+  ],
+  "listings": [
+    {
+      "id": "eq-tractor-1",
+      "ownerId": "usr-owner-1",
+      "name": "Mahindra 575 DI Yuvo Tech+",
+      "nameTa": "மகிந்திரா 575 DI யுவோ டெக்+",
+      "category": "Tractor",
+      "brand": "Mahindra",
+      "model": "575 DI Yuvo Tech+",
+      "imageUrl": "/equipment/tractors/mahindra-575-di-yuvo-tech-plus.jpg",
+      "description": "Official Mahindra 575 DI Yuvo Tech+ tractor with powerful 4-cylinder engine, 12F+3R transmission, superior fuel economy, and 1700 kg lift capacity ideal for rotary tillage, haulage, and puddling.",
+      "location": "Coimbatore, Tamil Nadu",
+      "lat": 11.0168,
+      "lng": 76.9558,
+      "pricePerDay": 1800,
+      "available": true,
+      "img": "/equipment/tractors/mahindra-575-di-yuvo-tech-plus.jpg",
+      "rating": 4,
+      "reviews": 5,
+      "hp": 47,
+      "fuelType": "Diesel",
+      "securityDeposit": 3000,
+      "operatorIncluded": true,
+      "specs": [
+        {
+          "label": "Engine Power",
+          "labelTa": "என்ஜின் திறன்",
+          "value": "47 HP (4-Cylinder)"
+        },
+        {
+          "label": "Transmission",
+          "labelTa": "டிரான்ஸ்மிஷன்",
+          "value": "12 Forward + 3 Reverse"
+        },
+        {
+          "label": "Lift Capacity",
+          "labelTa": "தூக்கும் திறன்",
+          "value": "1,700 kg"
+        },
+        {
+          "label": "Fuel Tank",
+          "labelTa": "எரிபொருள் தொட்டி",
+          "value": "60 Litres"
+        }
+      ],
+      "createdAt": "2026-09-18T17:29:05.421Z",
+      "availabilityType": "both",
+      "purchasePrice": 850000,
+      "vendorId": "vnd-1",
+      "vendorName": "Sri Murugan Mahindra Tractors & Implements"
+    },
+    {
+      "id": "eq-tractor-2",
+      "ownerId": "usr-owner-1",
+      "name": "John Deere 5310",
+      "nameTa": "ஜான் டீர் 5310",
+      "category": "Tractor",
+      "brand": "John Deere",
+      "model": "5310 PowerTech",
+      "imageUrl": "/equipment/tractors/john-deere-5310.jpg",
+      "description": "Heavy-duty John Deere 5310 utility tractor with 55 HP turbocharged PowerTech engine, Trem IV emission compliance, 2000 kg lift capacity, and oil-immersed disc brakes for heavy field operations.",
+      "location": "Thanjavur, Tamil Nadu",
+      "lat": 10.787,
+      "lng": 79.1378,
+      "pricePerDay": 2200,
+      "available": true,
+      "img": "/equipment/tractors/john-deere-5310.jpg",
+      "rating": 4.8,
+      "reviews": 38,
+      "hp": 55,
+      "fuelType": "Diesel",
+      "securityDeposit": 3500,
+      "operatorIncluded": true,
+      "specs": [
+        {
+          "label": "Engine Power",
+          "labelTa": "என்ஜின் திறன்",
+          "value": "55 HP PowerTech Turbo"
+        },
+        {
+          "label": "Transmission",
+          "labelTa": "டிரான்ஸ்மிஷன்",
+          "value": "9 Forward + 3 Reverse Collarshift"
+        },
+        {
+          "label": "Lift Capacity",
+          "labelTa": "தூக்கும் திறன்",
+          "value": "2,000 kg"
+        },
+        {
+          "label": "Brakes",
+          "labelTa": "பிரேக்",
+          "value": "Oil Immersed Disc Brakes"
+        }
+      ],
+      "createdAt": "2026-09-18T17:29:05.423Z",
+      "availabilityType": "both",
+      "purchasePrice": 1120000,
+      "vendorId": "vnd-3",
+      "vendorName": "Deere PowerTech Agricultural Center"
+    },
+    {
+      "id": "eq-tractor-3",
+      "ownerId": "usr-owner-1",
+      "name": "New Holland 3630 TX Super",
+      "nameTa": "நியூ ஹாலந்து 3630 TX சூப்பர்",
+      "category": "Tractor",
+      "brand": "New Holland",
+      "model": "3630 TX Super",
+      "imageUrl": "/equipment/tractors/new-holland-3630-tx-super.jpg",
+      "description": "New Holland 3630 TX Super 50 HP tractor featuring high torque backup, double clutch with independent PTO lever, and robust 1,800 kg hydraulic lift capacity for commercial farm work.",
+      "location": "Madurai, Tamil Nadu",
+      "lat": 9.9252,
+      "lng": 78.1198,
+      "pricePerDay": 2000,
+      "available": true,
+      "img": "/equipment/tractors/new-holland-3630-tx-super.jpg",
+      "rating": 4.8,
+      "reviews": 35,
+      "hp": 50,
+      "fuelType": "Diesel",
+      "securityDeposit": 3000,
+      "operatorIncluded": true,
+      "specs": [
+        {
+          "label": "Engine Power",
+          "labelTa": "என்ஜின் திறன்",
+          "value": "50 HP FPT Engine"
+        },
+        {
+          "label": "Transmission",
+          "labelTa": "டிரான்ஸ்மிஷன்",
+          "value": "8 Forward + 2 Reverse Constant Mesh"
+        },
+        {
+          "label": "Lift Capacity",
+          "labelTa": "தூக்கும் திறன்",
+          "value": "1,800 kg"
+        },
+        {
+          "label": "Clutch",
+          "labelTa": "கிளட்ச்",
+          "value": "Double Clutch Independent PTO"
+        }
+      ],
+      "createdAt": "2026-09-18T17:29:05.423Z",
+      "availabilityType": "both",
+      "purchasePrice": 680000,
+      "vendorId": "vnd-1",
+      "vendorName": "Sri Murugan Mahindra Tractors & Implements"
+    },
+    {
+      "id": "eq-harvester-1",
+      "ownerId": "usr-owner-2",
+      "name": "Claas Crop Tiger 30",
+      "nameTa": "கிளாஸ் கிராப் டைகர் 30",
+      "category": "Harvester",
+      "brand": "Claas",
+      "model": "Crop Tiger 30 Terra Trac",
+      "imageUrl": "/equipment/harvesters/claas-crop-tiger-30.jpg",
+      "description": "Claas Crop Tiger 30 Terra Trac multi-crop combine harvester equipped with 60 HP engine, Tangential Axial Flow (TAF) threshing, and rubber tracks for muddy and wet paddy fields.",
+      "location": "Thanjavur, Tamil Nadu",
+      "lat": 10.787,
+      "lng": 79.1378,
+      "pricePerDay": 4800,
+      "available": true,
+      "img": "/equipment/harvesters/claas-crop-tiger-30.jpg",
+      "rating": 4.9,
+      "reviews": 51,
+      "hp": 60,
+      "fuelType": "Diesel",
+      "securityDeposit": 7500,
+      "operatorIncluded": true,
+      "specs": [
+        {
+          "label": "Engine",
+          "labelTa": "என்ஜின்",
+          "value": "60 HP Tata 4SP RTV Diesel"
+        },
+        {
+          "label": "Cutter Bar Width",
+          "labelTa": "கட்டர் பார் அகலம்",
+          "value": "7.0 Feet (2.1 m)"
+        },
+        {
+          "label": "Grain Tank",
+          "labelTa": "தானிய தொட்டி",
+          "value": "1,200 Litres"
+        },
+        {
+          "label": "Drive Type",
+          "labelTa": "இயக்க வகை",
+          "value": "Terra Trac Rubber Track"
+        }
+      ],
+      "createdAt": "2026-09-18T17:29:05.423Z",
+      "availabilityType": "both",
+      "purchasePrice": 2450000,
+      "vendorId": "vnd-4",
+      "vendorName": "Kisan Harvester & Drone SuperStore"
+    },
+    {
+      "id": "eq-harvester-2",
+      "ownerId": "usr-owner-2",
+      "name": "Kubota DC-68G",
+      "nameTa": "குபோடா DC-68G",
+      "category": "Harvester",
+      "brand": "Kubota",
+      "model": "DC-68G Harvesking",
+      "imageUrl": "/equipment/harvesters/kubota-dc-68g.jpg",
+      "description": "Authentic Kubota DC-68G Harvesking paddy combine harvester featuring 68 HP diesel engine, Hydrostatic Transmission (HST), and crawler tracks for maximum efficiency with minimal grain loss.",
+      "location": "Erode, Tamil Nadu",
+      "lat": 11.341,
+      "lng": 77.7172,
+      "pricePerDay": 5200,
+      "available": true,
+      "img": "/equipment/harvesters/kubota-dc-68g.jpg",
+      "rating": 4.9,
+      "reviews": 47,
+      "hp": 68,
+      "fuelType": "Diesel",
+      "securityDeposit": 8000,
+      "operatorIncluded": true,
+      "specs": [
+        {
+          "label": "Engine",
+          "labelTa": "என்ஜின்",
+          "value": "68 HP Kubota Diesel Turbo"
+        },
+        {
+          "label": "Transmission",
+          "labelTa": "டிரான்ஸ்மிஷன்",
+          "value": "Hydrostatic Transmission (HST)"
+        },
+        {
+          "label": "Cutter Bar",
+          "labelTa": "கட்டர் பார்",
+          "value": "2.0 m width"
+        },
+        {
+          "label": "Ground Clearance",
+          "labelTa": "தரை இடைவெளி",
+          "value": "High-Clearance Crawler Track"
+        }
+      ],
+      "createdAt": "2026-09-18T17:29:05.423Z",
+      "availabilityType": "both",
+      "purchasePrice": 2200000,
+      "vendorId": "vnd-4",
+      "vendorName": "Kisan Harvester & Drone SuperStore"
+    },
+    {
+      "id": "eq-harvester-3",
+      "ownerId": "usr-owner-2",
+      "name": "New Holland TC5.30",
+      "nameTa": "நியூ ஹாலந்து TC5.30",
+      "category": "Harvester",
+      "brand": "New Holland",
+      "model": "TC5.30 Multi-Crop",
+      "imageUrl": "/equipment/harvesters/new-holland-tc5-30.jpg",
+      "description": "High-capacity New Holland TC5.30 multi-crop combine harvester with 130 HP turbocharged engine, 15-foot cutterbar, 3000-litre grain tank, and rotary separator for extensive commercial acreage.",
+      "location": "Salem, Tamil Nadu",
+      "lat": 11.6643,
+      "lng": 78.146,
+      "pricePerDay": 5800,
+      "available": true,
+      "img": "/equipment/harvesters/new-holland-tc5-30.jpg",
+      "rating": 4.8,
+      "reviews": 36,
+      "hp": 130,
+      "fuelType": "Diesel",
+      "securityDeposit": 9000,
+      "operatorIncluded": true,
+      "specs": [
+        {
+          "label": "Engine Power",
+          "labelTa": "என்ஜின் திறன்",
+          "value": "130 HP Turbocharged"
+        },
+        {
+          "label": "Cutterbar Width",
+          "labelTa": "கட்டர் பார் அகலம்",
+          "value": "15 Feet (4.6 m)"
+        },
+        {
+          "label": "Grain Tank",
+          "labelTa": "தானிய தொட்டி",
+          "value": "3,000 Litres"
+        },
+        {
+          "label": "Separation",
+          "labelTa": "பிரிப்பு அமைப்பு",
+          "value": "Rotary Separator with 5 Walkers"
+        }
+      ],
+      "createdAt": "2026-09-18T17:29:05.423Z",
+      "availabilityType": "both",
+      "purchasePrice": 2100000,
+      "vendorId": "vnd-2",
+      "vendorName": "Cauvery Delta Agro Machinery & Implements Dealer"
+    },
+    {
+      "id": "eq-tillage-1",
+      "ownerId": "usr-owner-1",
+      "name": "Mahindra MB Plough",
+      "nameTa": "மகிந்திரா MB ஏர் கலப்பை",
+      "category": "Ploughing & Tilling",
+      "brand": "Mahindra",
+      "model": "Dharti Mitra MB Plough",
+      "imageUrl": "/equipment/tillage/mahindra-mb-plough.jpg",
+      "description": "Mahindra Dharti Mitra reversible mouldboard plough engineered for deep soil aeration, hardpan penetration, weed burial, and post-monsoon seedbed tillage.",
+      "location": "Tiruchirappalli, Tamil Nadu",
+      "lat": 10.7905,
+      "lng": 78.7047,
+      "pricePerDay": 850,
+      "available": true,
+      "img": "/equipment/tillage/mahindra-mb-plough.jpg",
+      "rating": 4.8,
+      "reviews": 29,
+      "hp": 45,
+      "fuelType": "Diesel",
+      "securityDeposit": 1500,
+      "operatorIncluded": false,
+      "specs": [
+        {
+          "label": "Working Depth",
+          "labelTa": "வேலை ஆழம்",
+          "value": "10 - 15 cm"
+        },
+        {
+          "label": "Plough Bottoms",
+          "labelTa": "கலப்பை அடி",
+          "value": "2 or 3 Furrows Reversible"
+        },
+        {
+          "label": "Tractor Required",
+          "labelTa": "டிராக்டர் தேவை",
+          "value": "40 - 55 HP"
+        },
+        {
+          "label": "Blades",
+          "labelTa": "பிளேடுகள்",
+          "value": "High Boron Hardened Steel"
+        }
+      ],
+      "createdAt": "2026-09-18T17:29:05.423Z",
+      "availabilityType": "both",
+      "purchasePrice": 75000,
+      "vendorId": "vnd-1",
+      "vendorName": "Sri Murugan Mahindra Tractors & Implements"
+    },
+    {
+      "id": "eq-tillage-2",
+      "ownerId": "usr-owner-1",
+      "name": "Shaktiman Rotary Tiller",
+      "nameTa": "சக்திமான் ரோட்டரி டில்லர்",
+      "category": "Ploughing & Tilling",
+      "brand": "Shaktiman",
+      "model": "Regular Plus Series Rotavator",
+      "imageUrl": "/equipment/tillage/shaktiman-rotary-tiller.jpg",
+      "description": "Shaktiman Regular Plus rotary tiller with 48 boron steel blades and multi-speed drive for single-pass soil pulverization in both dry and wet agricultural fields.",
+      "location": "Coimbatore, Tamil Nadu",
+      "lat": 11.0168,
+      "lng": 76.9558,
+      "pricePerDay": 1100,
+      "available": true,
+      "img": "/equipment/tillage/shaktiman-rotary-tiller.jpg",
+      "rating": 4.9,
+      "reviews": 64,
+      "hp": 40,
+      "fuelType": "Diesel",
+      "securityDeposit": 2000,
+      "operatorIncluded": false,
+      "specs": [
+        {
+          "label": "Tillage Width",
+          "labelTa": "உழவு அகலம்",
+          "value": "7.0 Feet (2.1 m)"
+        },
+        {
+          "label": "Blades",
+          "labelTa": "பிளேடுகள்",
+          "value": "48 L-type Boron Steel Blades"
+        },
+        {
+          "label": "Gearbox",
+          "labelTa": "கியர்பாக்ஸ்",
+          "value": "Multi-Speed Side Gear Drive"
+        },
+        {
+          "label": "Tractor Required",
+          "labelTa": "டிராக்டர் தேவை",
+          "value": "45 - 60 HP"
+        }
+      ],
+      "createdAt": "2026-09-18T17:29:05.423Z",
+      "availabilityType": "both",
+      "purchasePrice": 135000,
+      "vendorId": "vnd-5",
+      "vendorName": "Kongu Agro Implements & Spares Hub"
+    },
+    {
+      "id": "eq-tillage-3",
+      "ownerId": "usr-owner-1",
+      "name": "John Deere Disc Harrow",
+      "nameTa": "ஜான் டீர் டிஸ்க் ஹாரோ",
+      "category": "Ploughing & Tilling",
+      "brand": "John Deere",
+      "model": "GreenSystem Disc Harrow",
+      "imageUrl": "/equipment/tillage/john-deere-disc-harrow.jpg",
+      "description": "John Deere GreenSystem heavy tandem disc harrow with 16 boron discs designed for chopping heavy crop residues, clod breaking, and thorough secondary tillage.",
+      "location": "Madurai, Tamil Nadu",
+      "lat": 9.9252,
+      "lng": 78.1198,
+      "pricePerDay": 950,
+      "available": true,
+      "img": "/equipment/tillage/john-deere-disc-harrow.jpg",
+      "rating": 4.7,
+      "reviews": 31,
+      "hp": 45,
+      "fuelType": "Diesel",
+      "securityDeposit": 1500,
+      "operatorIncluded": false,
+      "specs": [
+        {
+          "label": "Discs",
+          "labelTa": "டிஸ்க்குகள்",
+          "value": "16 Discs (Notched + Plain)"
+        },
+        {
+          "label": "Disc Diameter",
+          "labelTa": "டிஸ்க் விட்டம்",
+          "value": "560 mm Boron Steel"
+        },
+        {
+          "label": "Gang Angle",
+          "labelTa": "சாய்வு கோணம்",
+          "value": "Adjustable 0° - 20°"
+        },
+        {
+          "label": "Tractor Required",
+          "labelTa": "டிராக்டர் தேவை",
+          "value": "40 - 55 HP"
+        }
+      ],
+      "createdAt": "2026-09-18T17:29:05.423Z",
+      "availabilityType": "both",
+      "purchasePrice": 88000,
+      "vendorId": "vnd-2",
+      "vendorName": "Cauvery Delta Agro Machinery & Implements Dealer"
+    },
+    {
+      "id": "eq-seeding-1",
+      "ownerId": "usr-owner-1",
+      "name": "Mahindra Seed Drill",
+      "nameTa": "மகிந்திரா விதைப்பான்",
+      "category": "Seeding",
+      "brand": "Mahindra",
+      "model": "Dharti Mitra Super Seeder",
+      "imageUrl": "/equipment/seeding/mahindra-seed-drill.jpg",
+      "description": "Mahindra Super Seeder 3-in-1 seeding implement combining rotavator tillage, precision seed dispensing, and fertilizer placement directly into paddy residue without field burning.",
+      "location": "Thanjavur, Tamil Nadu",
+      "lat": 10.787,
+      "lng": 79.1378,
+      "pricePerDay": 1400,
+      "available": true,
+      "img": "/equipment/seeding/mahindra-seed-drill.jpg",
+      "rating": 4.9,
+      "reviews": 39,
+      "hp": 50,
+      "fuelType": "Diesel",
+      "securityDeposit": 2500,
+      "operatorIncluded": false,
+      "specs": [
+        {
+          "label": "Row Capacity",
+          "labelTa": "வரிசை திறன்",
+          "value": "9 or 11 Tynes"
+        },
+        {
+          "label": "Mechanism",
+          "labelTa": "இயங்கும் முறை",
+          "value": "Rotary Tiller + Seed/Fertilizer Delivery"
+        },
+        {
+          "label": "Seed Hopper",
+          "labelTa": "விதை தொட்டி",
+          "value": "80 kg Capacity"
+        },
+        {
+          "label": "Fertilizer Hopper",
+          "labelTa": "உர தொட்டி",
+          "value": "80 kg Capacity"
+        }
+      ],
+      "createdAt": "2026-09-18T17:29:05.423Z",
+      "availabilityType": "both",
+      "purchasePrice": 62000,
+      "vendorId": "vnd-1",
+      "vendorName": "Sri Murugan Mahindra Tractors & Implements"
+    },
+    {
+      "id": "eq-seeding-2",
+      "ownerId": "usr-owner-1",
+      "name": "John Deere Seed Drill",
+      "nameTa": "ஜான் டீர் சீட் கம் உரம் டிரில்",
+      "category": "Seeding",
+      "brand": "John Deere",
+      "model": "GreenSystem Seed Cum Fertilizer Drill",
+      "imageUrl": "/equipment/seeding/john-deere-seed-drill.jpg",
+      "description": "John Deere GreenSystem Seed Cum Fertilizer Drill with fluted roller metering ensuring uniform seed spacing and simultaneous root-zone fertilizer placement for wheat, pulses, and oilseeds.",
+      "location": "Salem, Tamil Nadu",
+      "lat": 11.6643,
+      "lng": 78.146,
+      "pricePerDay": 1350,
+      "available": true,
+      "img": "/equipment/seeding/john-deere-seed-drill.jpg",
+      "rating": 4.8,
+      "reviews": 28,
+      "hp": 40,
+      "fuelType": "Diesel",
+      "securityDeposit": 2500,
+      "operatorIncluded": false,
+      "specs": [
+        {
+          "label": "Rows",
+          "labelTa": "வரிசைகள்",
+          "value": "9 Rows Adjustable Spacing"
+        },
+        {
+          "label": "Metering Type",
+          "labelTa": "அளவீட்டு வகை",
+          "value": "Fluted Roller Metering"
+        },
+        {
+          "label": "Depth Control",
+          "labelTa": "ஆழ கட்டுப்பாடு",
+          "value": "Spring Loaded Furrow Openers"
+        },
+        {
+          "label": "Tractor Required",
+          "labelTa": "டிராக்டர் தேவை",
+          "value": "35 - 50 HP"
+        }
+      ],
+      "createdAt": "2026-09-18T17:29:05.423Z",
+      "availabilityType": "both",
+      "purchasePrice": 195000,
+      "vendorId": "vnd-5",
+      "vendorName": "Kongu Agro Implements & Spares Hub"
+    },
+    {
+      "id": "eq-seeding-3",
+      "ownerId": "usr-owner-1",
+      "name": "Shaktiman Pneumatic Planter",
+      "nameTa": "சக்திமான் நியூமேடிக் பிளான்டர்",
+      "category": "Seeding",
+      "brand": "Shaktiman",
+      "model": "SVPP 4-Row Precision Planter",
+      "imageUrl": "/equipment/seeding/shaktiman-pneumatic-planter.jpg",
+      "description": "Shaktiman SVPP 4-row pneumatic precision planter utilizing vacuum suction technology for single-seed placement with exact plant-to-plant spacing in cotton, corn, and maize fields.",
+      "location": "Dindigul, Tamil Nadu",
+      "lat": 10.3673,
+      "lng": 77.9803,
+      "pricePerDay": 1800,
+      "available": true,
+      "img": "/equipment/seeding/shaktiman-pneumatic-planter.jpg",
+      "rating": 4.9,
+      "reviews": 22,
+      "hp": 50,
+      "fuelType": "Diesel",
+      "securityDeposit": 3000,
+      "operatorIncluded": false,
+      "specs": [
+        {
+          "label": "Rows",
+          "labelTa": "வரிசைகள்",
+          "value": "4 Rows (45 - 75 cm adjustable)"
+        },
+        {
+          "label": "Technology",
+          "labelTa": "தொழில்நுட்பம்",
+          "value": "Pneumatic Vacuum Metering"
+        },
+        {
+          "label": "Accuracy",
+          "labelTa": "துல்லியம்",
+          "value": "Single Seed Precision Sowing"
+        },
+        {
+          "label": "Supported Crops",
+          "labelTa": "பயிர்கள்",
+          "value": "Corn, Cotton, Soybean, Sunflower"
+        }
+      ],
+      "createdAt": "2026-09-18T17:29:05.423Z",
+      "availabilityType": "both",
+      "purchasePrice": 84000,
+      "vendorId": "vnd-2",
+      "vendorName": "Cauvery Delta Agro Machinery & Implements Dealer"
+    },
+    {
+      "id": "eq-drone-1",
+      "ownerId": "usr-owner-2",
+      "name": "DJI Agras T40 Agricultural Drone",
+      "nameTa": "டிஜேஐ அக்ராஸ் T40 விவசாய ட்ரோன்",
+      "category": "Sprayers & Drones",
+      "brand": "DJI",
+      "model": "Agras T40",
+      "imageUrl": "/equipment/sprayers-drones/dji-agras-t40.jpg",
+      "description": "DJI Agras T40 flagship agricultural drone featuring coaxial twin rotor design, 40-litre spraying payload, dual atomized centrifugal nozzles, and active phased-array radar for 40 acres/hour coverage.",
+      "location": "Coimbatore, Tamil Nadu",
+      "lat": 11.0168,
+      "lng": 76.9558,
+      "pricePerDay": 2800,
+      "available": true,
+      "img": "/equipment/sprayers-drones/dji-agras-t40.jpg",
+      "rating": 4.9,
+      "reviews": 76,
+      "hp": 0,
+      "fuelType": "Battery / Hybrid",
+      "securityDeposit": 5000,
+      "operatorIncluded": true,
+      "specs": [
+        {
+          "label": "Payload Capacity",
+          "labelTa": "சுமை திறன்",
+          "value": "40 Litres Spray / 50 kg Spread"
+        },
+        {
+          "label": "Spray Flow Rate",
+          "labelTa": "தெளிக்கும் வேகம்",
+          "value": "Up to 12 L/min Dual Atomized"
+        },
+        {
+          "label": "Rotor Type",
+          "labelTa": "ரோட்டார் வகை",
+          "value": "Coaxial Twin Rotor"
+        },
+        {
+          "label": "Radar",
+          "labelTa": "ரேடார்",
+          "value": "Active Phased Array + Binocular Vision"
+        }
+      ],
+      "createdAt": "2026-09-18T17:29:05.423Z",
+      "availabilityType": "both",
+      "purchasePrice": 980000,
+      "vendorId": "vnd-4",
+      "vendorName": "Kisan Harvester & Drone SuperStore"
+    },
+    {
+      "id": "eq-drone-2",
+      "ownerId": "usr-owner-2",
+      "name": "Garuda Kisan Agricultural Drone",
+      "nameTa": "கருடா கிசான் விவசாய ட்ரோன்",
+      "category": "Sprayers & Drones",
+      "brand": "Garuda Aerospace",
+      "model": "Agri Kisan Drone V2",
+      "imageUrl": "/equipment/sprayers-drones/garuda-kisan-drone.jpg",
+      "description": "Garuda Kisan DGCA-certified indigenous agricultural drone engineered for uniform pesticide and micronutrient spraying with terrain-following sensors and high-efficiency nozzles.",
+      "location": "Erode, Tamil Nadu",
+      "lat": 11.341,
+      "lng": 77.7172,
+      "pricePerDay": 2200,
+      "available": true,
+      "img": "/equipment/sprayers-drones/garuda-kisan-drone.jpg",
+      "rating": 4.8,
+      "reviews": 43,
+      "hp": 0,
+      "fuelType": "Battery / Hybrid",
+      "securityDeposit": 4000,
+      "operatorIncluded": true,
+      "specs": [
+        {
+          "label": "Spray Tank",
+          "labelTa": "தெளிப்பு தொட்டி",
+          "value": "10 - 12 Litres"
+        },
+        {
+          "label": "Flight Time",
+          "labelTa": "பறக்கும் நேரம்",
+          "value": "Up to 25 mins per battery"
+        },
+        {
+          "label": "Coverage",
+          "labelTa": "பரப்பளவு",
+          "value": "6 - 8 acres per hour"
+        },
+        {
+          "label": "Certification",
+          "labelTa": "சான்றிதழ்",
+          "value": "DGCA Type Certified (Make in India)"
+        }
+      ],
+      "createdAt": "2026-09-18T17:29:05.423Z",
+      "availabilityType": "both",
+      "purchasePrice": 550000,
+      "vendorId": "vnd-4",
+      "vendorName": "Kisan Harvester & Drone SuperStore"
+    },
+    {
+      "id": "eq-sprayer-1",
+      "ownerId": "usr-owner-1",
+      "name": "John Deere Field Sprayer",
+      "nameTa": "ஜான் டீர் ஃபீல்ட் ஸ்ப்ரேயர்",
+      "category": "Sprayers & Drones",
+      "brand": "John Deere",
+      "model": "4630 Self-Propelled Sprayer",
+      "imageUrl": "/equipment/sprayers-drones/john-deere-field-sprayer.jpg",
+      "description": "John Deere 4630 self-propelled commercial field sprayer with 165 HP engine, 2,270-litre tank, wide 80-foot boom, and high underbody clearance for mature cotton, maize, and sugarcane spraying.",
+      "location": "Madurai, Tamil Nadu",
+      "lat": 9.9252,
+      "lng": 78.1198,
+      "pricePerDay": 3200,
+      "available": true,
+      "img": "/equipment/sprayers-drones/john-deere-field-sprayer.jpg",
+      "rating": 4.8,
+      "reviews": 26,
+      "hp": 165,
+      "fuelType": "Diesel",
+      "securityDeposit": 5000,
+      "operatorIncluded": true,
+      "specs": [
+        {
+          "label": "Tank Capacity",
+          "labelTa": "தொட்டி கொள்ளளவு",
+          "value": "2,270 Litres (600 Gal)"
+        },
+        {
+          "label": "Boom Width",
+          "labelTa": "பூம் அகலம்",
+          "value": "80 - 90 Feet (24 - 27 m)"
+        },
+        {
+          "label": "Crop Clearance",
+          "labelTa": "பயிர் இடைவெளி",
+          "value": "1.27 m Underbody"
+        },
+        {
+          "label": "Engine Power",
+          "labelTa": "என்ஜின் திறன்",
+          "value": "165 HP John Deere PowerTech"
+        }
+      ],
+      "createdAt": "2026-09-18T17:29:05.423Z",
+      "availabilityType": "both",
+      "purchasePrice": 1120000,
+      "vendorId": "vnd-1",
+      "vendorName": "Sri Murugan Mahindra Tractors & Implements"
+    },
+    {
+      "id": "eq-pump-1",
+      "ownerId": "usr-owner-1",
+      "name": "Kirloskar Diesel Water Pump",
+      "nameTa": "கிர்லோஸ்கர் டீசல் நீர் பம்ப்",
+      "category": "Water Pump",
+      "brand": "Kirloskar",
+      "model": "5 HP Diesel Engine Pumpset",
+      "imageUrl": "/equipment/water-pumps/kirloskar-diesel-water-pump.jpg",
+      "description": "Kirloskar 5 HP portable diesel water pumpset with 3-inch delivery port and 55,000 L/h flow capacity, ideal for flood irrigation, canals, and rural farms without reliable electricity.",
+      "location": "Tiruchirappalli, Tamil Nadu",
+      "lat": 10.7905,
+      "lng": 78.7047,
+      "pricePerDay": 600,
+      "available": true,
+      "img": "/equipment/water-pumps/kirloskar-diesel-water-pump.jpg",
+      "rating": 4.8,
+      "reviews": 54,
+      "hp": 5,
+      "fuelType": "Diesel",
+      "securityDeposit": 1000,
+      "operatorIncluded": false,
+      "specs": [
+        {
+          "label": "Power",
+          "labelTa": "திறன்",
+          "value": "5.0 HP Single Cylinder Diesel"
+        },
+        {
+          "label": "Delivery Port",
+          "labelTa": "வெளியேறும் குழாய்",
+          "value": "3\" x 3\" (75 mm)"
+        },
+        {
+          "label": "Discharge Rate",
+          "labelTa": "நீர் வெளியேற்றம்",
+          "value": "55,000 Litres/hour"
+        },
+        {
+          "label": "Max Head",
+          "labelTa": "அதிகபட்ச உயரம்",
+          "value": "18 - 24 metres"
+        }
+      ],
+      "createdAt": "2026-09-18T17:29:05.423Z",
+      "availabilityType": "both",
+      "purchasePrice": 42000,
+      "vendorId": "vnd-2",
+      "vendorName": "Cauvery Delta Agro Machinery & Implements Dealer"
+    },
+    {
+      "id": "eq-pump-2",
+      "ownerId": "usr-owner-1",
+      "name": "Texmo Solar Water Pump",
+      "nameTa": "டெக்ஸ்மோ சோலார் நீர் பம்ப்",
+      "category": "Water Pump",
+      "brand": "Texmo",
+      "model": "Taro Solar Submersible Pumpset",
+      "imageUrl": "/equipment/water-pumps/texmo-solar-water-pump.jpg",
+      "description": "Texmo (Taro) 3 HP high-efficiency solar submersible pump system with MPPT controller, designed for sustainable, zero-electricity-cost deep borewell farm irrigation.",
+      "location": "Coimbatore, Tamil Nadu",
+      "lat": 11.0168,
+      "lng": 76.9558,
+      "pricePerDay": 750,
+      "available": true,
+      "img": "/equipment/water-pumps/texmo-solar-water-pump.jpg",
+      "rating": 4.9,
+      "reviews": 40,
+      "hp": 3,
+      "fuelType": "Solar / Electric",
+      "securityDeposit": 1500,
+      "operatorIncluded": false,
+      "specs": [
+        {
+          "label": "Power",
+          "labelTa": "திறன்",
+          "value": "3.0 HP High-Efficiency DC Solar"
+        },
+        {
+          "label": "Head Range",
+          "labelTa": "தலைமை வரம்பு",
+          "value": "Up to 80 metres"
+        },
+        {
+          "label": "Discharge",
+          "labelTa": "வெளியேற்றம்",
+          "value": "25,000 - 35,000 L/h"
+        },
+        {
+          "label": "Pump Type",
+          "labelTa": "பம்ப் வகை",
+          "value": "Stainless Steel Borewell Submersible"
+        }
+      ],
+      "createdAt": "2026-09-18T17:29:05.423Z",
+      "availabilityType": "both",
+      "purchasePrice": 175000,
+      "vendorId": "vnd-5",
+      "vendorName": "Kongu Agro Implements & Spares Hub"
+    },
+    {
+      "id": "eq-pump-3",
+      "ownerId": "usr-owner-1",
+      "name": "Kirloskar Electric Water Pump",
+      "nameTa": "கிர்லோஸ்கர் எலக்ட்ரிக் மோனோபிளாக் பம்ப்",
+      "category": "Water Pump",
+      "brand": "Kirloskar",
+      "model": "KSMB Monobloc Centrifugal Pump",
+      "imageUrl": "/equipment/water-pumps/kirloskar-electric-water-pump.jpg",
+      "description": "Kirloskar KSMB high-efficiency electric monobloc centrifugal pump with thermal overload protection, anti-corrosive coating, and dependable continuous flow for open well irrigation.",
+      "location": "Erode, Tamil Nadu",
+      "lat": 11.341,
+      "lng": 77.7172,
+      "pricePerDay": 450,
+      "available": true,
+      "img": "/equipment/water-pumps/kirloskar-electric-water-pump.jpg",
+      "rating": 4.7,
+      "reviews": 33,
+      "hp": 2,
+      "fuelType": "Solar / Electric",
+      "securityDeposit": 1000,
+      "operatorIncluded": false,
+      "specs": [
+        {
+          "label": "Power",
+          "labelTa": "திறன்",
+          "value": "2.0 HP (1.5 kW) Single Phase"
+        },
+        {
+          "label": "Delivery Port",
+          "labelTa": "வெளியேறும் குழாய்",
+          "value": "2\" x 2\" (50 mm)"
+        },
+        {
+          "label": "Discharge",
+          "labelTa": "வெளியேற்றம்",
+          "value": "30,000 Litres/hour"
+        },
+        {
+          "label": "Max Head",
+          "labelTa": "அதிகபட்ச உயரம்",
+          "value": "28 metres"
+        }
+      ],
+      "createdAt": "2026-09-18T17:29:05.423Z",
+      "availabilityType": "both",
+      "purchasePrice": 58000,
+      "vendorId": "vnd-1",
+      "vendorName": "Sri Murugan Mahindra Tractors & Implements"
+    }
+  ],
+  "bookings": [
+    {
+      "listingId": "eq-tractor-1",
+      "equipmentName": "Mahindra 575 DI Yuvo Tech+",
+      "equipmentImg": "/equipment/tractors/mahindra-575-di-yuvo-tech-plus.jpg",
+      "farmerId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "farmerName": "Administrator",
+      "ownerId": "usr-owner-1",
+      "ownerName": "Verified Fleet Owner",
+      "startDate": "2026-09-26",
+      "endDate": "2026-09-29",
+      "days": 3,
+      "dailyRate": 1800,
+      "totalAmount": 5400,
+      "securityDeposit": 3000,
+      "escrowStatus": "held",
+      "status": "active",
+      "id": "BK-7626",
+      "createdAt": "2026-10-08T19:21:23.807Z"
+    },
+    {
+      "listingId": "eq-tractor-1",
+      "equipmentName": "Mahindra 575 DI Yuvo Tech+",
+      "equipmentImg": "/equipment/tractors/mahindra-575-di-yuvo-tech-plus.jpg",
+      "farmerId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "farmerName": "Administrator",
+      "ownerId": "usr-owner-1",
+      "ownerName": "Verified Fleet Owner",
+      "startDate": "2026-09-26",
+      "endDate": "2026-09-29",
+      "days": 3,
+      "dailyRate": 1800,
+      "totalAmount": 5400,
+      "securityDeposit": 3000,
+      "escrowStatus": "held",
+      "status": "active",
+      "id": "BK-1946",
+      "createdAt": "2026-10-08T19:21:17.565Z"
+    },
+    {
+      "listingId": "eq-tractor-2",
+      "equipmentName": "John Deere 5310",
+      "equipmentImg": "/equipment/tractors/john-deere-5310.jpg",
+      "farmerId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "farmerName": "Administrator",
+      "ownerId": "usr-owner-1",
+      "ownerName": "Verified Fleet Owner",
+      "startDate": "2026-09-26",
+      "endDate": "2026-09-29",
+      "days": 3,
+      "dailyRate": 2200,
+      "totalAmount": 6600,
+      "securityDeposit": 3500,
+      "escrowStatus": "held",
+      "status": "active",
+      "id": "BK-6454",
+      "createdAt": "2026-10-08T18:51:38.660Z"
+    },
+    {
+      "listingId": "eq-tractor-1",
+      "equipmentName": "Mahindra 575 DI Yuvo Tech+",
+      "equipmentImg": "/equipment/tractors/mahindra-575-di-yuvo-tech-plus.jpg",
+      "farmerId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "farmerName": "Administrator",
+      "ownerId": "usr-owner-1",
+      "ownerName": "Verified Fleet Owner",
+      "startDate": "2026-09-26",
+      "endDate": "2026-09-29",
+      "days": 3,
+      "dailyRate": 1800,
+      "totalAmount": 5400,
+      "securityDeposit": 3000,
+      "escrowStatus": "refunded",
+      "status": "cancelled",
+      "id": "BK-3641",
+      "createdAt": "2026-10-08T18:33:27.422Z"
+    },
+    {
+      "listingId": "eq-tractor-3",
+      "equipmentName": "New Holland 3630 TX Super",
+      "equipmentImg": "/equipment/tractors/new-holland-3630-tx-super.jpg",
+      "farmerId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "farmerName": "Administrator",
+      "ownerId": "usr-owner-1",
+      "ownerName": "Verified Fleet Owner",
+      "startDate": "2026-09-26",
+      "endDate": "2026-09-29",
+      "days": 3,
+      "dailyRate": 2000,
+      "totalAmount": 6000,
+      "securityDeposit": 3000,
+      "escrowStatus": "refunded",
+      "status": "cancelled",
+      "id": "BK-1499",
+      "createdAt": "2026-10-08T17:39:35.231Z"
+    },
+    {
+      "listingId": "eq-tractor-3",
+      "equipmentName": "New Holland 3630 TX Super",
+      "equipmentImg": "/equipment/tractors/new-holland-3630-tx-super.jpg",
+      "farmerId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "farmerName": "Administrator",
+      "ownerId": "usr-owner-1",
+      "ownerName": "Verified Fleet Owner",
+      "startDate": "2026-09-26",
+      "endDate": "2026-09-29",
+      "days": 3,
+      "dailyRate": 2000,
+      "totalAmount": 6000,
+      "securityDeposit": 3000,
+      "escrowStatus": "held",
+      "status": "active",
+      "id": "BK-6016",
+      "createdAt": "2026-10-08T17:39:32.371Z"
+    },
+    {
+      "listingId": "eq-harvester-3",
+      "equipmentName": "New Holland TC5.30",
+      "equipmentImg": "/equipment/harvesters/new-holland-tc5-30.jpg",
+      "farmerId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "farmerName": "Administrator",
+      "ownerId": "usr-owner-2",
+      "ownerName": "Verified Fleet Owner",
+      "startDate": "2026-09-26",
+      "endDate": "2026-09-29",
+      "days": 3,
+      "dailyRate": 5800,
+      "totalAmount": 17400,
+      "securityDeposit": 9000,
+      "escrowStatus": "held",
+      "status": "active",
+      "id": "BK-2422",
+      "createdAt": "2026-10-08T15:38:54.128Z"
+    },
+    {
+      "listingId": "eq-tractor-2",
+      "equipmentName": "John Deere 5310",
+      "equipmentImg": "/equipment/tractors/john-deere-5310.jpg",
+      "farmerId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "farmerName": "Administrator",
+      "ownerId": "usr-owner-1",
+      "ownerName": "Verified Fleet Owner",
+      "startDate": "2026-09-26",
+      "endDate": "2026-09-29",
+      "days": 3,
+      "dailyRate": 2200,
+      "totalAmount": 6600,
+      "securityDeposit": 3500,
+      "escrowStatus": "held",
+      "status": "active",
+      "id": "BK-5873",
+      "createdAt": "2026-10-07T18:11:21.750Z"
+    },
+    {
+      "listingId": "eq-tractor-2",
+      "equipmentName": "John Deere 5310",
+      "equipmentImg": "/equipment/tractors/john-deere-5310.jpg",
+      "farmerId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "farmerName": "Administrator",
+      "ownerId": "usr-owner-1",
+      "ownerName": "Verified Fleet Owner",
+      "startDate": "2026-09-26",
+      "endDate": "2026-09-29",
+      "days": 3,
+      "dailyRate": 2200,
+      "totalAmount": 6600,
+      "securityDeposit": 3500,
+      "escrowStatus": "held",
+      "status": "active",
+      "id": "BK-3852",
+      "createdAt": "2026-10-07T18:10:05.877Z"
+    },
+    {
+      "listingId": "eq-tractor-2",
+      "equipmentName": "John Deere 5310",
+      "equipmentImg": "/equipment/tractors/john-deere-5310.jpg",
+      "farmerId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "farmerName": "Administrator",
+      "ownerId": "usr-owner-1",
+      "ownerName": "Verified Fleet Owner",
+      "startDate": "2026-09-26",
+      "endDate": "2026-09-29",
+      "days": 3,
+      "dailyRate": 2200,
+      "totalAmount": 6600,
+      "securityDeposit": 3500,
+      "escrowStatus": "held",
+      "status": "active",
+      "id": "BK-2269",
+      "createdAt": "2026-10-07T18:10:03.915Z"
+    },
+    {
+      "listingId": "eq-tractor-2",
+      "equipmentName": "John Deere 5310",
+      "equipmentImg": "/equipment/tractors/john-deere-5310.jpg",
+      "farmerId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "farmerName": "Administrator",
+      "ownerId": "usr-owner-1",
+      "ownerName": "Verified Fleet Owner",
+      "startDate": "2026-09-26",
+      "endDate": "2026-09-26",
+      "days": 3,
+      "dailyRate": 2200,
+      "totalAmount": 6600,
+      "securityDeposit": 3500,
+      "escrowStatus": "released",
+      "status": "completed",
+      "id": "BK-5008",
+      "createdAt": "2026-10-07T17:50:15.789Z"
+    },
+    {
+      "listingId": "eq-tractor-1",
+      "equipmentName": "Mahindra 575 DI Yuvo Tech+",
+      "equipmentImg": "/equipment/tractors/mahindra-575-di-yuvo-tech-plus.jpg",
+      "farmerId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "farmerName": "Administrator",
+      "ownerId": "usr-owner-1",
+      "ownerName": "Verified Fleet Owner",
+      "startDate": "2026-09-26",
+      "endDate": "2026-09-29",
+      "days": 3,
+      "dailyRate": 1800,
+      "totalAmount": 5400,
+      "securityDeposit": 3000,
+      "escrowStatus": "refunded",
+      "status": "cancelled",
+      "id": "BK-5683",
+      "createdAt": "2026-10-07T17:48:29.602Z"
+    },
+    {
+      "listingId": "eq-tractor-1",
+      "equipmentName": "Mahindra 575 DI Yuvo Tech+",
+      "equipmentImg": "/equipment/tractors/mahindra-575-di-yuvo-tech-plus.jpg",
+      "farmerId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "farmerName": "Administrator",
+      "ownerId": "usr-owner-1",
+      "ownerName": "Verified Fleet Owner",
+      "startDate": "2026-09-26",
+      "endDate": "2026-09-29",
+      "days": 3,
+      "dailyRate": 1800,
+      "totalAmount": 5400,
+      "securityDeposit": 3000,
+      "escrowStatus": "released",
+      "status": "completed",
+      "id": "BK-2665",
+      "createdAt": "2026-10-07T17:48:27.722Z"
+    },
+    {
+      "listingId": "eq-tractor-1",
+      "equipmentName": "Mahindra 575 DI Yuvo Tech+",
+      "equipmentImg": "/equipment/tractors/mahindra-575-di-yuvo-tech-plus.jpg",
+      "farmerId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "farmerName": "Administrator",
+      "ownerId": "usr-owner-1",
+      "ownerName": "Verified Fleet Owner",
+      "startDate": "2026-09-26",
+      "endDate": "2026-09-29",
+      "days": 3,
+      "dailyRate": 1800,
+      "totalAmount": 5400,
+      "securityDeposit": 3000,
+      "escrowStatus": "released",
+      "status": "completed",
+      "id": "BK-3203",
+      "createdAt": "2026-10-07T17:47:40.052Z"
+    },
+    {
+      "listingId": "eq-tractor-1",
+      "equipmentName": "Mahindra 575 DI Yuvo Tech+",
+      "equipmentImg": "/equipment/tractors/mahindra-575-di-yuvo-tech-plus.jpg",
+      "farmerId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "farmerName": "Administrator",
+      "ownerId": "usr-owner-1",
+      "ownerName": "Verified Fleet Owner",
+      "startDate": "2026-09-26",
+      "endDate": "2026-09-29",
+      "days": 3,
+      "dailyRate": 1800,
+      "totalAmount": 5400,
+      "securityDeposit": 3000,
+      "escrowStatus": "released",
+      "status": "completed",
+      "id": "BK-6463",
+      "createdAt": "2026-10-07T17:47:38.240Z"
+    },
+    {
+      "listingId": "eq-tractor-2",
+      "equipmentName": "John Deere 5310",
+      "equipmentImg": "/equipment/tractors/john-deere-5310.jpg",
+      "farmerId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "farmerName": "Administrator",
+      "ownerId": "usr-owner-1",
+      "ownerName": "Verified Fleet Owner",
+      "startDate": "2026-09-26",
+      "endDate": "2026-09-29",
+      "days": 3,
+      "dailyRate": 2200,
+      "totalAmount": 6600,
+      "securityDeposit": 3500,
+      "escrowStatus": "released",
+      "status": "completed",
+      "id": "BK-4359",
+      "createdAt": "2026-10-07T14:21:45.153Z"
+    },
+    {
+      "listingId": "eq-tractor-2",
+      "equipmentName": "John Deere 5310",
+      "equipmentImg": "/equipment/tractors/john-deere-5310.jpg",
+      "farmerId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "farmerName": "Administrator",
+      "ownerId": "usr-owner-1",
+      "ownerName": "Verified Fleet Owner",
+      "startDate": "2026-09-26",
+      "endDate": "2026-09-29",
+      "days": 3,
+      "dailyRate": 2200,
+      "totalAmount": 6600,
+      "securityDeposit": 3500,
+      "escrowStatus": "released",
+      "status": "completed",
+      "id": "BK-2397",
+      "createdAt": "2026-10-07T14:21:43.101Z"
+    },
+    {
+      "listingId": "eq-harvester-1",
+      "equipmentName": "Claas Crop Tiger 30",
+      "equipmentImg": "/equipment/harvesters/claas-crop-tiger-30.jpg",
+      "farmerId": "557722b4-8cbd-4162-b947-2b88d0c59803",
+      "farmerName": "Yaswanth S",
+      "ownerId": "usr-owner-2",
+      "ownerName": "Verified Fleet Owner",
+      "startDate": "2026-09-26",
+      "endDate": "2026-09-29",
+      "days": 3,
+      "dailyRate": 4800,
+      "totalAmount": 14400,
+      "securityDeposit": 7500,
+      "escrowStatus": "released",
+      "status": "completed",
+      "id": "BK-1350",
+      "createdAt": "2026-10-06T17:49:28.244Z"
+    },
+    {
+      "listingId": "eq-tractor-1",
+      "equipmentName": "Mahindra 575 DI Yuvo Tech+",
+      "equipmentImg": "/equipment/tractors/mahindra-575-di-yuvo-tech-plus.jpg",
+      "farmerId": "4a73ef39-991d-485a-b3a2-2fed302e4076",
+      "farmerName": "Test Farmer",
+      "ownerId": "usr-owner-1",
+      "ownerName": "Verified Fleet Owner",
+      "startDate": "2026-09-26",
+      "endDate": "2026-09-29",
+      "days": 3,
+      "dailyRate": 1800,
+      "totalAmount": 5400,
+      "securityDeposit": 3000,
+      "escrowStatus": "released",
+      "status": "completed",
+      "id": "BK-7428",
+      "createdAt": "2026-10-06T16:43:59.432Z"
+    },
+    {
+      "listingId": "eq-tractor-1",
+      "equipmentName": "Mahindra 575 DI Yuvo Tech+",
+      "equipmentImg": "/equipment/tractors/mahindra-575-di-yuvo-tech-plus.jpg",
+      "farmerId": "usr-farmer-1",
+      "farmerName": "Muthukumar S.",
+      "ownerId": "usr-owner-1",
+      "ownerName": "Selvam Murugan (Selvam Agro Fleet)",
+      "startDate": "2026-10-10",
+      "endDate": "2026-10-12",
+      "days": 2,
+      "dailyRate": 1800,
+      "totalAmount": 3600,
+      "securityDeposit": 3000,
+      "escrowStatus": "released",
+      "status": "completed",
+      "id": "BK-9185",
+      "createdAt": "2026-10-03T17:56:57.273Z"
+    },
+    {
+      "listingId": "eq-tractor-1",
+      "equipmentName": "Mahindra 575 DI Yuvo Tech+",
+      "equipmentImg": "/equipment/tractors/mahindra-575-di-yuvo-tech-plus.jpg",
+      "farmerId": "usr-farmer-1",
+      "farmerName": "Muthukumar S.",
+      "ownerId": "usr-owner-1",
+      "ownerName": "Selvam Murugan (Selvam Agro Fleet)",
+      "startDate": "2026-10-10",
+      "endDate": "2026-10-12",
+      "days": 1,
+      "dailyRate": 1800,
+      "totalAmount": 1800,
+      "securityDeposit": 3000,
+      "escrowStatus": "held",
+      "status": "active",
+      "id": "BK-1087",
+      "createdAt": "2026-10-03T17:56:30.456Z"
+    },
+    {
+      "listingId": "eq-tractor-2",
+      "equipmentName": "John Deere 5310",
+      "equipmentImg": "/equipment/tractors/john-deere-5310.jpg",
+      "farmerId": "usr-farmer-1",
+      "farmerName": "Muthukumar S.",
+      "ownerId": "usr-owner-1",
+      "ownerName": "Selvam Murugan (Selvam Agro Fleet)",
+      "startDate": "2026-09-26",
+      "endDate": "2026-09-29",
+      "days": 3,
+      "dailyRate": 1800,
+      "totalAmount": 5400,
+      "securityDeposit": 3000,
+      "escrowStatus": "held",
+      "status": "active",
+      "id": "BK-3466",
+      "createdAt": "2026-09-25T17:44:35.388Z"
+    },
+    {
+      "listingId": "eq-tractor-2",
+      "equipmentName": "John Deere 5310",
+      "farmerId": "usr-farmer-1",
+      "farmerName": "Muthukumar S.",
+      "ownerId": "usr-owner-1",
+      "ownerName": "Selvam Murugan (Selvam Agro Fleet)",
+      "startDate": "2026-09-24",
+      "endDate": "2026-09-27",
+      "days": 3,
+      "dailyRate": 1800,
+      "totalAmount": 5400,
+      "securityDeposit": 3000,
+      "escrowStatus": "held",
+      "status": "active",
+      "id": "BK-3974",
+      "createdAt": "2026-09-25T15:45:18.001Z",
+      "equipmentImg": "/equipment/tractors/john-deere-5310.jpg"
+    },
+    {
+      "listingId": "eq-tractor-2",
+      "equipmentName": "John Deere 5310",
+      "farmerId": "usr-farmer-1",
+      "farmerName": "Muthukumar S.",
+      "ownerId": "usr-owner-1",
+      "ownerName": "Selvam Murugan (Selvam Agro Fleet)",
+      "startDate": "2026-09-24",
+      "endDate": "2026-09-27",
+      "days": 3,
+      "dailyRate": 1800,
+      "totalAmount": 5400,
+      "securityDeposit": 3000,
+      "escrowStatus": "held",
+      "status": "active",
+      "id": "BK-6931",
+      "createdAt": "2026-09-25T11:19:33.264Z",
+      "equipmentImg": "/equipment/tractors/john-deere-5310.jpg"
+    },
+    {
+      "listingId": "eq-tractor-2",
+      "equipmentName": "John Deere 5310",
+      "farmerId": "usr-farmer-1",
+      "farmerName": "Muthukumar S.",
+      "ownerId": "usr-owner-1",
+      "ownerName": "Selvam Murugan (Selvam Agro Fleet)",
+      "startDate": "2026-09-24",
+      "endDate": "2026-09-27",
+      "days": 3,
+      "dailyRate": 1800,
+      "totalAmount": 5400,
+      "securityDeposit": 3000,
+      "escrowStatus": "held",
+      "status": "active",
+      "id": "BK-2721",
+      "createdAt": "2026-09-25T11:19:15.723Z",
+      "equipmentImg": "/equipment/tractors/john-deere-5310.jpg"
+    },
+    {
+      "listingId": "eq-tractor-2",
+      "equipmentName": "John Deere 5310",
+      "farmerId": "usr-owner-1",
+      "farmerName": "Selvam Murugan (Selvam Agro Fleet)",
+      "ownerId": "usr-owner-1",
+      "ownerName": "Selvam Murugan (Selvam Agro Fleet)",
+      "startDate": "2026-09-24",
+      "endDate": "2026-09-27",
+      "days": 3,
+      "dailyRate": 1800,
+      "totalAmount": 5400,
+      "securityDeposit": 3000,
+      "escrowStatus": "held",
+      "status": "active",
+      "id": "BK-8810",
+      "createdAt": "2026-09-23T16:58:44.766Z",
+      "equipmentImg": "/equipment/tractors/john-deere-5310.jpg"
+    },
+    {
+      "listingId": "eq-tractor-2",
+      "equipmentName": "John Deere 5310",
+      "farmerId": "usr-farmer-1",
+      "farmerName": "Muthukumar S.",
+      "ownerId": "usr-owner-1",
+      "ownerName": "Selvam Murugan (Selvam Agro Fleet)",
+      "startDate": "2026-09-24",
+      "endDate": "2026-09-27",
+      "days": 3,
+      "dailyRate": 1800,
+      "totalAmount": 5400,
+      "securityDeposit": 3000,
+      "escrowStatus": "held",
+      "status": "active",
+      "id": "BK-7984",
+      "createdAt": "2026-09-23T16:28:47.875Z",
+      "equipmentImg": "/equipment/tractors/john-deere-5310.jpg"
+    },
+    {
+      "id": "BK-9021",
+      "listingId": "eq-drone-1",
+      "equipmentName": "DJI Agras T40 Agricultural Drone",
+      "farmerId": "usr-farmer-1",
+      "farmerName": "Muthukumar S.",
+      "ownerId": "usr-owner-1",
+      "ownerName": "Selvam Murugan",
+      "startDate": "2026-09-21",
+      "endDate": "2026-09-24",
+      "days": 3,
+      "dailyRate": 2800,
+      "totalAmount": 8400,
+      "securityDeposit": 5000,
+      "escrowStatus": "held",
+      "status": "active",
+      "createdAt": "2026-09-20T10:00:00.000Z",
+      "equipmentImg": "/equipment/sprayers-drones/dji-agras-t40.jpg"
+    },
+    {
+      "id": "BK-8842",
+      "listingId": "eq-harvester-1",
+      "equipmentName": "Claas Crop Tiger 30",
+      "farmerId": "usr-farmer-1",
+      "farmerName": "Muthukumar S.",
+      "ownerId": "usr-owner-2",
+      "ownerName": "Balvinder Singh",
+      "startDate": "2026-08-15",
+      "endDate": "2026-08-18",
+      "days": 3,
+      "dailyRate": 5200,
+      "totalAmount": 15600,
+      "securityDeposit": 8000,
+      "escrowStatus": "released",
+      "status": "completed",
+      "createdAt": "2026-08-12T14:20:00.000Z",
+      "equipmentImg": "/equipment/harvesters/claas-crop-tiger-30.jpg"
+    },
+    {
+      "id": "BK-8510",
+      "listingId": "eq-tractor-2",
+      "equipmentName": "John Deere 5310",
+      "farmerId": "usr-farmer-2",
+      "farmerName": "Rajesh Kumar Patil",
+      "ownerId": "usr-owner-1",
+      "ownerName": "Selvam Murugan",
+      "startDate": "2026-09-22",
+      "endDate": "2026-09-26",
+      "days": 4,
+      "dailyRate": 1800,
+      "totalAmount": 7200,
+      "securityDeposit": 3000,
+      "escrowStatus": "held",
+      "status": "active",
+      "createdAt": "2026-09-21T08:30:00.000Z",
+      "equipmentImg": "/equipment/tractors/john-deere-5310.jpg"
+    },
+    {
+      "id": "BK-8104",
+      "listingId": "eq-tillage-1",
+      "equipmentName": "Mahindra MB Plough",
+      "farmerId": "usr-farmer-1",
+      "farmerName": "Muthukumar S.",
+      "ownerId": "usr-owner-2",
+      "ownerName": "Balvinder Singh",
+      "startDate": "2026-07-10",
+      "endDate": "2026-07-12",
+      "days": 2,
+      "dailyRate": 2400,
+      "totalAmount": 4800,
+      "securityDeposit": 4000,
+      "escrowStatus": "released",
+      "status": "completed",
+      "createdAt": "2026-07-08T16:00:00.000Z",
+      "equipmentImg": "/equipment/tillage/mahindra-mb-plough.jpg"
+    }
+  ],
+  "notifications": [
+    {
+      "userId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "title": "Booking Confirmed: Mahindra 575 DI Yuvo Tech+",
+      "message": "Your booking BK-7626 (3 days, ₹5,400) has been placed. Equipment will arrive on 2026-09-26.",
+      "type": "booking_confirmed",
+      "read": false,
+      "relatedId": "BK-7626",
+      "id": "notif-1791487283810-17",
+      "timestamp": "2026-10-08T19:21:23.810Z"
+    },
+    {
+      "userId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "title": "Booking Confirmed: Mahindra 575 DI Yuvo Tech+",
+      "message": "Your booking BK-1946 (3 days, ₹5,400) has been placed. Equipment will arrive on 2026-09-26.",
+      "type": "booking_confirmed",
+      "read": false,
+      "relatedId": "BK-1946",
+      "id": "notif-1791487277577-887",
+      "timestamp": "2026-10-08T19:21:17.577Z"
+    },
+    {
+      "userId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "title": "Booking Confirmed: John Deere 5310",
+      "message": "Your booking BK-6454 (3 days, ₹6,600) has been placed. Equipment will arrive on 2026-09-26.",
+      "type": "booking_confirmed",
+      "read": false,
+      "relatedId": "BK-6454",
+      "id": "notif-1791485498663-627",
+      "timestamp": "2026-10-08T18:51:38.663Z"
+    },
+    {
+      "userId": "usr-owner-1",
+      "title": "Booking Cancelled: New Holland 3630 TX Super",
+      "message": "Booking BK-1499 was cancelled by the renter. Equipment is now available again.",
+      "type": "booking_cancelled",
+      "read": false,
+      "relatedId": "BK-1499",
+      "id": "notif-1791484481056-669",
+      "timestamp": "2026-10-08T18:34:41.056Z"
+    },
+    {
+      "userId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "title": "Booking Cancelled: New Holland 3630 TX Super",
+      "message": "Booking BK-1499 has been cancelled. Refund has been initiated.",
+      "type": "booking_cancelled",
+      "read": false,
+      "relatedId": "BK-1499",
+      "id": "notif-1791484481053-830",
+      "timestamp": "2026-10-08T18:34:41.053Z"
+    },
+    {
+      "userId": "usr-owner-1",
+      "title": "Booking Cancelled: Mahindra 575 DI Yuvo Tech+",
+      "message": "Booking BK-3641 was cancelled by the renter. Equipment is now available again.",
+      "type": "booking_cancelled",
+      "read": false,
+      "relatedId": "BK-3641",
+      "id": "notif-1791484473327-649",
+      "timestamp": "2026-10-08T18:34:33.327Z"
+    },
+    {
+      "userId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "title": "Booking Cancelled: Mahindra 575 DI Yuvo Tech+",
+      "message": "Booking BK-3641 has been cancelled. Refund has been initiated.",
+      "type": "booking_cancelled",
+      "read": false,
+      "relatedId": "BK-3641",
+      "id": "notif-1791484473325-579",
+      "timestamp": "2026-10-08T18:34:33.325Z"
+    },
+    {
+      "userId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "title": "Booking Confirmed: Mahindra 575 DI Yuvo Tech+",
+      "message": "Your booking BK-3641 (3 days, ₹5,400) has been placed. Equipment will arrive on 2026-09-26.",
+      "type": "booking_confirmed",
+      "read": false,
+      "relatedId": "BK-3641",
+      "id": "notif-1791484407435-792",
+      "timestamp": "2026-10-08T18:33:27.435Z"
+    },
+    {
+      "userId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "title": "Booking Confirmed: New Holland 3630 TX Super",
+      "message": "Your booking BK-1499 (3 days, ₹6,000) has been placed. Equipment will arrive on 2026-09-26.",
+      "type": "booking_confirmed",
+      "read": false,
+      "relatedId": "BK-1499",
+      "id": "notif-1791481175233-28",
+      "timestamp": "2026-10-08T17:39:35.233Z"
+    },
+    {
+      "userId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "title": "Booking Confirmed: New Holland 3630 TX Super",
+      "message": "Your booking BK-6016 (3 days, ₹6,000) has been placed. Equipment will arrive on 2026-09-26.",
+      "type": "booking_confirmed",
+      "read": false,
+      "relatedId": "BK-6016",
+      "id": "notif-1791481172383-561",
+      "timestamp": "2026-10-08T17:39:32.383Z"
+    },
+    {
+      "userId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "title": "Booking Confirmed: New Holland TC5.30",
+      "message": "Your booking BK-2422 (3 days, ₹17,400) has been placed. Equipment will arrive on 2026-09-26.",
+      "type": "booking_confirmed",
+      "read": false,
+      "relatedId": "BK-2422",
+      "id": "notif-1791473934142-756",
+      "timestamp": "2026-10-08T15:38:54.142Z"
+    },
+    {
+      "userId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "title": "Booking Confirmed: John Deere 5310",
+      "message": "Your booking BK-5873 (3 days, ₹6,600) has been placed. Equipment will arrive on 2026-09-26.",
+      "type": "booking_confirmed",
+      "read": false,
+      "relatedId": "BK-5873",
+      "id": "notif-1791396681756-322",
+      "timestamp": "2026-10-07T18:11:21.756Z"
+    },
+    {
+      "userId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "title": "Booking Confirmed: John Deere 5310",
+      "message": "Your booking BK-3852 (3 days, ₹6,600) has been placed. Equipment will arrive on 2026-09-26.",
+      "type": "booking_confirmed",
+      "read": false,
+      "relatedId": "BK-3852",
+      "id": "notif-1791396605881-141",
+      "timestamp": "2026-10-07T18:10:05.881Z"
+    },
+    {
+      "userId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "title": "Booking Confirmed: John Deere 5310",
+      "message": "Your booking BK-2269 (3 days, ₹6,600) has been placed. Equipment will arrive on 2026-09-26.",
+      "type": "booking_confirmed",
+      "read": false,
+      "relatedId": "BK-2269",
+      "id": "notif-1791396603925-28",
+      "timestamp": "2026-10-07T18:10:03.925Z"
+    },
+    {
+      "userId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "title": "Booking Confirmed: John Deere 5310",
+      "message": "Your booking BK-5008 (3 days, ₹6,600) has been placed. Equipment will arrive on 2026-09-26.",
+      "type": "booking_confirmed",
+      "read": false,
+      "relatedId": "BK-5008",
+      "id": "notif-1791395415795-580",
+      "timestamp": "2026-10-07T17:50:15.795Z"
+    },
+    {
+      "userId": "usr-owner-1",
+      "title": "Booking Cancelled: Mahindra 575 DI Yuvo Tech+",
+      "message": "Booking BK-5683 was cancelled by the renter. Equipment is now available again.",
+      "type": "booking_cancelled",
+      "read": false,
+      "relatedId": "BK-5683",
+      "id": "notif-1791395386868-240",
+      "timestamp": "2026-10-07T17:49:46.868Z"
+    },
+    {
+      "userId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "title": "Booking Cancelled: Mahindra 575 DI Yuvo Tech+",
+      "message": "Booking BK-5683 has been cancelled. Refund has been initiated.",
+      "type": "booking_cancelled",
+      "read": false,
+      "relatedId": "BK-5683",
+      "id": "notif-1791395386863-489",
+      "timestamp": "2026-10-07T17:49:46.863Z"
+    },
+    {
+      "userId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "title": "Booking Confirmed: Mahindra 575 DI Yuvo Tech+",
+      "message": "Your booking BK-5683 (3 days, ₹5,400) has been placed. Equipment will arrive on 2026-09-26.",
+      "type": "booking_confirmed",
+      "read": false,
+      "relatedId": "BK-5683",
+      "id": "notif-1791395309608-663",
+      "timestamp": "2026-10-07T17:48:29.608Z"
+    },
+    {
+      "userId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "title": "Booking Confirmed: Mahindra 575 DI Yuvo Tech+",
+      "message": "Your booking BK-2665 (3 days, ₹5,400) has been placed. Equipment will arrive on 2026-09-26.",
+      "type": "booking_confirmed",
+      "read": false,
+      "relatedId": "BK-2665",
+      "id": "notif-1791395307727-259",
+      "timestamp": "2026-10-07T17:48:27.727Z"
+    },
+    {
+      "userId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "title": "Booking Confirmed: Mahindra 575 DI Yuvo Tech+",
+      "message": "Your booking BK-3203 (3 days, ₹5,400) has been placed. Equipment will arrive on 2026-09-26.",
+      "type": "booking_confirmed",
+      "read": false,
+      "relatedId": "BK-3203",
+      "id": "notif-1791395260058-143",
+      "timestamp": "2026-10-07T17:47:40.058Z"
+    },
+    {
+      "userId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "title": "Booking Confirmed: Mahindra 575 DI Yuvo Tech+",
+      "message": "Your booking BK-6463 (3 days, ₹5,400) has been placed. Equipment will arrive on 2026-09-26.",
+      "type": "booking_confirmed",
+      "read": false,
+      "relatedId": "BK-6463",
+      "id": "notif-1791395258252-175",
+      "timestamp": "2026-10-07T17:47:38.252Z"
+    },
+    {
+      "userId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "title": "Booking Confirmed: John Deere 5310",
+      "message": "Your booking BK-4359 (3 days, ₹6,600) has been placed. Equipment will arrive on 2026-09-26.",
+      "type": "booking_confirmed",
+      "read": false,
+      "relatedId": "BK-4359",
+      "id": "notif-1791382905157-154",
+      "timestamp": "2026-10-07T14:21:45.157Z"
+    },
+    {
+      "userId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "title": "Booking Confirmed: John Deere 5310",
+      "message": "Your booking BK-2397 (3 days, ₹6,600) has been placed. Equipment will arrive on 2026-09-26.",
+      "type": "booking_confirmed",
+      "read": false,
+      "relatedId": "BK-2397",
+      "id": "notif-1791382903115-94",
+      "timestamp": "2026-10-07T14:21:43.115Z"
+    },
+    {
+      "userId": "557722b4-8cbd-4162-b947-2b88d0c59803",
+      "title": "Booking Confirmed: Claas Crop Tiger 30",
+      "message": "Your booking BK-1350 (3 days, ₹14,400) has been placed. Equipment will arrive on 2026-09-26.",
+      "type": "booking_confirmed",
+      "read": false,
+      "relatedId": "BK-1350",
+      "id": "notif-1791308968275-201",
+      "timestamp": "2026-10-06T17:49:28.275Z"
+    },
+    {
+      "userId": "4a73ef39-991d-485a-b3a2-2fed302e4076",
+      "title": "Booking Confirmed: Mahindra 575 DI Yuvo Tech+",
+      "message": "Your booking BK-7428 (3 days, ₹5,400) has been placed. Equipment will arrive on 2026-09-26.",
+      "type": "booking_confirmed",
+      "read": false,
+      "relatedId": "BK-7428",
+      "id": "notif-1791305039446-891",
+      "timestamp": "2026-10-06T16:43:59.446Z"
+    },
+    {
+      "userId": "usr-owner-1",
+      "title": "Equipment Listing Removed",
+      "message": "Your listing \"Preet 987 Combine Harvester\" has been removed from the catalog.",
+      "type": "equipment_deleted",
+      "read": false,
+      "id": "notif-1791052121889-389",
+      "timestamp": "2026-10-03T18:28:41.889Z"
+    },
+    {
+      "userId": "usr-owner-1",
+      "title": "Equipment Listing Removed",
+      "message": "Your listing \"Swaraj 744 FE\" has been removed from the catalog.",
+      "type": "equipment_deleted",
+      "read": false,
+      "id": "notif-1791052121882-186",
+      "timestamp": "2026-10-03T18:28:41.882Z"
+    },
+    {
+      "userId": "usr-owner-1",
+      "title": "Equipment Listing Updated",
+      "message": "Your listing \"Preet 987 Combine Harvester\" has been updated successfully.",
+      "type": "equipment_updated",
+      "read": false,
+      "relatedId": "eq-49c25b3d",
+      "id": "notif-1791052121874-915",
+      "timestamp": "2026-10-03T18:28:41.874Z"
+    },
+    {
+      "userId": "usr-owner-1",
+      "title": "Equipment Listed Successfully",
+      "message": "Your Preet 987 Combine Harvester is now published and visible to farmers on the AgriRent marketplace.",
+      "type": "equipment_added",
+      "read": false,
+      "relatedId": "eq-49c25b3d",
+      "id": "notif-1791052121869-388",
+      "timestamp": "2026-10-03T18:28:41.869Z"
+    },
+    {
+      "userId": "usr-owner-1",
+      "title": "Equipment Listed Successfully",
+      "message": "Your Swaraj 744 FE is now published and visible to farmers on the AgriRent marketplace.",
+      "type": "equipment_added",
+      "read": false,
+      "relatedId": "eq-d43510ac",
+      "id": "notif-1791052121865-332",
+      "timestamp": "2026-10-03T18:28:41.865Z"
+    },
+    {
+      "userId": "usr-owner-1",
+      "title": "Equipment Listing Removed",
+      "message": "Your listing \"Preet 987 Combine Harvester\" has been removed from the catalog.",
+      "type": "equipment_deleted",
+      "read": false,
+      "id": "notif-1791052096803-378",
+      "timestamp": "2026-10-03T18:28:16.803Z"
+    },
+    {
+      "userId": "usr-owner-1",
+      "title": "Equipment Listing Removed",
+      "message": "Your listing \"Swaraj 744 FE\" has been removed from the catalog.",
+      "type": "equipment_deleted",
+      "read": false,
+      "id": "notif-1791052096799-930",
+      "timestamp": "2026-10-03T18:28:16.799Z"
+    },
+    {
+      "userId": "usr-owner-1",
+      "title": "Equipment Listing Updated",
+      "message": "Your listing \"Preet 987 Combine Harvester\" has been updated successfully.",
+      "type": "equipment_updated",
+      "read": false,
+      "relatedId": "eq-7ca0eea0",
+      "id": "notif-1791052096790-813",
+      "timestamp": "2026-10-03T18:28:16.790Z"
+    },
+    {
+      "userId": "usr-owner-1",
+      "title": "Equipment Listed Successfully",
+      "message": "Your Preet 987 Combine Harvester is now published and visible to farmers on the AgriRent marketplace.",
+      "type": "equipment_added",
+      "read": false,
+      "relatedId": "eq-7ca0eea0",
+      "id": "notif-1791052096784-560",
+      "timestamp": "2026-10-03T18:28:16.784Z"
+    },
+    {
+      "userId": "usr-owner-1",
+      "title": "Equipment Listed Successfully",
+      "message": "Your Swaraj 744 FE is now published and visible to farmers on the AgriRent marketplace.",
+      "type": "equipment_added",
+      "read": false,
+      "relatedId": "eq-7d55d3b9",
+      "id": "notif-1791052096779-505",
+      "timestamp": "2026-10-03T18:28:16.779Z"
+    },
+    {
+      "userId": "usr-owner-1",
+      "title": "New Booking Received: Mahindra 575 DI Yuvo Tech+",
+      "message": "Farmer Muthukumar S. booked Mahindra 575 DI Yuvo Tech+ from 2026-10-10 to 2026-10-12. ₹3,600 held in escrow.",
+      "type": "booking_received",
+      "read": false,
+      "relatedId": "BK-9185",
+      "id": "notif-1791050217276-183",
+      "timestamp": "2026-10-03T17:56:57.276Z"
+    },
+    {
+      "userId": "usr-farmer-1",
+      "title": "Booking Confirmed: Mahindra 575 DI Yuvo Tech+",
+      "message": "Your booking BK-9185 (2 days, ₹3,600) has been placed. Equipment will arrive on 2026-10-10.",
+      "type": "booking_confirmed",
+      "read": false,
+      "relatedId": "BK-9185",
+      "id": "notif-1791050217274-661",
+      "timestamp": "2026-10-03T17:56:57.274Z"
+    },
+    {
+      "userId": "usr-owner-1",
+      "title": "New Booking Received: Mahindra 575 DI Yuvo Tech+",
+      "message": "Farmer Muthukumar S. booked Mahindra 575 DI Yuvo Tech+ from 2026-10-10 to 2026-10-12. ₹1,800 held in escrow.",
+      "type": "booking_received",
+      "read": false,
+      "relatedId": "BK-1087",
+      "id": "notif-1791050190462-7",
+      "timestamp": "2026-10-03T17:56:30.462Z"
+    },
+    {
+      "userId": "usr-farmer-1",
+      "title": "Booking Confirmed: Mahindra 575 DI Yuvo Tech+",
+      "message": "Your booking BK-1087 (1 days, ₹1,800) has been placed. Equipment will arrive on 2026-10-10.",
+      "type": "booking_confirmed",
+      "read": false,
+      "relatedId": "BK-1087",
+      "id": "notif-1791050190461-235",
+      "timestamp": "2026-10-03T17:56:30.461Z"
+    },
+    {
+      "userId": "usr-owner-1",
+      "title": "New Booking Received: John Deere 5310 4WD (55 HP) Tractor",
+      "message": "Farmer Muthukumar S. booked John Deere 5310 4WD (55 HP) Tractor from 2026-09-26 to 2026-09-29. ₹5,400 held in escrow.",
+      "type": "booking_received",
+      "read": false,
+      "relatedId": "BK-3466",
+      "id": "notif-1790358275394-968",
+      "timestamp": "2026-09-25T17:44:35.394Z"
+    },
+    {
+      "userId": "usr-farmer-1",
+      "title": "Booking Confirmed: John Deere 5310 4WD (55 HP) Tractor",
+      "message": "Your booking BK-3466 (3 days, ₹5,400) has been placed. Equipment will arrive on 2026-09-26.",
+      "type": "booking_confirmed",
+      "read": false,
+      "relatedId": "BK-3466",
+      "id": "notif-1790358275391-731",
+      "timestamp": "2026-09-25T17:44:35.391Z"
+    },
+    {
+      "id": "notif-f1-1",
+      "userId": "usr-farmer-1",
+      "title": "Booking Confirmed: Spraying Drone",
+      "message": "Your booking BK-9021 for DJI Agras T40 Agricultural Spraying Drone has been confirmed by owner Selvam Murugan.",
+      "type": "booking_confirmed",
+      "read": false,
+      "timestamp": "2026-09-24T18:30:00.000Z",
+      "relatedId": "BK-9021"
+    },
+    {
+      "id": "notif-f1-2",
+      "userId": "usr-farmer-1",
+      "title": "Payment Successful",
+      "message": "Payment of ₹8,400 with ₹5,000 AgriSafe™ escrow deposit processed successfully for booking BK-9021.",
+      "type": "payment_success",
+      "read": false,
+      "timestamp": "2026-09-24T18:28:00.000Z",
+      "relatedId": "BK-9021"
+    },
+    {
+      "id": "notif-f1-3",
+      "userId": "usr-farmer-1",
+      "title": "Identity Verification Verified",
+      "message": "Your Aadhaar-style prototype identity verification has been confirmed. You now have full access to high-capacity equipment rentals.",
+      "type": "verification_status",
+      "read": true,
+      "timestamp": "2026-09-20T10:00:00.000Z"
+    },
+    {
+      "id": "notif-f1-4",
+      "userId": "usr-farmer-1",
+      "title": "Booking Completed & Deposit Refunded",
+      "message": "Rental BK-8842 for Preet 987 Combine Harvester completed with clean inspection. Escrow deposit ₹8,000 released.",
+      "type": "booking_confirmed",
+      "read": true,
+      "timestamp": "2026-08-19T14:00:00.000Z",
+      "relatedId": "BK-8842"
+    },
+    {
+      "id": "notif-f2-1",
+      "userId": "usr-farmer-2",
+      "title": "Booking Active: John Deere Tractor",
+      "message": "Your active booking BK-8510 for John Deere 5310 4WD Tractor is currently underway at your farm plot.",
+      "type": "booking_confirmed",
+      "read": false,
+      "timestamp": "2026-09-22T09:00:00.000Z",
+      "relatedId": "BK-8510"
+    },
+    {
+      "id": "notif-f2-2",
+      "userId": "usr-farmer-2",
+      "title": "Identity Verification Needed",
+      "message": "Please complete your prototype identity verification in your profile to unlock instant booking approvals.",
+      "type": "verification_status",
+      "read": false,
+      "timestamp": "2026-09-21T08:00:00.000Z"
+    },
+    {
+      "id": "notif-o1-1",
+      "userId": "usr-owner-1",
+      "title": "New Equipment Booking Received!",
+      "message": "Farmer Muthukumar S. has booked your DJI Agras T40 Agricultural Spraying Drone for 3 days (₹8,400).",
+      "type": "booking_received",
+      "read": false,
+      "timestamp": "2026-09-24T18:29:00.000Z",
+      "relatedId": "BK-9021"
+    },
+    {
+      "id": "notif-o1-2",
+      "userId": "usr-owner-1",
+      "title": "Escrow Payment Credited",
+      "message": "Security deposit of ₹5,000 for BK-9021 is securely held in AgriSafe™ escrow for your equipment.",
+      "type": "payment_success",
+      "read": false,
+      "timestamp": "2026-09-24T18:31:00.000Z",
+      "relatedId": "BK-9021"
+    },
+    {
+      "id": "notif-o1-3",
+      "userId": "usr-owner-1",
+      "title": "Equipment Live on Marketplace",
+      "message": "Your John Deere 5310 4WD (55 HP) Tractor listing has been verified and is now receiving booking requests.",
+      "type": "equipment_added",
+      "read": true,
+      "timestamp": "2026-09-15T11:00:00.000Z",
+      "relatedId": "eq-tractor-1"
+    },
+    {
+      "id": "notif-o1-4",
+      "userId": "usr-owner-1",
+      "title": "Booking Received: John Deere Tractor",
+      "message": "Farmer Rajesh Kumar Patil placed a rental request for John Deere 5310 4WD Tractor (4 days).",
+      "type": "booking_received",
+      "read": true,
+      "timestamp": "2026-09-21T08:35:00.000Z",
+      "relatedId": "BK-8510"
+    },
+    {
+      "id": "notif-o2-1",
+      "userId": "usr-owner-2",
+      "title": "Booking Completed: Preet 987 Harvester",
+      "message": "Rental BK-8842 has been completed. Payout of ₹15,600 has been transferred to your registered bank account.",
+      "type": "booking_confirmed",
+      "read": false,
+      "timestamp": "2026-08-19T14:30:00.000Z",
+      "relatedId": "BK-8842"
+    },
+    {
+      "id": "notif-o2-2",
+      "userId": "usr-owner-2",
+      "title": "Fleet Equipment Listed",
+      "message": "CLAAS CROP TIGER 30 Terra Trac Harvester is published and available for hire in Dindigul region.",
+      "type": "equipment_added",
+      "read": true,
+      "timestamp": "2026-08-01T09:00:00.000Z",
+      "relatedId": "eq-harvester-2"
+    },
+    {
+      "id": "notif-adm-1",
+      "userId": "usr-admin-1",
+      "title": "Escrow Custody Alert",
+      "message": "AgriSafe™ escrow currently holds ₹8,000 across active rentals. All safety inspection checks are normal.",
+      "type": "booking_confirmed",
+      "read": false,
+      "timestamp": "2026-09-24T12:00:00.000Z"
+    },
+    {
+      "id": "notif-adm-2",
+      "userId": "usr-admin-1",
+      "title": "Platform GMV Update",
+      "message": "Monthly rental gross merchandise value crossed ₹36,000 with 10% platform commission retained.",
+      "type": "payment_success",
+      "read": true,
+      "timestamp": "2026-09-23T10:00:00.000Z"
+    }
+  ],
+  "contactMessages": [],
+  "reviews": [
+    {
+      "equipmentId": "eq-tractor-1",
+      "bookingId": "BK-3203",
+      "userId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "userName": "Administrator",
+      "rating": 1,
+      "reviewText": "",
+      "id": "rev-1791481242928-101",
+      "createdAt": "2026-10-08T17:40:42.928Z"
+    },
+    {
+      "equipmentId": "eq-tractor-1",
+      "bookingId": "BK-2665",
+      "userId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "userName": "Administrator",
+      "rating": 5,
+      "reviewText": "",
+      "id": "rev-1791473913469-491",
+      "createdAt": "2026-10-08T15:38:33.469Z"
+    },
+    {
+      "id": "rev-101",
+      "equipmentId": "eq-tractor-1",
+      "userId": "usr-farmer-1",
+      "userName": "Muthukumar S.",
+      "bookingId": "BK-2712",
+      "rating": 5,
+      "reviewText": "Very good tractor for field work. Engine torque and fuel mileage during puddling was top notch. Owner was helpful and equipment was maintained well.",
+      "createdAt": "2026-07-23T14:30:00.000Z"
+    },
+    {
+      "id": "rev-102",
+      "equipmentId": "eq-tractor-1",
+      "userId": "usr-farmer-2",
+      "userName": "Rajesh Kumar Patil",
+      "bookingId": "BK-seed-t1",
+      "rating": 5,
+      "reviewText": "High precision hydraulics made rotavator operation effortless. On-time doorstep delivery by owner.",
+      "createdAt": "2026-08-10T09:15:00.000Z"
+    },
+    {
+      "id": "rev-103",
+      "equipmentId": "eq-tractor-1",
+      "userId": "usr-farmer-1",
+      "userName": "Muthukumar S.",
+      "bookingId": "BK-seed-t2",
+      "rating": 4,
+      "reviewText": "Good machine condition and operator was skilled. Minor delay in transport arrival but overall great experience.",
+      "createdAt": "2026-08-18T16:45:00.000Z"
+    },
+    {
+      "id": "rev-104",
+      "equipmentId": "eq-tractor-2",
+      "userId": "usr-farmer-2",
+      "userName": "Rajesh Kumar Patil",
+      "bookingId": "BK-8510",
+      "rating": 5,
+      "reviewText": "John Deere 5310 is unbeatable in heavy clay soils. Smooth dual-clutch transmission and zero breakdown.",
+      "createdAt": "2026-09-27T11:00:00.000Z"
+    },
+    {
+      "id": "rev-105",
+      "equipmentId": "eq-harvester-1",
+      "userId": "usr-farmer-1",
+      "userName": "Muthukumar S.",
+      "bookingId": "BK-8842",
+      "rating": 5,
+      "reviewText": "Rubber tracks worked wonders in wet paddy land without sinking. Grain loss was less than 1%. Highly recommended!",
+      "createdAt": "2026-08-19T17:20:00.000Z"
+    },
+    {
+      "id": "rev-106",
+      "equipmentId": "eq-tillage-2",
+      "userId": "usr-farmer-1",
+      "userName": "Muthukumar S.",
+      "bookingId": "BK-2756",
+      "rating": 5,
+      "reviewText": "Shaktiman rotavator pulverized black soil into fine tilth in a single pass. Boron steel blades are sharp and strong.",
+      "createdAt": "2026-08-31T10:10:00.000Z"
+    },
+    {
+      "id": "rev-107",
+      "equipmentId": "eq-drone-1",
+      "userId": "usr-farmer-2",
+      "userName": "Rajesh Kumar Patil",
+      "bookingId": "BK-seed-d1",
+      "rating": 5,
+      "reviewText": "Sprayed 10 acres of cotton crop in under an hour. Saved 90% water and prevented direct chemical contact. Amazing tech!",
+      "createdAt": "2026-09-12T15:30:00.000Z"
+    }
+  ],
+  "vendors": [
+    {
+      "id": "vnd-1",
+      "name": "Sri Murugan Mahindra Tractors & Implements",
+      "dealerType": "Authorized Mahindra Dealer & Service Hub",
+      "rating": 4.8,
+      "reviewsCount": 142,
+      "phone": "+91 98421 88900",
+      "email": "murugan.dealers@agrirent.in",
+      "address": "142 Pollachi Main Road, Eachanari, Coimbatore, Tamil Nadu 641021",
+      "city": "Coimbatore",
+      "lat": 10.938,
+      "lng": 76.974,
+      "brands": [
+        "Mahindra",
+        "Shaktiman",
+        "Texmo"
+      ],
+      "inventory": [
+        {
+          "id": "eq-tractor-1",
+          "name": "Mahindra 575 DI Yuvo Tech+",
+          "price": 850000,
+          "category": "Tractor",
+          "inStock": true
+        },
+        {
+          "id": "eq-tractor-3",
+          "name": "Sonalika DI 745 III",
+          "price": 680000,
+          "category": "Tractor",
+          "inStock": true
+        },
+        {
+          "id": "eq-tillage-1",
+          "name": "Mahindra MB Plough",
+          "price": 75000,
+          "category": "Ploughing & Tilling",
+          "inStock": true
+        },
+        {
+          "id": "eq-seeding-1",
+          "name": "Mahindra Seed Drill",
+          "price": 62000,
+          "category": "Seeding",
+          "inStock": true
+        },
+        {
+          "id": "eq-pump-3",
+          "name": "Texmo 7.5HP Submersible Pump",
+          "price": 58000,
+          "category": "Water Pump",
+          "inStock": true
+        }
+      ]
+    },
+    {
+      "id": "vnd-2",
+      "name": "Cauvery Delta Agro Machinery & Implements Dealer",
+      "dealerType": "Certified Multi-Brand Farm Equipment Dealer",
+      "rating": 4.7,
+      "reviewsCount": 98,
+      "phone": "+91 94432 77123",
+      "email": "cauvery.machinery@agrirent.in",
+      "address": "88 Cauvery River Road, Near Old Bus Stand, Thanjavur, Tamil Nadu 613001",
+      "city": "Thanjavur",
+      "lat": 10.787,
+      "lng": 79.1378,
+      "brands": [
+        "Preet",
+        "Fieldking",
+        "Kirloskar",
+        "Landforce"
+      ],
+      "inventory": [
+        {
+          "id": "eq-harvester-3",
+          "name": "Preet 987 Combine Harvester",
+          "price": 2100000,
+          "category": "Harvester",
+          "inStock": true
+        },
+        {
+          "id": "eq-tillage-3",
+          "name": "Fieldking Heavy Duty Disc Harrow",
+          "price": 88000,
+          "category": "Ploughing & Tilling",
+          "inStock": true
+        },
+        {
+          "id": "eq-seeding-3",
+          "name": "Landforce Zero Till Drill",
+          "price": 84000,
+          "category": "Seeding",
+          "inStock": true
+        },
+        {
+          "id": "eq-pump-1",
+          "name": "Kirloskar Diesel Water Pump",
+          "price": 42000,
+          "category": "Water Pump",
+          "inStock": true
+        }
+      ]
+    },
+    {
+      "id": "vnd-3",
+      "name": "Deere PowerTech Agricultural Center",
+      "dealerType": "Authorized John Deere Dealership",
+      "rating": 4.9,
+      "reviewsCount": 185,
+      "phone": "+91 98425 66789",
+      "email": "salem.deere@agrirent.in",
+      "address": "24 Bangalore National Highway, Omalur Bypass, Salem, Tamil Nadu 636005",
+      "city": "Salem",
+      "lat": 11.6643,
+      "lng": 78.146,
+      "brands": [
+        "John Deere"
+      ],
+      "inventory": [
+        {
+          "id": "eq-tractor-2",
+          "name": "John Deere 5310 PowerTech",
+          "price": 1120000,
+          "category": "Tractor",
+          "inStock": true
+        }
+      ]
+    },
+    {
+      "id": "vnd-4",
+      "name": "Kisan Harvester & Drone SuperStore",
+      "dealerType": "Claas, Kubota & DGCA Drone Authorized Partner",
+      "rating": 4.8,
+      "reviewsCount": 124,
+      "phone": "+91 98140 22345",
+      "email": "kisan.tech@agrirent.in",
+      "address": "56 Ring Road Junction, Mattuthavani, Madurai, Tamil Nadu 625020",
+      "city": "Madurai",
+      "lat": 9.9252,
+      "lng": 78.1198,
+      "brands": [
+        "Claas",
+        "Kubota",
+        "DJI",
+        "Garuda Aerospace"
+      ],
+      "inventory": [
+        {
+          "id": "eq-harvester-1",
+          "name": "Claas Crop Tiger 30",
+          "price": 2450000,
+          "category": "Harvester",
+          "inStock": true
+        },
+        {
+          "id": "eq-harvester-2",
+          "name": "Kubota DC-68G Combine Harvester",
+          "price": 2200000,
+          "category": "Harvester",
+          "inStock": true
+        },
+        {
+          "id": "eq-drone-1",
+          "name": "DJI Agras T40 Agricultural Drone",
+          "price": 980000,
+          "category": "Sprayers & Drones",
+          "inStock": true
+        },
+        {
+          "id": "eq-drone-2",
+          "name": "Garuda Kisan Drone",
+          "price": 550000,
+          "category": "Sprayers & Drones",
+          "inStock": true
+        }
+      ]
+    },
+    {
+      "id": "vnd-5",
+      "name": "Kongu Agro Implements & Spares Hub",
+      "dealerType": "Agricultural Equipment & Machinery Dealer",
+      "rating": 4.6,
+      "reviewsCount": 82,
+      "phone": "+91 98423 44556",
+      "email": "kongu.agro@agrirent.in",
+      "address": "102 Karur Bypass Road, Tiruchirappalli, Tamil Nadu 620002",
+      "city": "Tiruchirappalli",
+      "lat": 10.7905,
+      "lng": 78.7047,
+      "brands": [
+        "Shaktiman",
+        "Aspee",
+        "Crompton",
+        "National"
+      ],
+      "inventory": [
+        {
+          "id": "eq-tillage-2",
+          "name": "Shaktiman Rotary Tiller",
+          "price": 135000,
+          "category": "Ploughing & Tilling",
+          "inStock": true
+        },
+        {
+          "id": "eq-seeding-2",
+          "name": "National Pneumatic Planter",
+          "price": 195000,
+          "category": "Seeding",
+          "inStock": true
+        },
+        {
+          "id": "eq-drone-3",
+          "name": "Aspee Tractor Mounted Boom Sprayer",
+          "price": 145000,
+          "category": "Sprayers & Drones",
+          "inStock": true
+        },
+        {
+          "id": "eq-pump-2",
+          "name": "Crompton 5HP Solar Water Pump",
+          "price": 175000,
+          "category": "Water Pump",
+          "inStock": true
+        }
+      ]
+    }
+  ]
+}
