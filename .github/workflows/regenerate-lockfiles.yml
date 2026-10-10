@@ -1,0 +1,53 @@
+
+name: Regenerate AgriRent Lockfiles
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  regenerate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.2
+
+      - name: Regenerate Bun lockfile
+        working-directory: agrirent-app
+        run: bun install --ignore-scripts
+
+      - name: Regenerate npm lockfile
+        working-directory: agrirent-app
+        run: npm install --package-lock-only --ignore-scripts --no-audit --no-fund
+
+      - name: Verify TanStack versions
+        working-directory: agrirent-app
+        run: |
+          node -e "const p=require('./package-lock.json'); for (const n of ['@tanstack/react-start','@tanstack/start-server-core']) { const v=p.packages['node_modules/'+n]?.version; console.log(n+': '+v); if (!v) process.exitCode=1; }"
+          
+      - name: Commit updated lockfiles
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add agrirent-app/bun.lock agrirent-app/package-lock.json
+          if git diff --cached --quiet; then
+            echo "No lockfile changes needed"
+          else
+            git commit -m "Regenerate AgriRent lockfiles"
+            git push origin HEAD:main
+          fi
