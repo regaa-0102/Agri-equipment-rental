@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
 import Sidebar from '../components/Sidebar'
 import { useLanguage } from '../context/LanguageContext'
-import { getStoredUser, UserSession } from '../lib/api-client'
+import { api, getStoredUser, setAuthenticatedUser, type UserSession } from '../lib/api-client'
+import { normalizeIndianMobileNumber } from '../lib/phone'
 import {
   getUserVerification,
   setUserVerificationStatus,
@@ -35,10 +36,47 @@ export default function ProfilePage({ onNavigate }: Props) {
   const { t, isTamil } = useLanguage()
   const [currentUser, setCurrentUserState] = useState<UserSession | null>(() => getStoredUser())
   const userId = currentUser?.id || ''
+  const [isEditingContact, setIsEditingContact] = useState(false)
+  const [email, setEmail] = useState('')
+  const [phone, setPhone] = useState('')
+  const [verificationCode, setVerificationCode] = useState('')
+  const [emailVerificationRequired, setEmailVerificationRequired] = useState(false)
+  const [isSavingContact, setIsSavingContact] = useState(false)
+  const [contactError, setContactError] = useState('')
+  const [contactSuccess, setContactSuccess] = useState('')
 
   const [verifData, setVerifData] = useState<UserVerificationData>(() => getUserVerification(userId))
   const [lastFour, setLastFour] = useState('4821')
   const [toastMsg, setToastMsg] = useState<string | null>(null)
+
+  useEffect(() => {
+    let active = true
+    const handleAuthChange = (event: Event) => {
+      const updatedUser = (event as CustomEvent<UserSession | null>).detail
+      setCurrentUserState(updatedUser)
+    }
+    window.addEventListener('agrirent_auth_change', handleAuthChange)
+
+    api.getMe()
+      .then(({ user }) => {
+        if (!active) return
+        setCurrentUserState(user)
+        setAuthenticatedUser(user)
+      })
+      .catch((error: unknown) => {
+        if (!active) return
+        setContactError(
+          error instanceof Error
+            ? `${isTamil ? 'சுயவிவரத்தைப் புதுப்பிக்க முடியவில்லை:' : 'Could not refresh your profile:'} ${error.message}`
+            : (isTamil ? 'சுயவிவரத்தைப் புதுப்பிக்க முடியவில்லை.' : 'Could not refresh your profile.')
+        )
+      })
+
+    return () => {
+      active = false
+      window.removeEventListener('agrirent_auth_change', handleAuthChange)
+    }
+  }, [isTamil])
 
   useEffect(() => {
     setVerifData(getUserVerification(userId))
@@ -73,6 +111,119 @@ export default function ProfilePage({ onNavigate }: Props) {
     })
     setVerifData(getUserVerification(userId))
     showToast('Identity verified successfully! You can now book equipment.')
+  }
+
+  const handleEditContact = async () => {
+    setContactError('')
+    setContactSuccess('')
+    try {
+      const { user } = await api.getMe()
+      setCurrentUserState(user)
+      setAuthenticatedUser(user)
+      setEmail(user.email || '')
+      setPhone(user.phone || '')
+      setVerificationCode('')
+      setEmailVerificationRequired(false)
+      setIsEditingContact(true)
+    } catch (error) {
+      setContactError(
+        error instanceof Error
+          ? `${isTamil ? 'சுயவிவரத்தை ஏற்ற முடியவில்லை:' : 'Could not load your profile:'} ${error.message}`
+          : (isTamil ? 'சுயவிவரத்தை ஏற்ற முடியவில்லை. மீண்டும் முயற்சிக்கவும்.' : 'Could not load your profile. Please try again.')
+      )
+    }
+  }
+
+  const handleSaveContact = async () => {
+    const normalizedEmail = email.trim().toLowerCase()
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
+      setContactError(isTamil ? 'செல்லுபடியாகும் மின்னஞ்சல் முகவரியை உள்ளிடவும்.' : 'Enter a valid email address.')
+      return
+    }
+    const normalizedPhone = normalizeIndianMobileNumber(phone)
+    if (!normalizedPhone) {
+      setContactError(
+        isTamil
+          ? 'செல்லுபடியாகும் இந்திய மொபைல் எண்ணை உள்ளிடவும் (உதா. +91 98765 43210).'
+          : 'Enter a valid Indian mobile number, such as +91 98765 43210.'
+      )
+      return
+    }
+
+    setIsSavingContact(true)
+    setContactError('')
+    setContactSuccess('')
+    try {
+      const result = await api.updateContactDetails(normalizedEmail, normalizedPhone)
+      setCurrentUserState(result.user)
+      setAuthenticatedUser(result.user)
+      if (result.emailVerificationRequired) {
+        setEmailVerificationRequired(true)
+        setContactSuccess(
+          isTamil
+            ? `சரிபார்ப்பு குறியீடு ${normalizedEmail} முகவரிக்கு அனுப்பப்பட்டது. மின்னஞ்சல் மாற்றம் உறுதிப்படுத்தப்பட்ட பிறகே சேமிக்கப்படும்.`
+            : `A verification code was sent to ${normalizedEmail}. Your login email will change only after verification.`
+        )
+      } else {
+        const { user } = await api.getMe()
+        setCurrentUserState(user)
+        setAuthenticatedUser(user)
+        setEmail(user.email || '')
+        setPhone(user.phone || '')
+        setIsEditingContact(false)
+        setContactSuccess(isTamil ? 'தொலைபேசி எண் சேமிக்கப்பட்டது.' : 'Contact details saved successfully.')
+      }
+    } catch (error) {
+      setContactError(error instanceof Error ? error.message : (isTamil ? 'தொடர்பு விவரங்களைச் சேமிக்க முடியவில்லை.' : 'Could not save contact details.'))
+    } finally {
+      setIsSavingContact(false)
+    }
+  }
+
+  const handleVerifyContactEmail = async () => {
+    if (!/^\d{6}$/.test(verificationCode.trim())) {
+      setContactError(isTamil ? '6 இலக்க சரிபார்ப்பு குறியீட்டை உள்ளிடவும்.' : 'Enter the 6-digit verification code.')
+      return
+    }
+    setIsSavingContact(true)
+    setContactError('')
+    try {
+      await api.verifyContactEmail(verificationCode.trim())
+      const { user } = await api.getMe()
+      setCurrentUserState(user)
+      setAuthenticatedUser(user)
+      setEmail(user.email || '')
+      setPhone(user.phone || '')
+      setEmailVerificationRequired(false)
+      setIsEditingContact(false)
+      setContactSuccess(isTamil ? 'மின்னஞ்சல் சரிபார்க்கப்பட்டு தொடர்பு விவரங்கள் சேமிக்கப்பட்டன.' : 'Email verified and contact details saved successfully.')
+    } catch (error) {
+      setContactError(error instanceof Error ? error.message : (isTamil ? 'மின்னஞ்சலைச் சரிபார்க்க முடியவில்லை.' : 'Could not verify the email address.'))
+    } finally {
+      setIsSavingContact(false)
+    }
+  }
+
+  const handleCancelContactEdit = async () => {
+    if (emailVerificationRequired) {
+      setIsSavingContact(true)
+      setContactError('')
+      try {
+        await api.cancelContactEmailChange()
+      } catch (error) {
+        setContactError(error instanceof Error ? error.message : (isTamil ? 'மின்னஞ்சல் மாற்றத்தை ரத்து செய்ய முடியவில்லை.' : 'Could not cancel the pending email change.'))
+        setIsSavingContact(false)
+        return
+      }
+      setIsSavingContact(false)
+    }
+    setEmail(currentUser?.email || '')
+    setPhone(currentUser?.phone || '')
+    setVerificationCode('')
+    setEmailVerificationRequired(false)
+    setContactError('')
+    setContactSuccess('')
+    setIsEditingContact(false)
   }
 
   const getStatusBadge = () => {
@@ -161,7 +312,13 @@ export default function ProfilePage({ onNavigate }: Props) {
     }
   }
 
-  if (!currentUser) return null
+  if (!currentUser) {
+    return (
+      <div role="status" style={{ padding: 32, fontFamily: 'sans-serif', color: '#374151' }}>
+        {isTamil ? 'உங்கள் சுயவிவரத்தை ஏற்றுகிறது…' : 'Loading your profile…'}
+      </div>
+    )
+  }
 
   const roleLabel =
     currentUser.role === 'owner'
@@ -291,8 +448,25 @@ export default function ProfilePage({ onNavigate }: Props) {
                 </p>
               </div>
 
-              <div style={{ marginLeft: 'auto' }}>
+              <div style={{ marginLeft: 'auto', display: 'grid', justifyItems: 'end', gap: 10 }}>
                 {getStatusBadge()}
+                {!isEditingContact && (
+                  <button
+                    type="button"
+                    onClick={handleEditContact}
+                    style={{
+                      border: '1px solid #166534',
+                      borderRadius: 9,
+                      padding: '9px 14px',
+                      background: P,
+                      color: '#fff',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    {isTamil ? 'சுயவிவரத்தைத் திருத்து' : 'Edit Profile'}
+                  </button>
+                )}
               </div>
             </div>
 
@@ -311,9 +485,21 @@ export default function ProfilePage({ onNavigate }: Props) {
                 <Mail size={16} color="#6B7280" />
                 <div>
                   <div style={{ fontSize: 11, color: '#9CA3AF', textTransform: 'uppercase', fontWeight: 700 }}>Email</div>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: '#111827' }}>
-                    {currentUser?.email || 'muthukumar@agrirent.in'}
-                  </div>
+                  {isEditingContact ? (
+                    <input
+                      aria-label={isTamil ? 'மின்னஞ்சல் முகவரி' : 'Email address'}
+                      type="email"
+                      autoComplete="email"
+                      value={email}
+                      onChange={(event) => setEmail(event.target.value)}
+                      disabled={isSavingContact || emailVerificationRequired}
+                      style={{ marginTop: 4, width: '100%', minWidth: 0, boxSizing: 'border-box', padding: '8px 10px', border: '1px solid #D1D5DB', borderRadius: 8 }}
+                    />
+                  ) : (
+                    <div style={{ fontSize: 13, fontWeight: 600, color: '#111827' }}>
+                      {currentUser.email || (isTamil ? 'சேர்க்கப்படவில்லை' : 'Not provided')}
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -321,9 +507,23 @@ export default function ProfilePage({ onNavigate }: Props) {
                 <Phone size={16} color="#6B7280" />
                 <div>
                   <div style={{ fontSize: 11, color: '#9CA3AF', textTransform: 'uppercase', fontWeight: 700 }}>Phone</div>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: '#111827' }}>
-                    {currentUser?.phone || '+91 94431 87654'}
-                  </div>
+                  {isEditingContact ? (
+                    <input
+                      aria-label={isTamil ? 'தொலைபேசி எண்' : 'Phone number'}
+                      type="tel"
+                      autoComplete="tel"
+                      inputMode="tel"
+                      placeholder="+91 98765 43210"
+                      value={phone}
+                      onChange={(event) => setPhone(event.target.value)}
+                      disabled={isSavingContact || emailVerificationRequired}
+                      style={{ marginTop: 4, width: '100%', minWidth: 0, boxSizing: 'border-box', padding: '8px 10px', border: '1px solid #D1D5DB', borderRadius: 8 }}
+                    />
+                  ) : (
+                    <div style={{ fontSize: 13, fontWeight: 600, color: '#111827' }}>
+                      {currentUser.phone || (isTamil ? 'சேர்க்கப்படவில்லை' : 'Not provided')}
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -336,6 +536,56 @@ export default function ProfilePage({ onNavigate }: Props) {
                   </div>
                 </div>
               </div>
+              {isEditingContact && emailVerificationRequired && (
+                <label style={{ display: 'grid', gap: 6, maxWidth: 360, marginTop: 16, fontSize: 13, fontWeight: 700, color: '#374151' }}>
+                  {isTamil ? 'மின்னஞ்சல் சரிபார்ப்பு குறியீடு' : 'Email verification code'}
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    autoComplete="one-time-code"
+                    maxLength={6}
+                    value={verificationCode}
+                    onChange={(event) => setVerificationCode(event.target.value.replace(/\D/g, '').slice(0, 6))}
+                    disabled={isSavingContact}
+                    style={{ width: '100%', boxSizing: 'border-box', padding: '9px 11px', border: '1px solid #D1D5DB', borderRadius: 8 }}
+                  />
+                </label>
+              )}
+              {(contactError || contactSuccess) && (
+                <p role={contactError ? 'alert' : 'status'} style={{ margin: '14px 0 0', color: contactError ? '#B91C1C' : P, fontSize: 13 }}>
+                  {contactError || contactSuccess}
+                </p>
+              )}
+              {isEditingContact && (
+                <div style={{ display: 'flex', justifyContent: 'flex-end', flexWrap: 'wrap', gap: 8, marginTop: 16 }}>
+                  <button
+                    type="button"
+                    onClick={handleCancelContactEdit}
+                    disabled={isSavingContact}
+                    style={{ border: '1px solid #D1D5DB', borderRadius: 8, padding: '9px 14px', background: '#fff', color: '#374151', fontWeight: 700, cursor: isSavingContact ? 'wait' : 'pointer' }}
+                  >
+                    {isTamil ? 'ரத்து' : 'Cancel'}
+                  </button>
+                  {emailVerificationRequired && (
+                    <button
+                      type="button"
+                      onClick={handleVerifyContactEmail}
+                      disabled={isSavingContact}
+                      style={{ border: '1px solid #166534', borderRadius: 8, padding: '9px 14px', background: P, color: '#fff', fontWeight: 700, cursor: isSavingContact ? 'wait' : 'pointer' }}
+                    >
+                      {isTamil ? 'மின்னஞ்சலைச் சரிபார்க்கவும்' : 'Verify Email'}
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={handleSaveContact}
+                    disabled={isSavingContact || emailVerificationRequired}
+                    style={{ border: '1px solid #166534', borderRadius: 8, padding: '9px 14px', background: isSavingContact ? '#86A98F' : P, color: '#fff', fontWeight: 700, cursor: isSavingContact ? 'wait' : 'pointer' }}
+                  >
+                    {isSavingContact ? (isTamil ? 'சேமிக்கப்படுகிறது...' : 'Saving...') : (isTamil ? 'மாற்றங்களைச் சேமி' : 'Save Changes')}
+                  </button>
+                </div>
+              )}
             </div>
           </div>
 

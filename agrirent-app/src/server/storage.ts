@@ -107,7 +107,7 @@ export interface StoredBooking {
   totalAmount: number;
   securityDeposit: number;
   escrowStatus: "held" | "released" | "refunded" | "disputed";
-  status: "pending" | "approved" | "dispatched" | "delivered" | "active" | "completed" | "cancelled";
+  status: "pending" | "approved" | "rejected" | "dispatched" | "delivered" | "active" | "completed" | "cancelled";
   createdAt: string;
 }
 
@@ -132,6 +132,14 @@ export interface StoredContactMessage {
   message: string;
   createdAt: string;
   status: "new" | "reviewed";
+}
+
+interface StoredRequestReplay {
+  key: string;
+  userId: string;
+  operation: string;
+  state: "pending" | "complete";
+  response: unknown;
 }
 
 export function hashPassword(password: string): string {
@@ -413,6 +421,11 @@ export function calculateDistanceKm(
   return Math.round(R * c * 10) / 10;
 }
 
+interface StoredSmsNotificationEvent {
+  id: string;
+  createdAt: string;
+}
+
 interface DataStore {
   users: StoredUser[];
   listings: StoredListing[];
@@ -421,6 +434,8 @@ interface DataStore {
   contactMessages?: StoredContactMessage[];
   reviews?: StoredReview[];
   vendors?: StoredVendor[];
+  requestReplays?: StoredRequestReplay[];
+  smsNotificationEvents?: StoredSmsNotificationEvent[];
 }
 
 let memoryStore: DataStore | null = null;
@@ -601,6 +616,8 @@ function initializeDataStore(): DataStore {
     contactMessages: [],
     reviews: [...SEED_REVIEWS],
     vendors: [...SEED_VENDORS],
+    requestReplays: [],
+    smsNotificationEvents: [],
   };
 }
 
@@ -680,6 +697,13 @@ function loadStore(): DataStore {
           parsed.vendors = [...SEED_VENDORS];
         }
 
+        if (!parsed.requestReplays) {
+          parsed.requestReplays = [];
+        }
+        if (!parsed.smsNotificationEvents) {
+          parsed.smsNotificationEvents = [];
+        }
+
         memoryStore = parsed;
         saveStore();
         return memoryStore;
@@ -712,6 +736,49 @@ function saveStore(): void {
 
 // Storage Operations
 export const storage = {
+  claimSmsNotificationEvent(eventId: string): boolean {
+    const store = loadStore();
+    store.smsNotificationEvents ??= [];
+    if (store.smsNotificationEvents.some((event) => event.id === eventId)) return false;
+    const event = { id: eventId, createdAt: new Date().toISOString() };
+    store.smsNotificationEvents.push(event);
+    try {
+      saveStore();
+    } catch (error) {
+      store.smsNotificationEvents.pop();
+      throw error;
+    }
+    return true;
+  },
+
+  findRequestReplay(userId: string, operation: string, key: string): StoredRequestReplay | null {
+    return loadStore().requestReplays?.find(
+      (replay) => replay.userId === userId && replay.operation === operation && replay.key === key
+    ) || null;
+  },
+
+  beginRequestReplay(userId: string, operation: string, key: string, response: unknown): void {
+    const store = loadStore();
+    store.requestReplays ??= [];
+    const existing = store.requestReplays.find(
+      (replay) => replay.userId === userId && replay.operation === operation && replay.key === key
+    );
+    if (existing) return;
+    store.requestReplays.push({ userId, operation, key, state: "pending", response });
+    saveStore();
+  },
+
+  completeRequestReplay(userId: string, operation: string, key: string, response: unknown): void {
+    const store = loadStore();
+    const replay = store.requestReplays?.find(
+      (item) => item.userId === userId && item.operation === operation && item.key === key
+    );
+    if (!replay) return;
+    replay.state = "complete";
+    replay.response = response;
+    saveStore();
+  },
+
   getUsers(): StoredUser[] {
     return loadStore().users;
   },
@@ -766,6 +833,38 @@ export const storage = {
     user.verificationStatus = status;
     saveStore();
     return user;
+  },
+
+  updateUserContact(
+    userId: string,
+    email: string,
+    phone: string
+  ): { user: StoredUser } | { error: "not_found" | "email_in_use" | "phone_in_use" } {
+    const store = loadStore();
+    const user = store.users.find((candidate) => candidate.id === userId);
+    if (!user) return { error: "not_found" };
+    if (store.users.some((candidate) => candidate.id !== userId && candidate.email.toLowerCase() === email)) {
+      return { error: "email_in_use" };
+    }
+    const normalizedPhone = normalizePhone(phone);
+    if (normalizedPhone && store.users.some(
+      (candidate) => candidate.id !== userId && normalizePhone(candidate.phone) === normalizedPhone
+    )) {
+      return { error: "phone_in_use" };
+    }
+
+    const previousEmail = user.email;
+    const previousPhone = user.phone;
+    user.email = email;
+    user.phone = phone;
+    try {
+      saveStore();
+    } catch (error) {
+      user.email = previousEmail;
+      user.phone = previousPhone;
+      throw error;
+    }
+    return { user };
   },
 
   toggleUserStatus(userId: string): StoredUser | null {

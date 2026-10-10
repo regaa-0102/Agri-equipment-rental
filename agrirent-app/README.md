@@ -24,7 +24,7 @@ The current catalog includes 18 sample equipment listings. The application is in
 - Select rental dates and create a booking.
 - View booking history, status, and tracking information in **My Bookings**.
 - Receive a booking invoice by email when email delivery is configured.
-- Receive a booking confirmation SMS when Twilio and a registered phone number are available.
+- Receive SMS confirmations for bookings, equipment registration, and booking extensions when Twilio and a registered phone number are available.
 - Rate equipment and optionally leave a written review after an eligible booking is completed.
 - View notifications and dashboard summaries.
 - Use the interface in English or Tamil and switch between light and dark themes.
@@ -50,7 +50,7 @@ The current catalog includes 18 sample equipment listings. The application is in
 2. AgriRent saves the booking and its booking details.
 3. An invoice is generated from the persisted booking data.
 4. The server attempts to email the invoice to the farmer.
-5. The server attempts to send a booking confirmation SMS to the farmer's registered phone number.
+5. The server attempts to send a booking confirmation SMS to the farmer's latest saved phone number.
 6. The farmer can view the booking and its status in **My Bookings**.
 7. Once the booking is eligible and marked completed, the farmer can submit an equipment rating.
 
@@ -86,7 +86,11 @@ Farmers can review equipment only after an eligible booking has been completed. 
 
 ## 7. SMS Notifications
 
-Booking confirmation SMS messages are sent through Twilio to the phone number on the farmer's account. The booking interface masks the phone number in its confirmation message. Twilio credentials and sender configuration belong in local/server environment variables; do not put them in source control. An SMS delivery failure does not fail the booking.
+Booking confirmation, owner approval/rejection, and rental reminder SMS messages are sent through Twilio to the latest phone number saved on the farmer's account. Equipment registration and booking-extension confirmations are sent to the authenticated user's latest saved phone number. Each booking event is recorded before the SMS attempt to prevent duplicate sends. An SMS failure does not undo the operation. The interface distinguishes Twilio accepting a message from confirmed delivery and masks phone numbers.
+
+Configure `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, and `TWILIO_FROM_NUMBER` in the local/server environment to test these notifications. Valid E.164 phone numbers are supported, including Indian numbers. A missing or invalid configuration/phone number is reported as an SMS issue while the primary operation remains successful.
+
+The backend starts a reminder scheduler with the server process. It checks once per minute and sends a single reminder when an active or approved rental is within 24 hours of its start date. Because the application uses a local JSON store, run a single backend instance so reminder event claims are shared. Payment success is currently a presentation/demo flow and is not persisted by a backend payment operation, so payment-confirmation SMS is not sent.
 
 ## 8. Email and Invoices
 
@@ -199,11 +203,13 @@ Keep `.env` local and never commit credentials. Only configure provider variable
 3. Select an equipment listing and view its details.
 4. Choose dates and create a booking.
 5. Check the booking confirmation, invoice email, and SMS attempt (email/SMS delivery requires provider configuration).
-6. Sign in with an Admin account.
-7. Open **Escrow & Bookings Audit** and mark an eligible past booking as **Completed**.
-8. Return to the Farmer account.
-9. Open **My Bookings**.
-10. Rate the completed equipment and optionally add a review.
+6. As an equipment owner, register equipment and check its SMS attempt.
+7. In **My Bookings**, extend an active booking to a later return date and check its SMS attempt.
+8. Sign in with an Admin account.
+9. Open **Escrow & Bookings Audit** and mark an eligible past booking as **Completed**.
+10. Return to the Farmer account.
+11. Open **My Bookings**.
+12. Rate the completed equipment and optionally add a review.
 
 ## 14. Security Notes
 

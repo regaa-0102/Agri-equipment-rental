@@ -12,7 +12,7 @@ import {
   Image as ImageIcon,
   ExternalLink,
 } from 'lucide-react'
-import { useTheme, THEME_OPTIONS, type AppTheme } from '../context/ThemeContext'
+import { useTheme, THEME_OPTIONS } from '../context/ThemeContext'
 import { useLanguage } from '../context/LanguageContext'
 
 export default function SettingsModal() {

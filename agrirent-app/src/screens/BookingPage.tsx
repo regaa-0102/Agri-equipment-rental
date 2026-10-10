@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { CalendarDays, CheckCircle2, ShieldCheck, MapPin, ArrowRight, AlertCircle, X, ShieldAlert, Check } from 'lucide-react'
 import { useLanguage } from '../context/LanguageContext'
 import { catalog, findCatalogItem, CatalogItem, getCategoryFallback } from '../lib/catalog'
-import { api, getStoredUser } from '../lib/api-client'
+import { api, getStoredUser, SmsNotificationResult } from '../lib/api-client'
 import { checkBookingVerification, BookingVerificationCheck } from '../lib/verification'
 
 const P = '#2E7D32'
@@ -64,7 +64,7 @@ export default function BookingPage({ onNavigate, selectedEquipment }: Props) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [bookingSuccess, setBookingSuccess] = useState(false)
   const [invoiceEmailSent, setInvoiceEmailSent] = useState(false)
-  const [bookingSms, setBookingSms] = useState<{ status: 'sent' | 'failed' | 'no_phone'; maskedPhone?: string } | null>(null)
+  const [bookingSms, setBookingSms] = useState<SmsNotificationResult | null>(null)
   const [bookingError, setBookingError] = useState<string | null>(null)
 
   // Dynamic days calculation
@@ -688,11 +688,25 @@ export default function BookingPage({ onNavigate, selectedEquipment }: Props) {
                       ? (isTamil ? 'முன்பதிவு உறுதி செய்யப்பட்டது. விலைப்பட்டியல் உங்கள் மின்னஞ்சலுக்கு அனுப்பப்பட்டது.' : 'Booking confirmed. Invoice sent to your email.')
                       : (isTamil ? 'முன்பதிவு உறுதி செய்யப்பட்டது.' : 'Booking confirmed.')}
                   </div>
-                  {bookingSms?.status === 'sent' && (
+                  {bookingSms?.status === 'accepted' && (
                     <div>
                       {isTamil
-                        ? `SMS உறுதிப்படுத்தல் ${bookingSms.maskedPhone || '******'} எண்ணுக்கு அனுப்பப்பட்டது.`
-                        : `SMS confirmation sent to ${bookingSms.maskedPhone || '******'}.`}
+                        ? `SMS கோரிக்கை Twilio-ஆல் ஏற்கப்பட்டது (${bookingSms.maskedPhone || '******'}).`
+                        : `Twilio accepted the SMS request for ${bookingSms.maskedPhone || '******'}; delivery is not yet confirmed.`}
+                    </div>
+                  )}
+                  {bookingSms?.status === 'pending' && (
+                    <div role="status">
+                      {isTamil
+                        ? 'முன்பதிவு உறுதி செய்யப்பட்டது. SMS கோரிக்கை இன்னும் செயல்பாட்டில் உள்ளது; விநியோகம் உறுதிப்படுத்தப்படவில்லை.'
+                        : 'Booking confirmed. The SMS request is still processing; delivery is not yet confirmed.'}
+                    </div>
+                  )}
+                  {bookingSms?.status === 'delivered' && (
+                    <div>
+                      {isTamil
+                        ? `SMS ${bookingSms.maskedPhone || '******'} எண்ணுக்கு வழங்கப்பட்டது.`
+                        : `SMS delivery was confirmed for ${bookingSms.maskedPhone || '******'}.`}
                     </div>
                   )}
                   {bookingSms?.status === 'failed' && (
@@ -707,6 +721,13 @@ export default function BookingPage({ onNavigate, selectedEquipment }: Props) {
                       {isTamil
                         ? 'SMS உறுதிப்படுத்தலைப் பெற உங்கள் சுயவிவரத்தில் தொலைபேசி எண்ணைச் சேர்க்கவும்.'
                         : 'Booking confirmed. Add a phone number to your profile to receive SMS confirmations.'}
+                    </div>
+                  )}
+                  {bookingSms?.status === 'invalid_phone' && (
+                    <div role="status">
+                      {isTamil
+                        ? 'முன்பதிவு உறுதி செய்யப்பட்டது, ஆனால் சுயவிவர தொலைபேசி எண் தவறானது; SMS அனுப்பப்படவில்லை.'
+                        : 'Booking confirmed, but the phone number saved in your profile is invalid, so no SMS was sent.'}
                     </div>
                   )}
                 </div>

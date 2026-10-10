@@ -1,14 +1,21 @@
 import { createHmac, randomBytes, randomInt, timingSafeEqual } from "node:crypto";
 import { decodeJwt, signJwt, verifyJwt, type JwtPayload } from "./jwt";
 import { hashPassword, verifyPassword, storage, type StoredListing, type StoredUser, type StoredBooking } from "./storage";
-import { sendBookingConfirmationSms } from "./sms";
+import {
+  sendBookingDecisionSms,
+  sendBookingConfirmationSms,
+  sendBookingExtensionSms,
+  sendEquipmentRegistrationSms,
+  type BookingSmsResult,
+} from "./sms";
 import { DEMO_OTP_ROLE_EMAIL } from "../lib/auth-config";
+import { normalizeIndianMobileNumber } from "../lib/phone";
 
 const jsonHeaders = {
   "content-type": "application/json; charset=utf-8",
   "access-control-allow-origin": "*",
   "access-control-allow-methods": "GET, POST, PUT, PATCH, DELETE, OPTIONS",
-  "access-control-allow-headers": "Content-Type, Authorization",
+  "access-control-allow-headers": "Content-Type, Authorization, Idempotency-Key",
 };
 
 type AuthRole = StoredUser["role"];
@@ -19,6 +26,38 @@ function isAuthRole(role: unknown): role is AuthRole {
 
 function googleTestRoleSwitchEnabled(): boolean {
   return process.env["GOOGLE_TEST_ROLE_SWITCH"]?.trim().toLowerCase() === "true";
+}
+
+function isValidIsoDate(value: string): boolean {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+  const date = new Date(`${value}T00:00:00Z`);
+  return Number.isFinite(date.getTime()) && date.toISOString().slice(0, 10) === value;
+}
+
+function getIdempotencyKey(request: Request): string | null {
+  const key = request.headers.get("Idempotency-Key");
+  return key && /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(key)
+    ? key
+    : null;
+}
+
+async function sendSmsForEvent(
+  eventId: string,
+  operation: string,
+  send: () => Promise<BookingSmsResult>
+): Promise<BookingSmsResult | null> {
+  try {
+    if (!storage.claimSmsNotificationEvent(eventId)) return null;
+  } catch {
+    console.error(`${operation} SMS could not reserve its duplicate-prevention record.`);
+    return { status: "failed", maskedPhone: "******", reason: "SMS notification could not be reserved." };
+  }
+  try {
+    return await send();
+  } catch {
+    console.warn(`${operation} SMS failed: provider request failed unexpectedly.`);
+    return { status: "failed", maskedPhone: "******", reason: "SMS provider request failed." };
+  }
 }
 
 function json(data: unknown, status = 200, extraHeaders?: Record<string, string>) {
@@ -116,6 +155,7 @@ function googleConfiguration() {
 
 const emailOtpPepper = randomBytes(32);
 const emailOtps = new Map<string, { hash: Buffer; expiresAt: number; attempts: number; role: AuthRole | null }>();
+const contactEmailOtps = new Map<string, { email: string; phone: string; hash: Buffer; expiresAt: number; attempts: number }>();
 const emailOtpRateLimits = new Map<string, number[]>();
 let lastEmailOtpCleanup = 0;
 
@@ -136,6 +176,9 @@ function cleanupEmailOtpState(now: number): void {
   for (const [email, otp] of emailOtps) {
     if (otp.expiresAt <= now) emailOtps.delete(email);
   }
+  for (const [userId, otp] of contactEmailOtps) {
+    if (otp.expiresAt <= now) contactEmailOtps.delete(userId);
+  }
   for (const [key, timestamps] of emailOtpRateLimits) {
     const recent = timestamps.filter((timestamp) => now - timestamp < 15 * 60_000);
     if (recent.length) emailOtpRateLimits.set(key, recent);
@@ -147,7 +190,7 @@ function hashEmailOtp(email: string, code: string): Buffer {
   return createHmac("sha256", emailOtpPepper).update(`${email}:${code}`).digest();
 }
 
-async function sendEmailOtp(email: string, code: string): Promise<boolean> {
+async function sendEmailOtp(email: string, code: string, purpose: "signin" | "change-email" = "signin"): Promise<boolean> {
   const apiKey = process.env["RESEND_API_KEY"]?.trim();
   const from = process.env["AUTH_EMAIL_FROM"]?.trim();
   if (!apiKey || !from) return false;
@@ -161,8 +204,10 @@ async function sendEmailOtp(email: string, code: string): Promise<boolean> {
     body: JSON.stringify({
       from,
       to: [email],
-      subject: "Your AgriRent sign-in code",
-      text: `Your AgriRent sign-in code is ${code}. It expires in 5 minutes. If you did not request it, you can ignore this email.`,
+      subject: purpose === "change-email" ? "Verify your new AgriRent email address" : "Your AgriRent sign-in code",
+      text: purpose === "change-email"
+        ? `Your AgriRent email change verification code is ${code}. It expires in 5 minutes. Your email address will not change until you verify this code. If you did not request this, you can ignore this email.`
+        : `Your AgriRent sign-in code is ${code}. It expires in 5 minutes. If you did not request it, you can ignore this email.`,
     }),
   });
   return response.ok;
@@ -784,8 +829,7 @@ export async function handleApiRequest(request: Request): Promise<Response | nul
           !user ||
           user.status !== "active" ||
           user.provider !== "google" ||
-          user.googleId !== pending.googleId ||
-          user.email.toLowerCase() !== pending.email.toLowerCase()
+          user.googleId !== pending.googleId
         ) {
           return jsonWithCookies(
             { error: "This Google account is no longer linked to the AgriRent account." },
@@ -1088,6 +1132,144 @@ export async function handleApiRequest(request: Request): Promise<Response | nul
       return json({ user: { ...safeUser, role: jwtUser.role }, jwtClaims: jwtUser });
     }
 
+    if (request.method === "PUT" && pathname === "/api/profile/contact") {
+      const jwtUser = getJwtFromHeader(request);
+      if (!jwtUser) return json({ error: "Authentication required" }, 401);
+
+      const body = await readBody<{ email?: string; phone?: string }>(request);
+      const email = body?.email?.trim().toLowerCase();
+      const phone = typeof body?.phone === "string" ? normalizeIndianMobileNumber(body.phone) : null;
+      if (!email || email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        return json({ error: "Enter a valid email address." }, 400);
+      }
+      if (!phone) {
+        return json({ error: "Enter a valid Indian mobile number, such as +91 98765 43210." }, 400);
+      }
+
+      const user = storage.findUserById(jwtUser.userId);
+      if (!user) return json({ error: "User no longer exists" }, 404);
+      if (email !== user.email.toLowerCase()) {
+        const now = Date.now();
+        cleanupEmailOtpState(now);
+        const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+        if (
+          !checkEmailOtpRateLimit(`contact-otp-email:${email}`, 3, 15 * 60_000, now) ||
+          !checkEmailOtpRateLimit(`contact-otp-user:${user.id}`, 3, 15 * 60_000, now) ||
+          !checkEmailOtpRateLimit(`contact-otp-ip:${ip}`, 20, 15 * 60_000, now)
+        ) {
+          return json({ error: "Too many verification code requests. Please wait before trying again." }, 429);
+        }
+        if (storage.findUserByEmail(email)) {
+          return json({ error: "An account with this email already exists. Please use a different email address." }, 409);
+        }
+        const phoneOwner = storage.findUserByPhone(phone);
+        if (phoneOwner && phoneOwner.id !== user.id) {
+          return json({ error: "This phone number is already used by another account." }, 409);
+        }
+
+        const code = randomInt(0, 1_000_000).toString().padStart(6, "0");
+        let delivered = false;
+        try {
+          delivered = await sendEmailOtp(email, code, "change-email");
+        } catch {
+          console.error("Email change verification delivery failed.");
+        }
+        if (!delivered) {
+          return json({ error: "Could not send a verification code to that email. Contact details were not changed." }, 502);
+        }
+
+        contactEmailOtps.set(user.id, {
+          email,
+          phone,
+          hash: hashEmailOtp(email, code),
+          expiresAt: now + 5 * 60_000,
+          attempts: 0,
+        });
+        const { passwordHash: _passwordHash, ...safeUser } = user;
+        return json({ user: { ...safeUser, role: jwtUser.role }, emailVerificationRequired: true });
+      }
+
+      const updateResult = storage.updateUserContact(user.id, user.email.toLowerCase(), phone);
+      if ("error" in updateResult) {
+        if (updateResult.error === "phone_in_use") {
+          return json({ error: "This phone number is already used by another account." }, 409);
+        }
+        return json({ error: "Could not update contact details." }, updateResult.error === "email_in_use" ? 409 : 404);
+      }
+      const { passwordHash: _passwordHash, ...safeUser } = updateResult.user;
+      return json({ user: { ...safeUser, role: jwtUser.role }, emailVerificationRequired: false });
+    }
+
+    if (request.method === "POST" && pathname === "/api/profile/contact/email/verify") {
+      const jwtUser = getJwtFromHeader(request);
+      if (!jwtUser) return json({ error: "Authentication required" }, 401);
+      const body = await readBody<{ code?: string }>(request);
+      const code = body?.code?.trim();
+      if (!code || !/^\d{6}$/.test(code)) {
+        return json({ error: "Enter the 6-digit verification code." }, 400);
+      }
+
+      const now = Date.now();
+      cleanupEmailOtpState(now);
+      const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+      if (
+        !checkEmailOtpRateLimit(`contact-verify-user:${jwtUser.userId}`, 10, 15 * 60_000, now) ||
+        !checkEmailOtpRateLimit(`contact-verify-ip:${ip}`, 30, 15 * 60_000, now)
+      ) {
+        return json({ error: "Too many verification attempts. Request a new code later." }, 429);
+      }
+
+      const pending = contactEmailOtps.get(jwtUser.userId);
+      if (!pending || pending.expiresAt <= now) {
+        contactEmailOtps.delete(jwtUser.userId);
+        return json({ error: "The code is invalid or expired. Request a new code and try again." }, 401);
+      }
+      const submittedHash = hashEmailOtp(pending.email, code);
+      if (!timingSafeEqual(pending.hash, submittedHash)) {
+        pending.attempts += 1;
+        if (pending.attempts >= 5) contactEmailOtps.delete(jwtUser.userId);
+        return json({ error: "The code is invalid or expired. Request a new code and try again." }, 401);
+      }
+
+      const user = storage.findUserById(jwtUser.userId);
+      if (!user || user.status !== "active") {
+        contactEmailOtps.delete(jwtUser.userId);
+        return json({ error: "User no longer exists or is inactive." }, 403);
+      }
+      if (storage.findUserByEmail(pending.email)) {
+        contactEmailOtps.delete(jwtUser.userId);
+        return json({ error: "An account with this email already exists. Please use a different email address." }, 409);
+      }
+
+      const updateResult = storage.updateUserContact(user.id, pending.email, pending.phone);
+      if ("error" in updateResult) {
+        contactEmailOtps.delete(jwtUser.userId);
+        return json({ error: "Could not update the verified email address." }, updateResult.error === "email_in_use" ? 409 : 404);
+      }
+      contactEmailOtps.delete(jwtUser.userId);
+
+      const token = signJwt({
+        userId: updateResult.user.id,
+        name: updateResult.user.name,
+        email: updateResult.user.email,
+        role: jwtUser.role,
+        provider: updateResult.user.provider || "local",
+      });
+      const { passwordHash: _passwordHash, ...safeUser } = updateResult.user;
+      return json(
+        { user: { ...safeUser, role: jwtUser.role }, emailVerified: true },
+        200,
+        { "set-cookie": sessionCookie(token, request) }
+      );
+    }
+
+    if (request.method === "DELETE" && pathname === "/api/profile/contact/email/pending") {
+      const jwtUser = getJwtFromHeader(request);
+      if (!jwtUser) return json({ error: "Authentication required" }, 401);
+      contactEmailOtps.delete(jwtUser.userId);
+      return json({ success: true });
+    }
+
     // 7. Equipment Listings (Public REST API with filters & ratings)
     if (request.method === "GET" && pathname === "/api/listings") {
       const search = url.searchParams.get("search") || undefined;
@@ -1281,6 +1463,12 @@ export async function handleApiRequest(request: Request): Promise<Response | nul
         return json({ error: "Name, category, and pricePerDay are mandatory" }, 400);
       }
 
+      const idempotencyKey = getIdempotencyKey(request);
+      if (idempotencyKey) {
+        const replay = storage.findRequestReplay(jwtUser.userId, "equipment-registration", idempotencyKey);
+        if (replay) return json(replay.response);
+      }
+
       const created = storage.createListing({
         ownerId: jwtUser.userId,
         name: body.name,
@@ -1311,6 +1499,13 @@ export async function handleApiRequest(request: Request): Promise<Response | nul
         ...(body.lng !== undefined ? { lng: body.lng } : {}),
       });
 
+      if (idempotencyKey) {
+        storage.beginRequestReplay(jwtUser.userId, "equipment-registration", idempotencyKey, {
+          listing: created,
+          sms: { status: "pending" },
+        });
+      }
+
       storage.createNotification({
         userId: jwtUser.userId,
         title: "Equipment Listed Successfully",
@@ -1320,7 +1515,25 @@ export async function handleApiRequest(request: Request): Promise<Response | nul
         relatedId: created.id,
       });
 
-      return json({ listing: created }, 201);
+      let sms: Awaited<ReturnType<typeof sendEquipmentRegistrationSms>>;
+      const registeringUser = storage.findUserById(jwtUser.userId);
+      try {
+        sms = await sendEquipmentRegistrationSms(registeringUser?.phone || "", created.name, created.id);
+      } catch {
+        console.warn(`Equipment registration SMS failed for ${created.id}: provider request failed unexpectedly.`);
+        sms = { status: "failed", maskedPhone: "******", reason: "SMS provider request failed." };
+      }
+
+      const responseBody = {
+        listing: created,
+        sms: sms.status === "no_phone"
+          ? { status: sms.status }
+          : { status: sms.status, maskedPhone: sms.maskedPhone },
+      };
+      if (idempotencyKey) {
+        storage.completeRequestReplay(jwtUser.userId, "equipment-registration", idempotencyKey, responseBody);
+      }
+      return json(responseBody, 201);
     }
 
     // Update Equipment (Owner / Admin JWT Required)
@@ -1449,6 +1662,12 @@ export async function handleApiRequest(request: Request): Promise<Response | nul
         return json({ error: "listingId, startDate, and endDate are required" }, 400);
       }
 
+      const idempotencyKey = getIdempotencyKey(request);
+      if (idempotencyKey) {
+        const replay = storage.findRequestReplay(jwtUser.userId, "booking", idempotencyKey);
+        if (replay) return json(replay.response);
+      }
+
       const listing = storage.findListingById(body.listingId);
       if (!listing) {
         return json({ error: "Listing not found" }, 404);
@@ -1475,6 +1694,14 @@ export async function handleApiRequest(request: Request): Promise<Response | nul
         escrowStatus: "held",
         status: "active",
       });
+
+      if (idempotencyKey) {
+        storage.beginRequestReplay(jwtUser.userId, "booking", idempotencyKey, {
+          booking,
+          invoiceEmailSent: false,
+          sms: { status: "pending" },
+        });
+      }
 
       // Notification for Farmer
       storage.createNotification({
@@ -1510,25 +1737,26 @@ export async function handleApiRequest(request: Request): Promise<Response | nul
         console.error(`Booking invoice email failed for ${booking.id}:`, error);
       }
 
-      let sms: Awaited<ReturnType<typeof sendBookingConfirmationSms>>
-      try {
-        sms = await sendBookingConfirmationSms(farmer?.phone || "", booking);
-      } catch {
-        sms = { status: "failed", maskedPhone: "******", reason: "SMS provider request failed." };
-      }
-      if (sms.status === "no_phone") {
-        console.warn(`Booking confirmation SMS not sent for ${booking.id}: farmer has no usable registered phone number.`);
-      } else if (sms.status === "failed") {
-        console.warn(`Booking confirmation SMS failed for ${booking.id} (${sms.maskedPhone}): ${sms.reason}`);
-      }
-
-      return json({
+      const sms = await sendSmsForEvent(
+        `booking-created:${booking.id}`,
+        "Booking confirmation",
+        () => sendBookingConfirmationSms(storage.findUserById(booking.farmerId)?.phone || "", booking)
+      );
+      const responseBody = {
         booking,
         invoiceEmailSent,
-        sms: sms.status === "no_phone"
-          ? { status: sms.status }
-          : { status: sms.status, maskedPhone: sms.maskedPhone },
-      }, 201);
+        ...(sms
+          ? {
+              sms: sms.status === "no_phone"
+                ? { status: sms.status }
+                : { status: sms.status, maskedPhone: sms.maskedPhone },
+            }
+          : {}),
+      };
+      if (idempotencyKey) {
+        storage.completeRequestReplay(jwtUser.userId, "booking", idempotencyKey, responseBody);
+      }
+      return json(responseBody, 201);
     }
 
     if (request.method === "PATCH" && pathname.startsWith("/api/admin/bookings/") && pathname.endsWith("/complete")) {
@@ -1580,14 +1808,44 @@ export async function handleApiRequest(request: Request): Promise<Response | nul
         }
 
         const body = await readBody<{ endDate?: string }>(request);
-        if (!body?.endDate || !/^\d{4}-\d{2}-\d{2}$/.test(body.endDate)) {
+        if (!body?.endDate || !isValidIsoDate(body.endDate)) {
           return json({ error: "A valid endDate in YYYY-MM-DD format is required" }, 400);
         }
+        const idempotencyKey = getIdempotencyKey(request);
+        if (idempotencyKey) {
+          const replay = storage.findRequestReplay(jwtUser.userId, "booking-extension", idempotencyKey);
+          if (replay) return json(replay.response);
+        }
+
         const updatedBooking = storage.extendBooking(bookingIdForExtension, body.endDate);
         if (!updatedBooking) {
           return json({ error: "Only active bookings can be extended to a date after the current end date" }, 400);
         }
-        return json({ booking: updatedBooking });
+        if (idempotencyKey) {
+          storage.beginRequestReplay(jwtUser.userId, "booking-extension", idempotencyKey, {
+            booking: updatedBooking,
+            sms: { status: "pending" },
+          });
+        }
+
+        let sms: Awaited<ReturnType<typeof sendBookingExtensionSms>>;
+        const farmer = storage.findUserById(updatedBooking.farmerId);
+        try {
+          sms = await sendBookingExtensionSms(farmer?.phone || "", updatedBooking);
+        } catch {
+          console.warn(`Booking extension SMS failed for ${updatedBooking.id}: provider request failed unexpectedly.`);
+          sms = { status: "failed", maskedPhone: "******", reason: "SMS provider request failed." };
+        }
+        const responseBody = {
+          booking: updatedBooking,
+          sms: sms.status === "no_phone"
+            ? { status: sms.status }
+            : { status: sms.status, maskedPhone: sms.maskedPhone },
+        };
+        if (idempotencyKey) {
+          storage.completeRequestReplay(jwtUser.userId, "booking-extension", idempotencyKey, responseBody);
+        }
+        return json(responseBody);
       }
       const existingBooking = storage.findBookingById(bookingId);
       if (!existingBooking) {
@@ -1611,6 +1869,7 @@ export async function handleApiRequest(request: Request): Promise<Response | nul
         return json({ error: "Farmers can only cancel their bookings" }, 403);
       }
 
+      const previousStatus = existingBooking.status;
       const updated = storage.updateBookingStatus(bookingId, body.status, body.escrowStatus);
       if (!updated) return json({ error: "Booking not found" }, 404);
 
@@ -1630,6 +1889,30 @@ export async function handleApiRequest(request: Request): Promise<Response | nul
           type: "booking_cancelled",
           read: false,
           relatedId: updated.id,
+        });
+      }
+
+      const isDecision = (body.status === "approved" || body.status === "rejected") &&
+        previousStatus !== body.status;
+      if (isDecision) {
+        const sms = await sendSmsForEvent(
+          `booking-${body.status}:${updated.id}`,
+          `Booking ${body.status}`,
+          () => sendBookingDecisionSms(
+            storage.findUserById(updated.farmerId)?.phone || "",
+            updated,
+            body.status === "approved" ? "approved" : "rejected"
+          )
+        );
+        return json({
+          booking: updated,
+          ...(sms
+            ? {
+                sms: sms.status === "no_phone"
+                  ? { status: sms.status }
+                  : { status: sms.status, maskedPhone: sms.maskedPhone },
+              }
+            : {}),
         });
       }
 

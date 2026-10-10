@@ -11,6 +11,11 @@ export interface UserSession {
   verificationStatus?: 'NOT_VERIFIED' | 'PENDING' | 'VERIFIED' | 'REJECTED'
 }
 
+export interface SmsNotificationResult {
+  status: 'pending' | 'accepted' | 'delivered' | 'failed' | 'no_phone' | 'invalid_phone'
+  maskedPhone?: string
+}
+
 let currentUser: UserSession | null = null
 let authInitialized = false
 let authRestorePromise: Promise<UserSession | null> | null = null
@@ -63,6 +68,52 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
   }
 
   return response.json() as Promise<T>
+}
+
+async function requestIdempotently<T>(endpoint: string, body: unknown): Promise<T> {
+  const fingerprintBytes = await globalThis.crypto.subtle.digest(
+    'SHA-256',
+    new TextEncoder().encode(JSON.stringify(body)),
+  )
+  const fingerprint = Array.from(new Uint8Array(fingerprintBytes), (byte) => byte.toString(16).padStart(2, '0')).join('')
+  const storageKey = `agrirent-idempotency:${endpoint}`
+  let idempotencyKey: string | undefined
+
+  if (typeof window !== 'undefined') {
+    try {
+      const cached = window.localStorage.getItem(storageKey)
+      if (cached) {
+        const parsed = JSON.parse(cached) as { fingerprint?: string; key?: string }
+        if (parsed.fingerprint === fingerprint && parsed.key) idempotencyKey = parsed.key
+      }
+      idempotencyKey ??= globalThis.crypto.randomUUID()
+      window.localStorage.setItem(storageKey, JSON.stringify({ fingerprint, key: idempotencyKey }))
+    } catch {
+      idempotencyKey ??= globalThis.crypto.randomUUID()
+      console.warn('Could not persist the request retry key in browser storage.')
+    }
+  } else {
+    idempotencyKey = globalThis.crypto.randomUUID()
+  }
+
+  const result = await request<T>(endpoint, {
+    method: endpoint.endsWith('/extend') ? 'PATCH' : 'POST',
+    headers: { 'Idempotency-Key': idempotencyKey },
+    body: JSON.stringify(body),
+  })
+
+  if (typeof window !== 'undefined') {
+    try {
+      const cached = window.localStorage.getItem(storageKey)
+      if (cached && (JSON.parse(cached) as { key?: string }).key === idempotencyKey) {
+        window.localStorage.removeItem(storageKey)
+      }
+    } catch {
+      console.warn('Could not clear the completed request retry key from browser storage.')
+    }
+  }
+
+  return result
 }
 
 export const api = {
@@ -153,6 +204,26 @@ export const api = {
     return request<{ user: UserSession; jwtClaims: unknown }>('/api/auth/me')
   },
 
+  async updateContactDetails(email: string, phone: string) {
+    return request<{ user: UserSession; emailVerificationRequired: boolean }>('/api/profile/contact', {
+      method: 'PUT',
+      body: JSON.stringify({ email, phone }),
+    })
+  },
+
+  async verifyContactEmail(code: string) {
+    return request<{ user: UserSession; emailVerified: boolean }>('/api/profile/contact/email/verify', {
+      method: 'POST',
+      body: JSON.stringify({ code }),
+    })
+  },
+
+  async cancelContactEmailChange() {
+    return request<{ success: boolean }>('/api/profile/contact/email/pending', {
+      method: 'DELETE',
+    })
+  },
+
   // Listings
   async getListings(filters?: {
     search?: string
@@ -215,10 +286,7 @@ export const api = {
   },
 
   async createListing(data: any) {
-    return request<{ listing: any }>('/api/listings', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    })
+    return requestIdempotently<{ listing: any; sms: SmsNotificationResult }>('/api/listings', data)
   },
 
   async updateListing(id: string, data: any) {
@@ -267,14 +335,11 @@ export const api = {
   },
 
   async createBooking(data: { listingId: string; startDate: string; endDate: string; days: number }) {
-    return request<{
+    return requestIdempotently<{
       booking: any
       invoiceEmailSent: boolean
-      sms: { status: 'sent' | 'failed' | 'no_phone'; maskedPhone?: string }
-    }>('/api/bookings', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    })
+      sms: SmsNotificationResult
+    }>('/api/bookings', data)
   },
 
   async updateBookingStatus(id: string, status: string, escrowStatus?: string) {
@@ -291,10 +356,10 @@ export const api = {
   },
 
   async extendBooking(id: string, endDate: string) {
-    return request<{ booking: any }>(`/api/bookings/${id}/extend`, {
-      method: 'PATCH',
-      body: JSON.stringify({ endDate }),
-    })
+    return requestIdempotently<{ booking: any; sms: SmsNotificationResult }>(
+      `/api/bookings/${id}/extend`,
+      { endDate },
+    )
   },
 
   // Admin

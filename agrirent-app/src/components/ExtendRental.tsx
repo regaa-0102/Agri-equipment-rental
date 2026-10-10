@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { CalendarDays, Check, Clock, AlertCircle, X } from 'lucide-react'
 import { useLanguage } from '../context/LanguageContext'
 import { BookingItem } from '../lib/bookings'
-import { api } from '../lib/api-client'
+import { api, SmsNotificationResult } from '../lib/api-client'
 
 interface Props {
   booking: BookingItem
@@ -29,6 +29,8 @@ export default function ExtendRental({ booking, isOpen, onClose, onSuccess }: Pr
   const [isConfirming, setIsConfirming] = useState<boolean>(false)
   const [errorMsg, setErrorMsg] = useState<string>('')
   const [successMsg, setSuccessMsg] = useState<string>('')
+  const [extensionSms, setExtensionSms] = useState<SmsNotificationResult | null>(null)
+  const [isExtending, setIsExtending] = useState(false)
 
   if (!isOpen) return null
 
@@ -65,12 +67,21 @@ export default function ExtendRental({ booking, isOpen, onClose, onSuccess }: Pr
   }
 
   const handleConfirm = async () => {
+    if (isExtending) return
+    setIsExtending(true)
     try {
-      await api.extendBooking(booking.id, newEndDate)
+      const result = await api.extendBooking(booking.id, newEndDate)
+      setExtensionSms(result.sms)
+      const formattedDate = new Date(`${newEndDate}T00:00:00Z`).toLocaleDateString('en-GB', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+        timeZone: 'UTC',
+      })
       setSuccessMsg(
         isTamil
-          ? `வாடகை ${newEndDate} வரை வெற்றிகரமாக நீட்டிக்கப்பட்டது!`
-          : `Rental successfully extended to ${newEndDate}!`
+          ? `வாடகை ${formattedDate} வரை வெற்றிகரமாக நீட்டிக்கப்பட்டது!`
+          : `Rental successfully extended to ${formattedDate}!`
       )
       setTimeout(() => {
         if (onSuccess) onSuccess({
@@ -85,6 +96,8 @@ export default function ExtendRental({ booking, isOpen, onClose, onSuccess }: Pr
     } catch (error) {
       setErrorMsg(error instanceof Error ? error.message : (isTamil ? 'நீட்டிப்பு தோல்வியடைந்தது' : 'Extension failed'))
       setIsConfirming(false)
+    } finally {
+      setIsExtending(false)
     }
   }
 
@@ -199,6 +212,36 @@ export default function ExtendRental({ booking, isOpen, onClose, onSuccess }: Pr
               {isTamil ? 'வெற்றிகரமாக நீட்டிக்கப்பட்டது' : 'Extension Applied!'}
             </h3>
             <p style={{ fontSize: 13, color: '#15803D', margin: 0 }}>{successMsg}</p>
+            {extensionSms?.status === 'pending' && (
+              <p role="status" style={{ fontSize: 12, color: '#92400E', margin: '8px 0 0' }}>
+                Extension succeeded. The SMS request is still processing; delivery is not yet confirmed.
+              </p>
+            )}
+            {extensionSms?.status === 'accepted' && (
+              <p role="status" style={{ fontSize: 12, color: '#166534', margin: '8px 0 0' }}>
+                Twilio accepted the SMS request for {extensionSms.maskedPhone || '******'}; delivery is not yet confirmed.
+              </p>
+            )}
+            {extensionSms?.status === 'delivered' && (
+              <p role="status" style={{ fontSize: 12, color: '#166534', margin: '8px 0 0' }}>
+                SMS delivery was confirmed for {extensionSms.maskedPhone || '******'}.
+              </p>
+            )}
+            {extensionSms?.status === 'failed' && (
+              <p role="status" style={{ fontSize: 12, color: '#92400E', margin: '8px 0 0' }}>
+                Extension succeeded, but the SMS could not be sent. Check your saved phone number or Twilio configuration.
+              </p>
+            )}
+            {extensionSms?.status === 'no_phone' && (
+              <p role="status" style={{ fontSize: 12, color: '#92400E', margin: '8px 0 0' }}>
+                Extension succeeded. Add a phone number to your profile to receive SMS notifications.
+              </p>
+            )}
+            {extensionSms?.status === 'invalid_phone' && (
+              <p role="status" style={{ fontSize: 12, color: '#92400E', margin: '8px 0 0' }}>
+                Extension succeeded, but the phone number saved in your profile is invalid, so no SMS was sent.
+              </p>
+            )}
           </div>
         ) : (
           <div>
@@ -390,14 +433,15 @@ export default function ExtendRental({ booking, isOpen, onClose, onSuccess }: Pr
                   <button
                     type="button"
                     onClick={handleConfirm}
+                    disabled={isExtending}
                     style={{
                       padding: '10px 22px',
-                      background: '#2E7D32',
+                      background: isExtending ? '#9CA3AF' : '#2E7D32',
                       border: 'none',
                       borderRadius: 10,
                       fontWeight: 700,
                       fontSize: 13,
-                      cursor: 'pointer',
+                      cursor: isExtending ? 'wait' : 'pointer',
                       color: '#fff',
                       display: 'flex',
                       alignItems: 'center',
@@ -405,7 +449,9 @@ export default function ExtendRental({ booking, isOpen, onClose, onSuccess }: Pr
                     }}
                   >
                     <Check size={16} />
-                    {isTamil ? 'நீட்டிப்பை உறுதிப்படுத்து' : 'Confirm Extension'}
+                    {isExtending
+                      ? (isTamil ? 'செயல்படுத்தப்படுகிறது...' : 'Applying...')
+                      : (isTamil ? 'நீட்டிப்பை உறுதிப்படுத்து' : 'Confirm Extension')}
                   </button>
                 </div>
               </div>

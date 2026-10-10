@@ -3,12 +3,14 @@ import "./lib/error-capture";
 import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
 import { handleApiRequest } from "./server/api";
+import { startRentalReminderScheduler } from "./server/reminder-scheduler";
 
 type ServerEntry = {
   fetch: (request: Request, env: unknown, ctx: unknown) => Promise<Response> | Response;
 };
 
 let serverEntryPromise: Promise<ServerEntry> | undefined;
+startRentalReminderScheduler();
 
 async function getServerEntry(): Promise<ServerEntry> {
   if (!serverEntryPromise) {

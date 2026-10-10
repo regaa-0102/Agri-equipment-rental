@@ -12,8 +12,7 @@ import {
   tamilNaduDistricts,
 } from '../lib/catalog'
 import { useLanguage } from '../context/LanguageContext'
-import { api, getStoredUser } from '../lib/api-client'
-import { addNotification } from '../lib/notifications'
+import { api, getStoredUser, SmsNotificationResult } from '../lib/api-client'
 import {
   CheckCircle2,
   Upload,
@@ -114,6 +113,7 @@ export default function AddEquipment({ onNavigate }: Props) {
   // Feedback states
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [successItem, setSuccessItem] = useState<CatalogItem | null>(null)
+  const [successSms, setSuccessSms] = useState<SmsNotificationResult | null>(null)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   // Load existing equipment if in Edit mode
@@ -404,44 +404,31 @@ export default function AddEquipment({ onNavigate }: Props) {
         window.localStorage.removeItem('agrirent_edit_equipment_id')
       } else {
         // Create new listing
-        addCatalogItem(itemRecord)
-        try {
-          await api.createListing({
-            name: itemRecord.name,
-            category: itemRecord.category,
-            brand: itemRecord.brand,
-            model: itemRecord.model,
-            description: itemRecord.description,
-            pricePerDay: priceNum,
-            pricePerHour: priceHrNum,
-            securityDeposit: depositNum,
-            minRentalDays: minDaysNum,
-            deliveryAvailable,
-            deliveryCharge: delivChargeNum,
-            location: locationString,
-            lat: coords.lat,
-            lng: coords.lng,
-            img: finalImage,
-            condition,
-            year,
-            specs: specsList,
-            hp: hp ? `${hp} HP` : undefined,
-            fuelType,
-            operatorIncluded,
-          })
-        } catch (apiErr) {
-          console.warn('Backend create sync note:', apiErr)
-        }
-
-        addNotification({
-          userId: ownerId,
-          title: isTamil ? `உபகரணம் சேர்க்கப்பட்டது: ${name}` : `Equipment Added: ${name}`,
-          message: isTamil
-            ? `உங்கள் ${name} வெற்றிகரமாக சேர்க்கப்பட்டது மற்றும் ${category} பிரிவில் நேரலையில் உள்ளது.`
-            : `Your ${name} has been successfully listed for rental and is live under ${category}.`,
-          type: 'equipment_added',
-          relatedId: listingId,
+        const result = await api.createListing({
+          name: itemRecord.name,
+          category: itemRecord.category,
+          brand: itemRecord.brand,
+          model: itemRecord.model,
+          description: itemRecord.description,
+          pricePerDay: priceNum,
+          pricePerHour: priceHrNum,
+          securityDeposit: depositNum,
+          minRentalDays: minDaysNum,
+          deliveryAvailable,
+          deliveryCharge: delivChargeNum,
+          location: locationString,
+          lat: coords.lat,
+          lng: coords.lng,
+          img: finalImage,
+          condition,
+          year,
+          specs: specsList,
+          hp: hp ? `${hp} HP` : undefined,
+          fuelType,
+          operatorIncluded,
         })
+        addCatalogItem(itemRecord)
+        setSuccessSms(result.sms)
       }
 
       setSuccessItem(itemRecord)
@@ -457,6 +444,7 @@ export default function AddEquipment({ onNavigate }: Props) {
     window.localStorage.removeItem('agrirent_edit_equipment_id')
     setEditId(null)
     setSuccessItem(null)
+    setSuccessSms(null)
     setCurrentStep(1)
     setName('')
     setBrand('')
@@ -513,6 +501,36 @@ export default function AddEquipment({ onNavigate }: Props) {
               <strong>{successItem.name}</strong> {isTamil ? 'வெற்றிகரமாக உங்கள் பட்டியலில் சேர்க்கப்பட்டது. இது இப்போது' : 'has been added successfully to your listings and is now live in the'}{' '}
               <strong style={{ color: P }}>{successItem.category}</strong> {isTamil ? 'பிரிவில் கிடைக்கும்.' : 'catalog.'}
             </p>
+            {!editId && successSms?.status === 'pending' && (
+              <p role="status" style={{ color: '#92400E', fontSize: 13, margin: '-12px 0 20px' }}>
+                Equipment registration succeeded. The SMS request is still processing; delivery is not yet confirmed.
+              </p>
+            )}
+            {!editId && successSms?.status === 'accepted' && (
+              <p role="status" style={{ color: '#166534', fontSize: 13, margin: '-12px 0 20px' }}>
+                Twilio accepted the SMS request for {successSms.maskedPhone || '******'}; delivery is not yet confirmed.
+              </p>
+            )}
+            {!editId && successSms?.status === 'delivered' && (
+              <p role="status" style={{ color: '#166534', fontSize: 13, margin: '-12px 0 20px' }}>
+                SMS delivery was confirmed for {successSms.maskedPhone || '******'}.
+              </p>
+            )}
+            {!editId && successSms?.status === 'failed' && (
+              <p role="status" style={{ color: '#92400E', fontSize: 13, margin: '-12px 0 20px' }}>
+                Equipment registration succeeded, but the SMS could not be sent. Check the saved phone number or Twilio configuration.
+              </p>
+            )}
+            {!editId && successSms?.status === 'no_phone' && (
+              <p role="status" style={{ color: '#92400E', fontSize: 13, margin: '-12px 0 20px' }}>
+                Equipment registration succeeded. Add a phone number to your profile to receive SMS notifications.
+              </p>
+            )}
+            {!editId && successSms?.status === 'invalid_phone' && (
+              <p role="status" style={{ color: '#92400E', fontSize: 13, margin: '-12px 0 20px' }}>
+                Equipment registration succeeded, but the phone number saved in your profile is invalid, so no SMS was sent.
+              </p>
+            )}
 
             {/* Equipment Preview Snapshot */}
             <div
