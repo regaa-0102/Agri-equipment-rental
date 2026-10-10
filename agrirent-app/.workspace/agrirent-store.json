@@ -13,6 +13,35 @@
       "verificationStatus": "NOT_VERIFIED",
       "id": "4a73ef39-991d-485a-b3a2-2fed302e4076",
       "createdAt": "2026-10-06T16:43:17.452Z"
+    },
+    {
+      "name": "Yaswanth S",
+      "email": "yashwanthyashwanth12174@gmail.com",
+      "passwordHash": "scrypt$kTMEA3UK/GwFu1L/KszbQg==$LYKncE6ElODGv3HJdf/iTq7dHiwenqp9q/KhbiRk2nPdOmeMZD3f0vjWocTOwoM9sf4aSDUWnS/dcd1ZbRKo6A==",
+      "role": "farmer",
+      "phone": "+917695961439",
+      "location": "Thoothukudi, Tamil Nadu",
+      "avatar": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80",
+      "status": "active",
+      "provider": "local",
+      "verificationStatus": "NOT_VERIFIED",
+      "id": "557722b4-8cbd-4162-b947-2b88d0c59803",
+      "createdAt": "2026-10-06T17:48:59.914Z"
+    },
+    {
+      "id": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "name": "Administrator",
+      "email": "gregaa749@gmail.com",
+      "passwordHash": "scrypt$zd5nrlA6cIRbD2E7892Jfw==$YUywu0bIlGZ0VooEeYcz7Iqk8aZO8Q8I+c7t/17Jx7crvn8WZBuQU98e/LTh3lWsq6HJmedd0A5KaYZizJJtNQ==",
+      "role": "admin",
+      "phone": "+916380167495",
+      "location": "",
+      "avatar": "",
+      "status": "active",
+      "verificationStatus": "VERIFIED",
+      "provider": "google",
+      "createdAt": "2026-01-10T10:00:00.000Z",
+      "googleId": "104931576705907580048"
     }
   ],
   "listings": [
@@ -919,6 +948,348 @@
   ],
   "bookings": [
     {
+      "listingId": "eq-tractor-2",
+      "equipmentName": "John Deere 5310",
+      "equipmentImg": "/equipment/tractors/john-deere-5310.jpg",
+      "farmerId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "farmerName": "Administrator",
+      "ownerId": "usr-owner-1",
+      "ownerName": "Verified Fleet Owner",
+      "startDate": "2026-09-26",
+      "endDate": "2026-09-29",
+      "days": 3,
+      "dailyRate": 2200,
+      "totalAmount": 6600,
+      "securityDeposit": 3500,
+      "escrowStatus": "held",
+      "status": "active",
+      "id": "BK-4867",
+      "createdAt": "2026-10-10T02:19:24.419Z"
+    },
+    {
+      "listingId": "eq-tractor-1",
+      "equipmentName": "Mahindra 575 DI Yuvo Tech+",
+      "equipmentImg": "/equipment/tractors/mahindra-575-di-yuvo-tech-plus.jpg",
+      "farmerId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "farmerName": "Administrator",
+      "ownerId": "usr-owner-1",
+      "ownerName": "Verified Fleet Owner",
+      "startDate": "2026-09-26",
+      "endDate": "2026-09-29",
+      "days": 3,
+      "dailyRate": 1800,
+      "totalAmount": 5400,
+      "securityDeposit": 3000,
+      "escrowStatus": "held",
+      "status": "active",
+      "id": "BK-3693",
+      "createdAt": "2026-10-09T19:46:17.642Z"
+    },
+    {
+      "listingId": "eq-tractor-1",
+      "equipmentName": "Mahindra 575 DI Yuvo Tech+",
+      "equipmentImg": "/equipment/tractors/mahindra-575-di-yuvo-tech-plus.jpg",
+      "farmerId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "farmerName": "Administrator",
+      "ownerId": "usr-owner-1",
+      "ownerName": "Verified Fleet Owner",
+      "startDate": "2026-09-26",
+      "endDate": "2026-09-29",
+      "days": 3,
+      "dailyRate": 1800,
+      "totalAmount": 5400,
+      "securityDeposit": 3000,
+      "escrowStatus": "held",
+      "status": "active",
+      "id": "BK-3704",
+      "createdAt": "2026-10-09T19:40:41.861Z"
+    },
+    {
+      "listingId": "eq-tractor-1",
+      "equipmentName": "Mahindra 575 DI Yuvo Tech+",
+      "equipmentImg": "/equipment/tractors/mahindra-575-di-yuvo-tech-plus.jpg",
+      "farmerId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "farmerName": "Administrator",
+      "ownerId": "usr-owner-1",
+      "ownerName": "Verified Fleet Owner",
+      "startDate": "2026-09-26",
+      "endDate": "2026-09-29",
+      "days": 3,
+      "dailyRate": 1800,
+      "totalAmount": 5400,
+      "securityDeposit": 3000,
+      "escrowStatus": "held",
+      "status": "active",
+      "id": "BK-3617",
+      "createdAt": "2026-10-09T19:40:39.196Z"
+    },
+    {
+      "listingId": "eq-tractor-1",
+      "equipmentName": "Mahindra 575 DI Yuvo Tech+",
+      "equipmentImg": "/equipment/tractors/mahindra-575-di-yuvo-tech-plus.jpg",
+      "farmerId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "farmerName": "Administrator",
+      "ownerId": "usr-owner-1",
+      "ownerName": "Verified Fleet Owner",
+      "startDate": "2026-09-26",
+      "endDate": "2026-09-29",
+      "days": 3,
+      "dailyRate": 1800,
+      "totalAmount": 5400,
+      "securityDeposit": 3000,
+      "escrowStatus": "held",
+      "status": "active",
+      "id": "BK-1574",
+      "createdAt": "2026-10-09T19:20:50.634Z"
+    },
+    {
+      "listingId": "eq-tractor-1",
+      "equipmentName": "Mahindra 575 DI Yuvo Tech+",
+      "equipmentImg": "/equipment/tractors/mahindra-575-di-yuvo-tech-plus.jpg",
+      "farmerId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "farmerName": "Administrator",
+      "ownerId": "usr-owner-1",
+      "ownerName": "Verified Fleet Owner",
+      "startDate": "2026-09-26",
+      "endDate": "2026-10-10",
+      "days": 14,
+      "dailyRate": 1800,
+      "totalAmount": 25200,
+      "securityDeposit": 3000,
+      "escrowStatus": "held",
+      "status": "active",
+      "id": "BK-6272",
+      "createdAt": "2026-10-09T18:29:06.166Z"
+    },
+    {
+      "listingId": "eq-tractor-1",
+      "equipmentName": "Mahindra 575 DI Yuvo Tech+",
+      "equipmentImg": "/equipment/tractors/mahindra-575-di-yuvo-tech-plus.jpg",
+      "farmerId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "farmerName": "Administrator",
+      "ownerId": "usr-owner-1",
+      "ownerName": "Verified Fleet Owner",
+      "startDate": "2026-09-26",
+      "endDate": "2026-09-29",
+      "days": 3,
+      "dailyRate": 1800,
+      "totalAmount": 5400,
+      "securityDeposit": 3000,
+      "escrowStatus": "held",
+      "status": "active",
+      "id": "BK-6291",
+      "createdAt": "2026-10-09T18:29:03.777Z"
+    },
+    {
+      "listingId": "eq-tractor-2",
+      "equipmentName": "John Deere 5310",
+      "equipmentImg": "/equipment/tractors/john-deere-5310.jpg",
+      "farmerId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "farmerName": "Administrator",
+      "ownerId": "usr-owner-1",
+      "ownerName": "Verified Fleet Owner",
+      "startDate": "2026-09-26",
+      "endDate": "2026-09-29",
+      "days": 3,
+      "dailyRate": 2200,
+      "totalAmount": 6600,
+      "securityDeposit": 3500,
+      "escrowStatus": "held",
+      "status": "active",
+      "id": "BK-5873",
+      "createdAt": "2026-10-07T18:11:21.750Z"
+    },
+    {
+      "listingId": "eq-tractor-2",
+      "equipmentName": "John Deere 5310",
+      "equipmentImg": "/equipment/tractors/john-deere-5310.jpg",
+      "farmerId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "farmerName": "Administrator",
+      "ownerId": "usr-owner-1",
+      "ownerName": "Verified Fleet Owner",
+      "startDate": "2026-09-26",
+      "endDate": "2026-09-29",
+      "days": 3,
+      "dailyRate": 2200,
+      "totalAmount": 6600,
+      "securityDeposit": 3500,
+      "escrowStatus": "held",
+      "status": "active",
+      "id": "BK-3852",
+      "createdAt": "2026-10-07T18:10:05.877Z"
+    },
+    {
+      "listingId": "eq-tractor-2",
+      "equipmentName": "John Deere 5310",
+      "equipmentImg": "/equipment/tractors/john-deere-5310.jpg",
+      "farmerId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "farmerName": "Administrator",
+      "ownerId": "usr-owner-1",
+      "ownerName": "Verified Fleet Owner",
+      "startDate": "2026-09-26",
+      "endDate": "2026-09-29",
+      "days": 3,
+      "dailyRate": 2200,
+      "totalAmount": 6600,
+      "securityDeposit": 3500,
+      "escrowStatus": "held",
+      "status": "active",
+      "id": "BK-2269",
+      "createdAt": "2026-10-07T18:10:03.915Z"
+    },
+    {
+      "listingId": "eq-tractor-2",
+      "equipmentName": "John Deere 5310",
+      "equipmentImg": "/equipment/tractors/john-deere-5310.jpg",
+      "farmerId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "farmerName": "Administrator",
+      "ownerId": "usr-owner-1",
+      "ownerName": "Verified Fleet Owner",
+      "startDate": "2026-09-26",
+      "endDate": "2026-09-26",
+      "days": 3,
+      "dailyRate": 2200,
+      "totalAmount": 6600,
+      "securityDeposit": 3500,
+      "escrowStatus": "released",
+      "status": "completed",
+      "id": "BK-5008",
+      "createdAt": "2026-10-07T17:50:15.789Z"
+    },
+    {
+      "listingId": "eq-tractor-1",
+      "equipmentName": "Mahindra 575 DI Yuvo Tech+",
+      "equipmentImg": "/equipment/tractors/mahindra-575-di-yuvo-tech-plus.jpg",
+      "farmerId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "farmerName": "Administrator",
+      "ownerId": "usr-owner-1",
+      "ownerName": "Verified Fleet Owner",
+      "startDate": "2026-09-26",
+      "endDate": "2026-09-29",
+      "days": 3,
+      "dailyRate": 1800,
+      "totalAmount": 5400,
+      "securityDeposit": 3000,
+      "escrowStatus": "refunded",
+      "status": "cancelled",
+      "id": "BK-5683",
+      "createdAt": "2026-10-07T17:48:29.602Z"
+    },
+    {
+      "listingId": "eq-tractor-1",
+      "equipmentName": "Mahindra 575 DI Yuvo Tech+",
+      "equipmentImg": "/equipment/tractors/mahindra-575-di-yuvo-tech-plus.jpg",
+      "farmerId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "farmerName": "Administrator",
+      "ownerId": "usr-owner-1",
+      "ownerName": "Verified Fleet Owner",
+      "startDate": "2026-09-26",
+      "endDate": "2026-09-29",
+      "days": 3,
+      "dailyRate": 1800,
+      "totalAmount": 5400,
+      "securityDeposit": 3000,
+      "escrowStatus": "released",
+      "status": "completed",
+      "id": "BK-2665",
+      "createdAt": "2026-10-07T17:48:27.722Z"
+    },
+    {
+      "listingId": "eq-tractor-1",
+      "equipmentName": "Mahindra 575 DI Yuvo Tech+",
+      "equipmentImg": "/equipment/tractors/mahindra-575-di-yuvo-tech-plus.jpg",
+      "farmerId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "farmerName": "Administrator",
+      "ownerId": "usr-owner-1",
+      "ownerName": "Verified Fleet Owner",
+      "startDate": "2026-09-26",
+      "endDate": "2026-09-29",
+      "days": 3,
+      "dailyRate": 1800,
+      "totalAmount": 5400,
+      "securityDeposit": 3000,
+      "escrowStatus": "released",
+      "status": "completed",
+      "id": "BK-3203",
+      "createdAt": "2026-10-07T17:47:40.052Z"
+    },
+    {
+      "listingId": "eq-tractor-1",
+      "equipmentName": "Mahindra 575 DI Yuvo Tech+",
+      "equipmentImg": "/equipment/tractors/mahindra-575-di-yuvo-tech-plus.jpg",
+      "farmerId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "farmerName": "Administrator",
+      "ownerId": "usr-owner-1",
+      "ownerName": "Verified Fleet Owner",
+      "startDate": "2026-09-26",
+      "endDate": "2026-09-29",
+      "days": 3,
+      "dailyRate": 1800,
+      "totalAmount": 5400,
+      "securityDeposit": 3000,
+      "escrowStatus": "released",
+      "status": "completed",
+      "id": "BK-6463",
+      "createdAt": "2026-10-07T17:47:38.240Z"
+    },
+    {
+      "listingId": "eq-tractor-2",
+      "equipmentName": "John Deere 5310",
+      "equipmentImg": "/equipment/tractors/john-deere-5310.jpg",
+      "farmerId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "farmerName": "Administrator",
+      "ownerId": "usr-owner-1",
+      "ownerName": "Verified Fleet Owner",
+      "startDate": "2026-09-26",
+      "endDate": "2026-09-29",
+      "days": 3,
+      "dailyRate": 2200,
+      "totalAmount": 6600,
+      "securityDeposit": 3500,
+      "escrowStatus": "released",
+      "status": "completed",
+      "id": "BK-4359",
+      "createdAt": "2026-10-07T14:21:45.153Z"
+    },
+    {
+      "listingId": "eq-tractor-2",
+      "equipmentName": "John Deere 5310",
+      "equipmentImg": "/equipment/tractors/john-deere-5310.jpg",
+      "farmerId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "farmerName": "Administrator",
+      "ownerId": "usr-owner-1",
+      "ownerName": "Verified Fleet Owner",
+      "startDate": "2026-09-26",
+      "endDate": "2026-09-29",
+      "days": 3,
+      "dailyRate": 2200,
+      "totalAmount": 6600,
+      "securityDeposit": 3500,
+      "escrowStatus": "released",
+      "status": "completed",
+      "id": "BK-2397",
+      "createdAt": "2026-10-07T14:21:43.101Z"
+    },
+    {
+      "listingId": "eq-harvester-1",
+      "equipmentName": "Claas Crop Tiger 30",
+      "equipmentImg": "/equipment/harvesters/claas-crop-tiger-30.jpg",
+      "farmerId": "557722b4-8cbd-4162-b947-2b88d0c59803",
+      "farmerName": "Yaswanth S",
+      "ownerId": "usr-owner-2",
+      "ownerName": "Verified Fleet Owner",
+      "startDate": "2026-09-26",
+      "endDate": "2026-09-29",
+      "days": 3,
+      "dailyRate": 4800,
+      "totalAmount": 14400,
+      "securityDeposit": 7500,
+      "escrowStatus": "released",
+      "status": "completed",
+      "id": "BK-1350",
+      "createdAt": "2026-10-06T17:49:28.244Z"
+    },
+    {
       "listingId": "eq-tractor-1",
       "equipmentName": "Mahindra 575 DI Yuvo Tech+",
       "equipmentImg": "/equipment/tractors/mahindra-575-di-yuvo-tech-plus.jpg",
@@ -932,8 +1303,8 @@
       "dailyRate": 1800,
       "totalAmount": 5400,
       "securityDeposit": 3000,
-      "escrowStatus": "held",
-      "status": "active",
+      "escrowStatus": "released",
+      "status": "completed",
       "id": "BK-7428",
       "createdAt": "2026-10-06T16:43:59.432Z"
     },
@@ -951,8 +1322,8 @@
       "dailyRate": 1800,
       "totalAmount": 3600,
       "securityDeposit": 3000,
-      "escrowStatus": "held",
-      "status": "active",
+      "escrowStatus": "released",
+      "status": "completed",
       "id": "BK-9185",
       "createdAt": "2026-10-03T17:56:57.273Z"
     },
@@ -1167,6 +1538,206 @@
     }
   ],
   "notifications": [
+    {
+      "userId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "title": "Booking Confirmed: John Deere 5310",
+      "message": "Your booking BK-4867 (3 days, ₹6,600) has been placed. Equipment will arrive on 2026-09-26.",
+      "type": "booking_confirmed",
+      "read": false,
+      "relatedId": "BK-4867",
+      "id": "notif-1791598764441-248",
+      "timestamp": "2026-10-10T02:19:24.441Z"
+    },
+    {
+      "userId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "title": "Booking Confirmed: Mahindra 575 DI Yuvo Tech+",
+      "message": "Your booking BK-3693 (3 days, ₹5,400) has been placed. Equipment will arrive on 2026-09-26.",
+      "type": "booking_confirmed",
+      "read": false,
+      "relatedId": "BK-3693",
+      "id": "notif-1791575177663-692",
+      "timestamp": "2026-10-09T19:46:17.663Z"
+    },
+    {
+      "userId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "title": "Booking Confirmed: Mahindra 575 DI Yuvo Tech+",
+      "message": "Your booking BK-3704 (3 days, ₹5,400) has been placed. Equipment will arrive on 2026-09-26.",
+      "type": "booking_confirmed",
+      "read": false,
+      "relatedId": "BK-3704",
+      "id": "notif-1791574841876-530",
+      "timestamp": "2026-10-09T19:40:41.877Z"
+    },
+    {
+      "userId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "title": "Booking Confirmed: Mahindra 575 DI Yuvo Tech+",
+      "message": "Your booking BK-3617 (3 days, ₹5,400) has been placed. Equipment will arrive on 2026-09-26.",
+      "type": "booking_confirmed",
+      "read": false,
+      "relatedId": "BK-3617",
+      "id": "notif-1791574839258-669",
+      "timestamp": "2026-10-09T19:40:39.258Z"
+    },
+    {
+      "userId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "title": "Booking Confirmed: Mahindra 575 DI Yuvo Tech+",
+      "message": "Your booking BK-1574 (3 days, ₹5,400) has been placed. Equipment will arrive on 2026-09-26.",
+      "type": "booking_confirmed",
+      "read": false,
+      "relatedId": "BK-1574",
+      "id": "notif-1791573650656-933",
+      "timestamp": "2026-10-09T19:20:50.656Z"
+    },
+    {
+      "userId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "title": "Booking Confirmed: Mahindra 575 DI Yuvo Tech+",
+      "message": "Your booking BK-6272 (3 days, ₹5,400) has been placed. Equipment will arrive on 2026-09-26.",
+      "type": "booking_confirmed",
+      "read": false,
+      "relatedId": "BK-6272",
+      "id": "notif-1791570546182-879",
+      "timestamp": "2026-10-09T18:29:06.182Z"
+    },
+    {
+      "userId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "title": "Booking Confirmed: Mahindra 575 DI Yuvo Tech+",
+      "message": "Your booking BK-6291 (3 days, ₹5,400) has been placed. Equipment will arrive on 2026-09-26.",
+      "type": "booking_confirmed",
+      "read": false,
+      "relatedId": "BK-6291",
+      "id": "notif-1791570543800-801",
+      "timestamp": "2026-10-09T18:29:03.800Z"
+    },
+    {
+      "userId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "title": "Booking Confirmed: John Deere 5310",
+      "message": "Your booking BK-5873 (3 days, ₹6,600) has been placed. Equipment will arrive on 2026-09-26.",
+      "type": "booking_confirmed",
+      "read": false,
+      "relatedId": "BK-5873",
+      "id": "notif-1791396681756-322",
+      "timestamp": "2026-10-07T18:11:21.756Z"
+    },
+    {
+      "userId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "title": "Booking Confirmed: John Deere 5310",
+      "message": "Your booking BK-3852 (3 days, ₹6,600) has been placed. Equipment will arrive on 2026-09-26.",
+      "type": "booking_confirmed",
+      "read": false,
+      "relatedId": "BK-3852",
+      "id": "notif-1791396605881-141",
+      "timestamp": "2026-10-07T18:10:05.881Z"
+    },
+    {
+      "userId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "title": "Booking Confirmed: John Deere 5310",
+      "message": "Your booking BK-2269 (3 days, ₹6,600) has been placed. Equipment will arrive on 2026-09-26.",
+      "type": "booking_confirmed",
+      "read": false,
+      "relatedId": "BK-2269",
+      "id": "notif-1791396603925-28",
+      "timestamp": "2026-10-07T18:10:03.925Z"
+    },
+    {
+      "userId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "title": "Booking Confirmed: John Deere 5310",
+      "message": "Your booking BK-5008 (3 days, ₹6,600) has been placed. Equipment will arrive on 2026-09-26.",
+      "type": "booking_confirmed",
+      "read": false,
+      "relatedId": "BK-5008",
+      "id": "notif-1791395415795-580",
+      "timestamp": "2026-10-07T17:50:15.795Z"
+    },
+    {
+      "userId": "usr-owner-1",
+      "title": "Booking Cancelled: Mahindra 575 DI Yuvo Tech+",
+      "message": "Booking BK-5683 was cancelled by the renter. Equipment is now available again.",
+      "type": "booking_cancelled",
+      "read": false,
+      "relatedId": "BK-5683",
+      "id": "notif-1791395386868-240",
+      "timestamp": "2026-10-07T17:49:46.868Z"
+    },
+    {
+      "userId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "title": "Booking Cancelled: Mahindra 575 DI Yuvo Tech+",
+      "message": "Booking BK-5683 has been cancelled. Refund has been initiated.",
+      "type": "booking_cancelled",
+      "read": false,
+      "relatedId": "BK-5683",
+      "id": "notif-1791395386863-489",
+      "timestamp": "2026-10-07T17:49:46.863Z"
+    },
+    {
+      "userId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "title": "Booking Confirmed: Mahindra 575 DI Yuvo Tech+",
+      "message": "Your booking BK-5683 (3 days, ₹5,400) has been placed. Equipment will arrive on 2026-09-26.",
+      "type": "booking_confirmed",
+      "read": false,
+      "relatedId": "BK-5683",
+      "id": "notif-1791395309608-663",
+      "timestamp": "2026-10-07T17:48:29.608Z"
+    },
+    {
+      "userId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "title": "Booking Confirmed: Mahindra 575 DI Yuvo Tech+",
+      "message": "Your booking BK-2665 (3 days, ₹5,400) has been placed. Equipment will arrive on 2026-09-26.",
+      "type": "booking_confirmed",
+      "read": false,
+      "relatedId": "BK-2665",
+      "id": "notif-1791395307727-259",
+      "timestamp": "2026-10-07T17:48:27.727Z"
+    },
+    {
+      "userId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "title": "Booking Confirmed: Mahindra 575 DI Yuvo Tech+",
+      "message": "Your booking BK-3203 (3 days, ₹5,400) has been placed. Equipment will arrive on 2026-09-26.",
+      "type": "booking_confirmed",
+      "read": false,
+      "relatedId": "BK-3203",
+      "id": "notif-1791395260058-143",
+      "timestamp": "2026-10-07T17:47:40.058Z"
+    },
+    {
+      "userId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "title": "Booking Confirmed: Mahindra 575 DI Yuvo Tech+",
+      "message": "Your booking BK-6463 (3 days, ₹5,400) has been placed. Equipment will arrive on 2026-09-26.",
+      "type": "booking_confirmed",
+      "read": false,
+      "relatedId": "BK-6463",
+      "id": "notif-1791395258252-175",
+      "timestamp": "2026-10-07T17:47:38.252Z"
+    },
+    {
+      "userId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "title": "Booking Confirmed: John Deere 5310",
+      "message": "Your booking BK-4359 (3 days, ₹6,600) has been placed. Equipment will arrive on 2026-09-26.",
+      "type": "booking_confirmed",
+      "read": false,
+      "relatedId": "BK-4359",
+      "id": "notif-1791382905157-154",
+      "timestamp": "2026-10-07T14:21:45.157Z"
+    },
+    {
+      "userId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "title": "Booking Confirmed: John Deere 5310",
+      "message": "Your booking BK-2397 (3 days, ₹6,600) has been placed. Equipment will arrive on 2026-09-26.",
+      "type": "booking_confirmed",
+      "read": false,
+      "relatedId": "BK-2397",
+      "id": "notif-1791382903115-94",
+      "timestamp": "2026-10-07T14:21:43.115Z"
+    },
+    {
+      "userId": "557722b4-8cbd-4162-b947-2b88d0c59803",
+      "title": "Booking Confirmed: Claas Crop Tiger 30",
+      "message": "Your booking BK-1350 (3 days, ₹14,400) has been placed. Equipment will arrive on 2026-09-26.",
+      "type": "booking_confirmed",
+      "read": false,
+      "relatedId": "BK-1350",
+      "id": "notif-1791308968275-201",
+      "timestamp": "2026-10-06T17:49:28.275Z"
+    },
     {
       "userId": "4a73ef39-991d-485a-b3a2-2fed302e4076",
       "title": "Booking Confirmed: Mahindra 575 DI Yuvo Tech+",
@@ -1770,6 +2341,282 @@
           "inStock": true
         }
       ]
+    }
+  ],
+  "requestReplays": [
+    {
+      "userId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "operation": "booking",
+      "key": "e6911318-f40d-419d-8d8f-d3f8d815afdf",
+      "state": "complete",
+      "response": {
+        "booking": {
+          "listingId": "eq-tractor-1",
+          "equipmentName": "Mahindra 575 DI Yuvo Tech+",
+          "equipmentImg": "/equipment/tractors/mahindra-575-di-yuvo-tech-plus.jpg",
+          "farmerId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+          "farmerName": "Administrator",
+          "ownerId": "usr-owner-1",
+          "ownerName": "Verified Fleet Owner",
+          "startDate": "2026-09-26",
+          "endDate": "2026-09-29",
+          "days": 3,
+          "dailyRate": 1800,
+          "totalAmount": 5400,
+          "securityDeposit": 3000,
+          "escrowStatus": "held",
+          "status": "active",
+          "id": "BK-6291",
+          "createdAt": "2026-10-09T18:29:03.777Z"
+        },
+        "invoiceEmailSent": true,
+        "sms": {
+          "status": "no_phone"
+        }
+      }
+    },
+    {
+      "userId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "operation": "booking",
+      "key": "1e9ab521-b893-408e-9677-7305506b10de",
+      "state": "complete",
+      "response": {
+        "booking": {
+          "listingId": "eq-tractor-1",
+          "equipmentName": "Mahindra 575 DI Yuvo Tech+",
+          "equipmentImg": "/equipment/tractors/mahindra-575-di-yuvo-tech-plus.jpg",
+          "farmerId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+          "farmerName": "Administrator",
+          "ownerId": "usr-owner-1",
+          "ownerName": "Verified Fleet Owner",
+          "startDate": "2026-09-26",
+          "endDate": "2026-10-10",
+          "days": 14,
+          "dailyRate": 1800,
+          "totalAmount": 25200,
+          "securityDeposit": 3000,
+          "escrowStatus": "held",
+          "status": "active",
+          "id": "BK-6272",
+          "createdAt": "2026-10-09T18:29:06.166Z"
+        },
+        "invoiceEmailSent": true,
+        "sms": {
+          "status": "no_phone"
+        }
+      }
+    },
+    {
+      "userId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "operation": "booking-extension",
+      "key": "918eecaa-24cb-45e9-ad69-7d9ef25b483e",
+      "state": "complete",
+      "response": {
+        "booking": {
+          "listingId": "eq-tractor-1",
+          "equipmentName": "Mahindra 575 DI Yuvo Tech+",
+          "equipmentImg": "/equipment/tractors/mahindra-575-di-yuvo-tech-plus.jpg",
+          "farmerId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+          "farmerName": "Administrator",
+          "ownerId": "usr-owner-1",
+          "ownerName": "Verified Fleet Owner",
+          "startDate": "2026-09-26",
+          "endDate": "2026-10-10",
+          "days": 14,
+          "dailyRate": 1800,
+          "totalAmount": 25200,
+          "securityDeposit": 3000,
+          "escrowStatus": "held",
+          "status": "active",
+          "id": "BK-6272",
+          "createdAt": "2026-10-09T18:29:06.166Z"
+        },
+        "sms": {
+          "status": "no_phone"
+        }
+      }
+    },
+    {
+      "userId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "operation": "booking",
+      "key": "7e2049b5-d669-427f-b5f9-d76a563cdbdd",
+      "state": "complete",
+      "response": {
+        "booking": {
+          "listingId": "eq-tractor-1",
+          "equipmentName": "Mahindra 575 DI Yuvo Tech+",
+          "equipmentImg": "/equipment/tractors/mahindra-575-di-yuvo-tech-plus.jpg",
+          "farmerId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+          "farmerName": "Administrator",
+          "ownerId": "usr-owner-1",
+          "ownerName": "Verified Fleet Owner",
+          "startDate": "2026-09-26",
+          "endDate": "2026-09-29",
+          "days": 3,
+          "dailyRate": 1800,
+          "totalAmount": 5400,
+          "securityDeposit": 3000,
+          "escrowStatus": "held",
+          "status": "active",
+          "id": "BK-1574",
+          "createdAt": "2026-10-09T19:20:50.634Z"
+        },
+        "invoiceEmailSent": true,
+        "sms": {
+          "status": "failed",
+          "maskedPhone": "******7495"
+        }
+      }
+    },
+    {
+      "userId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "operation": "booking",
+      "key": "b68dca81-4043-486d-a9a5-3a322c48b498",
+      "state": "complete",
+      "response": {
+        "booking": {
+          "listingId": "eq-tractor-1",
+          "equipmentName": "Mahindra 575 DI Yuvo Tech+",
+          "equipmentImg": "/equipment/tractors/mahindra-575-di-yuvo-tech-plus.jpg",
+          "farmerId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+          "farmerName": "Administrator",
+          "ownerId": "usr-owner-1",
+          "ownerName": "Verified Fleet Owner",
+          "startDate": "2026-09-26",
+          "endDate": "2026-09-29",
+          "days": 3,
+          "dailyRate": 1800,
+          "totalAmount": 5400,
+          "securityDeposit": 3000,
+          "escrowStatus": "held",
+          "status": "active",
+          "id": "BK-3617",
+          "createdAt": "2026-10-09T19:40:39.196Z"
+        },
+        "invoiceEmailSent": true,
+        "sms": {
+          "status": "failed",
+          "maskedPhone": "******7495"
+        }
+      }
+    },
+    {
+      "userId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "operation": "booking",
+      "key": "0e25a57d-18b0-4093-b51a-657a5f504e09",
+      "state": "complete",
+      "response": {
+        "booking": {
+          "listingId": "eq-tractor-1",
+          "equipmentName": "Mahindra 575 DI Yuvo Tech+",
+          "equipmentImg": "/equipment/tractors/mahindra-575-di-yuvo-tech-plus.jpg",
+          "farmerId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+          "farmerName": "Administrator",
+          "ownerId": "usr-owner-1",
+          "ownerName": "Verified Fleet Owner",
+          "startDate": "2026-09-26",
+          "endDate": "2026-09-29",
+          "days": 3,
+          "dailyRate": 1800,
+          "totalAmount": 5400,
+          "securityDeposit": 3000,
+          "escrowStatus": "held",
+          "status": "active",
+          "id": "BK-3704",
+          "createdAt": "2026-10-09T19:40:41.861Z"
+        },
+        "invoiceEmailSent": true,
+        "sms": {
+          "status": "failed",
+          "maskedPhone": "******7495"
+        }
+      }
+    },
+    {
+      "userId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "operation": "booking",
+      "key": "609a7e4e-168e-4a5d-b944-13e81b1aa4a4",
+      "state": "complete",
+      "response": {
+        "booking": {
+          "listingId": "eq-tractor-1",
+          "equipmentName": "Mahindra 575 DI Yuvo Tech+",
+          "equipmentImg": "/equipment/tractors/mahindra-575-di-yuvo-tech-plus.jpg",
+          "farmerId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+          "farmerName": "Administrator",
+          "ownerId": "usr-owner-1",
+          "ownerName": "Verified Fleet Owner",
+          "startDate": "2026-09-26",
+          "endDate": "2026-09-29",
+          "days": 3,
+          "dailyRate": 1800,
+          "totalAmount": 5400,
+          "securityDeposit": 3000,
+          "escrowStatus": "held",
+          "status": "active",
+          "id": "BK-3693",
+          "createdAt": "2026-10-09T19:46:17.642Z"
+        },
+        "invoiceEmailSent": true,
+        "sms": {
+          "status": "failed",
+          "maskedPhone": "******7495"
+        }
+      }
+    },
+    {
+      "userId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+      "operation": "booking",
+      "key": "43ae2900-e75a-4158-8234-2a601dacaedc",
+      "state": "complete",
+      "response": {
+        "booking": {
+          "listingId": "eq-tractor-2",
+          "equipmentName": "John Deere 5310",
+          "equipmentImg": "/equipment/tractors/john-deere-5310.jpg",
+          "farmerId": "0c55f3b4-c4ca-4ff0-833d-bb08a568bf40",
+          "farmerName": "Administrator",
+          "ownerId": "usr-owner-1",
+          "ownerName": "Verified Fleet Owner",
+          "startDate": "2026-09-26",
+          "endDate": "2026-09-29",
+          "days": 3,
+          "dailyRate": 2200,
+          "totalAmount": 6600,
+          "securityDeposit": 3500,
+          "escrowStatus": "held",
+          "status": "active",
+          "id": "BK-4867",
+          "createdAt": "2026-10-10T02:19:24.419Z"
+        },
+        "invoiceEmailSent": true,
+        "sms": {
+          "status": "simulated",
+          "maskedPhone": "******7495"
+        }
+      }
+    }
+  ],
+  "smsNotificationEvents": [
+    {
+      "id": "booking-reminder:BK-1087",
+      "createdAt": "2026-10-09T19:30:44.586Z"
+    },
+    {
+      "id": "booking-created:BK-3617",
+      "createdAt": "2026-10-09T19:40:39.893Z"
+    },
+    {
+      "id": "booking-created:BK-3704",
+      "createdAt": "2026-10-09T19:40:42.365Z"
+    },
+    {
+      "id": "booking-created:BK-3693",
+      "createdAt": "2026-10-09T19:46:18.440Z"
+    },
+    {
+      "id": "booking-created:BK-4867",
+      "createdAt": "2026-10-10T02:19:25.379Z"
     }
   ]
 }
